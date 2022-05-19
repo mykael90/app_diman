@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { primaryColor } from '../../config/colors';
 
-export const Nav = styled.nav`
+export const Nav1 = styled.nav`
   background: ${primaryColor};
   padding: 10px;
   display: flex;
