@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  FaUser,
   FaHome,
   FaSignInAlt,
   FaUserAlt,
@@ -73,15 +74,17 @@ export default function Header() {
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
               <Link to="/Home">
-                <FaHome size={24} />
+                <FaUser size={24} />
               </Link>
-              <Nav.Link href="#features">Institucional</Nav.Link>
-              <Nav.Link href="#pricing">Notícias</Nav.Link>
-              <NavDropdown title="Dropdown" id="collasible-nav-dropdown">
-                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">
-                  Another action
+              <Nav.Link href="#features">Conta</Nav.Link>
+              <Nav.Link href="#pricing">Colaboradores</Nav.Link>
+              <Nav.Link href="#pricing">Materiais</Nav.Link>
+              <Nav.Link href="#pricing">Ferramentas</Nav.Link>
+              <NavDropdown title="Saneamento" id="collasible-nav-dropdown">
+                <NavDropdown.Item href="#action/3.1">
+                  Abastecimento de água
                 </NavDropdown.Item>
+                <NavDropdown.Item href="#action/3.2">Drenagem</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.3">
                   Something
                 </NavDropdown.Item>
@@ -90,6 +93,9 @@ export default function Header() {
                   Separated link
                 </NavDropdown.Item>
               </NavDropdown>
+              <Nav.Link href="#pricing">Elétrica</Nav.Link>
+              <Nav.Link href="#pricing">Pavimentação</Nav.Link>
+              <Nav.Link href="#pricing">Edificações</Nav.Link>
             </Nav>
             <Nav>
               <Nav.Link href="#deets">More deets</Nav.Link>
