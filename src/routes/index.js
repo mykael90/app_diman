@@ -8,6 +8,7 @@ import Fotos from '../pages/Fotos';
 import Register from '../pages/Register';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
+import NovoLogin from '../pages/NovoLogin';
 import Page404 from '../pages/Page404';
 import Unauthorized from '../components/Unauthorized';
 
@@ -24,6 +25,7 @@ export default function RoutesPages() {
       <Route path="/" element={<h1>Página de início</h1>} />
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/novologin" element={<NovoLogin />} />
       <Route path="/register" element={<Register />} />
 
       <Route path="/Unauthorized" element={<Unauthorized />} />
