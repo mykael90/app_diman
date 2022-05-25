@@ -6,6 +6,7 @@ import {
   Carousel,
   Card,
   CardGroup,
+  Alert,
 } from 'react-bootstrap';
 
 export default function Home() {
@@ -115,6 +116,21 @@ export default function Home() {
         <Col>1 of 3</Col>
         <Col xs={5}>2 of 3 (wider)</Col>
         <Col>3 of 3</Col>
+      </Row>
+      <Row>
+        <Alert variant="danger" dismissible>
+          <Alert.Heading>
+            I am an alert of type <span className="dangerText">danger</span>!
+            But my color is Teal!
+          </Alert.Heading>
+          <p>
+            By the way the button you just clicked is an{' '}
+            <span className="infoText">Info</span> button but is using the color
+            Tomato. Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+            Accusantium debitis deleniti distinctio impedit officia
+            reprehenderit suscipit voluptatibus. Earum, nam necessitatibus!
+          </p>
+        </Alert>
       </Row>
     </Container>
   );
