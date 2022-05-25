@@ -4,7 +4,7 @@ import { isEmail } from 'validator';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Form, Button, Row } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import * as actions from '../../store/modules/auth/actions';
 import Loading from '../../components/Loading';
 
@@ -41,40 +41,49 @@ export default function Login() {
   };
 
   return (
-    <Row xs={12} md={8} lg={6} xl={6} xxl={6}>
-      <Loading isLoading={isLoading} />
-      <h2>Login</h2>
-      <Form>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Insira seu email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Form.Text className="text-muted">
-            Não compartilhamos seu email.
-          </Form.Text>
-        </Form.Group>
+    <Row
+      xs={1}
+      md={2}
+      lg={2}
+      xl={3}
+      xxl={3}
+      className="justify-content-md-center"
+    >
+      <Col>
+        <Loading isLoading={isLoading} />
+        <h2>Login</h2>
+        <Form>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="Insira seu email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Form.Text className="text-muted">
+              Não compartilhamos seu email.
+            </Form.Text>
+          </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Senha</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Insira sua senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" label="Check me out" />
-        </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Label>Senha</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Insira sua senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicCheckbox">
+            <Form.Check type="checkbox" label="Check me out" />
+          </Form.Group>
 
-        <Button variant="primary" type="submit" onClick={handleSubmit}>
-          Logar
-        </Button>
-      </Form>
+          <Button variant="primary" type="submit" onClick={handleSubmit}>
+            Logar
+          </Button>
+        </Form>
+      </Col>
     </Row>
   );
 }
