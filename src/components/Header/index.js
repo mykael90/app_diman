@@ -14,6 +14,8 @@ import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap';
 import * as actions from '../../store/modules/auth/actions';
 import { Nav1 } from './styled';
 
+const logoDiman = require('../../img/logo_infra_diman.png');
+
 export default function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -57,17 +59,24 @@ export default function Header() {
         {isLoggedIn && <FaCircle size={24} color="#66ff33" />}
       </Nav1>
 
-      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+      <Navbar collapseOnSelect expand="md" bg="light">
         <Container>
-          <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
+          <Navbar.Brand href="#home">
+            <img
+              src={logoDiman}
+              height="40"
+              className="d-inline-block align-top"
+              alt="React Bootstrap logo"
+            />
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
               <Link to="/Home">
                 <FaHome size={24} />
               </Link>
-              <Nav.Link href="#features">Features</Nav.Link>
-              <Nav.Link href="#pricing">Pricing</Nav.Link>
+              <Nav.Link href="#features">Institucional</Nav.Link>
+              <Nav.Link href="#pricing">Notícias</Nav.Link>
               <NavDropdown title="Dropdown" id="collasible-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">

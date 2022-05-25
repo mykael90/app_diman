@@ -30,25 +30,25 @@ function persistRehydrate({ payload }) {
 
 // eslint-disable-next-line consistent-return
 function* registerRequest({ payload }) {
-  const { id, nome, email, password, navigate } = payload;
+  const { id, name, email, password, navigate } = payload;
 
   try {
     if (id) {
       yield call(axios.put, '/users', {
         email,
-        nome,
+        name,
         password: password || undefined,
       });
       toast.success('Conta alterada com sucesso');
-      yield put(actions.registerUpdatedSuccess({ nome, email, password }));
+      yield put(actions.registerUpdatedSuccess({ name, email, password }));
     } else {
       yield call(axios.post, '/users', {
         email,
-        nome,
+        name,
         password,
       });
       toast.success('Conta criada com sucesso');
-      yield put(actions.registerCreatedSuccess({ nome, email, password }));
+      yield put(actions.registerCreatedSuccess({ name, email, password }));
       return payload.navigate('/login', { replace: true });
     }
   } catch (e) {

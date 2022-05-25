@@ -12,27 +12,27 @@ import { Title, Form } from './styled';
 export default function Register() {
   const dispatch = useDispatch();
   const id = useSelector((state) => state.auth.user.id);
-  const nomeStored = useSelector((state) => state.auth.user.nome);
+  const nameStored = useSelector((state) => state.auth.user.name);
   const emailStored = useSelector((state) => state.auth.user.email);
   const isLoading = useSelector((state) => state.auth.isLoading);
 
-  const [nome, setNome] = useState('');
+  const [name, setname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!id) return;
-    setNome(nomeStored);
+    setname(nameStored);
     setEmail(emailStored);
-  }, [emailStored, id, nomeStored]);
+  }, [emailStored, id, nameStored]);
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     let formErrors = false;
 
-    if (nome.length < 3 || nome.length > 255) {
+    if (name.length < 3 || name.length > 255) {
       formErrors = true;
       toast.error('Nome deve ter entre 3 e 255 caracteres');
     }
@@ -49,19 +49,19 @@ export default function Register() {
 
     if (formErrors) return;
 
-    dispatch(actions.registerRequest({ nome, email, password, id, navigate }));
+    dispatch(actions.registerRequest({ name, email, password, id, navigate }));
   }
   return (
     <>
       <Loading isLoading={isLoading} />
       <Title>{id ? 'Editar dados' : 'Crie sua conta'}</Title>
       <Form onSubmit={handleSubmit}>
-        <label htmlFor="nome">
+        <label htmlFor="name">
           Nome:
           <input
             type="text"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
+            value={name}
+            onChange={(e) => setname(e.target.value)}
             placeholder="Seu nome"
           />
         </label>

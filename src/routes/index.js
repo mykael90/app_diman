@@ -22,13 +22,13 @@ export default function RoutesPages() {
     <Routes>
       {/* public routes */}
       <Route path="/" element={<h1>Página de início</h1>} />
+      <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
       <Route path="/Unauthorized" element={<Unauthorized />} />
       {/* we want to protect these routes */}
       <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-        <Route path="/home" element={<Home />} />
         <Route path="/aluno/:id/edit" element={<Aluno />} />
         <Route path="/aluno/" element={<Aluno />} />
         <Route path="/fotos/:id" element={<Fotos />} />
