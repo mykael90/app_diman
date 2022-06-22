@@ -78,7 +78,7 @@ export default function Header() {
               </Link>
               <Nav.Link href="#features">Conta</Nav.Link>
               <Nav.Link href="#pricing">Colaboradores</Nav.Link>
-              <Nav.Link href="#pricing">Materiais</Nav.Link>
+              <Nav.Link href="/materials">Materiais</Nav.Link>
               <Nav.Link href="#pricing">Ferramentas</Nav.Link>
               <NavDropdown title="Saneamento" id="collasible-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">

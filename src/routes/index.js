@@ -8,6 +8,7 @@ import Fotos from '../pages/Fotos';
 import Register from '../pages/Register';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
+import Materials from '../pages/Materials';
 import NovoLogin from '../pages/NovoLogin';
 import Page404 from '../pages/Page404';
 import Unauthorized from '../components/Unauthorized';
@@ -27,6 +28,7 @@ export default function RoutesPages() {
       <Route path="/login" element={<Login />} />
       <Route path="/novologin" element={<NovoLogin />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/materials" element={<Materials />} />
 
       <Route path="/Unauthorized" element={<Unauthorized />} />
       {/* we want to protect these routes */}
