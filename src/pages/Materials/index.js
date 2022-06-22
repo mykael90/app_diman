@@ -1,31 +1,78 @@
-import React from 'react';
-import { Container, Row, Form, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { get } from 'lodash';
+import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+
+import axios from 'axios';
 
 export default function Home() {
+  const [reqmat, setReqmat] = useState('');
+  const [sipac, setSipac] = useState('');
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+
+    try {
+      // setIsLoading(true);
+      const response = await axios.get(
+        `http://10.1.159.210:3010/reqmaterial/${reqmat}`
+      );
+
+      setSipac(response.data);
+
+      console.log(sipac);
+
+      console.log(response);
+
+      console.log(response.data);
+
+      // setIsLoading(false);
+    } catch (err) {
+      const status = get(err, 'response.status', 0);
+
+      if (status === 401) {
+        toast.error('Você precisa fazer login');
+      } else {
+        toast.error('Ocorreu um erro ao excluir aluno');
+      }
+
+      // setIsLoading(false);
+    }
+  };
+
   return (
     <Container>
-      <Row className="my-2 py-2">
-        <Form>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Email address</Form.Label>
-            <Form.Control type="email" placeholder="Enter email" />
-            <Form.Text className="text-muted">
-              Well never share your email with anyone else.
-            </Form.Text>
-          </Form.Group>
+      <Row className="my-2 py-2 justify-content-center">
+        <Col xs="6" lg="3">
+          <Form>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label>Nº Requisição de Material</Form.Label>
+              <Form.Control
+                type="text"
+                value={reqmat}
+                onChange={(e) => setReqmat(e.target.value)}
+                placeholder="requisição"
+              />
+              <Form.Text className="text-muted">
+                A requisição será importada do SIPAC. O processo pode demorar
+                alguns segundos.
+              </Form.Text>
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control type="password" placeholder="Password" />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicCheckbox">
-            <Form.Check type="checkbox" label="Check me out" />
-          </Form.Group>
-          <Button variant="primary" className="btn-primary" type="submit">
-            Submit
-          </Button>
-        </Form>
+            <Button
+              onClick={handleClick}
+              variant="primary"
+              className="btn-primary"
+              type="submit"
+            >
+              Submit
+            </Button>
+          </Form>
+        </Col>
       </Row>
+
+      <Row />
+      <Row />
     </Container>
   );
 }
