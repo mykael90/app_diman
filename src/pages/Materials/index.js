@@ -5,7 +5,9 @@ import { toast } from 'react-toastify';
 
 import axios from 'axios';
 
-export default function Home() {
+import Result from './result';
+
+export default function inputMaterial() {
   const [reqmat, setReqmat] = useState('');
   const [sipac, setSipac] = useState({});
   const array1 = ['a', 'b', 'c'];
@@ -69,19 +71,11 @@ export default function Home() {
           </Form>
         </Col>
       </Row>
-
-      <Row>{JSON.stringify(sipac)}</Row>
-      <Row>{array1.length}</Row>
-      <Row className="my-4">
-        {JSON.stringify(sipac.itensJSON[0]['Denominação'])}
-      </Row>
-      <Row className="my-4">{sipac.itensJSON.length}</Row>
-      <Row className="my-4">{typeof sipac.itensJSON}</Row>
-      <Row className="my-4">
-        {sipac.itensJSON.map((item) => (
-          <p key={item.Nr}>{item.Nr}</p>
-        ))}
-      </Row>
+      {Object.keys(sipac).length === 0 ? (
+        <p>Nada importado ainda.</p>
+      ) : (
+        <Result {...sipac} />
+      )}
     </Container>
   );
 }
