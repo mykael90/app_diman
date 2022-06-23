@@ -18,7 +18,7 @@ export default function inputMaterial() {
     try {
       // setIsLoading(true);
       const response = await axios.get(
-        `http://localhost:3010/reqmaterial/${reqmat}`
+        `http://10.1.159.210:3010/reqmaterial/${reqmat}`
       );
       setSipac({ ...sipac, ...response.data });
 
