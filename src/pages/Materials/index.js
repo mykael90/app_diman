@@ -7,7 +7,8 @@ import axios from 'axios';
 
 export default function Home() {
   const [reqmat, setReqmat] = useState('');
-  const [sipac, setSipac] = useState('');
+  const [sipac, setSipac] = useState({});
+  const array1 = ['a', 'b', 'c'];
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -15,13 +16,11 @@ export default function Home() {
     try {
       // setIsLoading(true);
       const response = await axios.get(
-        `http://10.1.159.210:3010/reqmaterial/${reqmat}`
+        `http://localhost:3010/reqmaterial/${reqmat}`
       );
-
-      setSipac(response.data);
+      setSipac({ ...sipac, ...response.data });
 
       console.log(sipac);
-
       console.log(response);
 
       console.log(response.data);
@@ -71,8 +70,18 @@ export default function Home() {
         </Col>
       </Row>
 
-      <Row />
-      <Row />
+      <Row>{JSON.stringify(sipac)}</Row>
+      <Row>{array1.length}</Row>
+      <Row className="my-4">
+        {JSON.stringify(sipac.itensJSON[0]['Denominação'])}
+      </Row>
+      <Row className="my-4">{sipac.itensJSON.length}</Row>
+      <Row className="my-4">{typeof sipac.itensJSON}</Row>
+      <Row className="my-4">
+        {sipac.itensJSON.map((item) => (
+          <p key={item.Nr}>{item.Nr}</p>
+        ))}
+      </Row>
     </Container>
   );
 }
