@@ -1,23 +1,66 @@
-import React, { useState } from 'react';
-import { get } from 'lodash';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-import { toast } from 'react-toastify';
+import React from 'react';
+import { Row, Col, Table, Button } from 'react-bootstrap';
 
 export default function result(props) {
   return (
     <>
-      <Row className="my-4">
-        {Object.entries(props.dadosJSON).map(([key, value]) => (
-          <p>
-            {key}: {value}
-          </p>
-        ))}
+      <Row className="pt-4 text-center" style={{ fontWeight: 'bold' }}>
+        <Col>DADOS DA REQUISIÇÃO</Col>
+      </Row>
+      {Object.entries(props.dadosJSON).map(([key, value]) => (
+        <Row className="py-0 my-0">
+          <Col
+            xs="4"
+            className="py-0 my-0 me-0 pe-0"
+            style={{ fontWeight: 'bold', textAlign: 'end' }}
+          >
+            {key}:
+          </Col>
+          <Col xs="8">
+            <span className="font-weight-bold">{value}</span>
+          </Col>
+        </Row>
+      ))}
+
+      <Row className="pt-4 text-center" style={{ fontWeight: 'bold' }}>
+        <Col>ITENS DA REQUISIÇÃO</Col>
       </Row>
 
-      <Row className="my-4">
-        {props.itensJSON.map((item) => (
-          <p key={item.Nr}>{item.Nr}</p>
-        ))}
+      <Table striped bordered hover size="sm">
+        <thead>
+          <tr>
+            <th>Nr.</th>
+            <th>Código</th>
+            <th>Denominação</th>
+            <th>Unid. Med.</th>
+            <th>Qt.</th>
+            <th>A</th>
+            <th>Valor</th>
+            <th>Valor A.</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {props.itensJSON.map((item) => (
+            <tr key={item.Nr}>
+              <td>{item.Nr}</td>
+              <td>{item['Código']}</td>
+              <td>{item['Denominação']}</td>
+              <td>{item['Unid. Med.']}</td>
+              <td>{item['Qt.']}</td>
+              <td>{item.A}</td>
+              <td>{item.Valor}</td>
+              <td>{item['Valor A.']}</td>
+              <td>{item.Total}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+      <Row>
+        <Col className="text-center">
+          <Button variant="success">Receber</Button>
+        </Col>
       </Row>
     </>
   );

@@ -18,7 +18,7 @@ export default function inputMaterial() {
     try {
       // setIsLoading(true);
       const response = await axios.get(
-        `http://10.1.159.210:3010/reqmaterial/${reqmat}`
+        `http://192.168.0.25:3010/reqmaterial/${reqmat}`
       );
       setSipac({ ...sipac, ...response.data });
 
@@ -60,14 +60,16 @@ export default function inputMaterial() {
               </Form.Text>
             </Form.Group>
 
-            <Button
-              onClick={handleClick}
-              variant="primary"
-              className="btn-primary"
-              type="submit"
-            >
-              Submit
-            </Button>
+            <div className="text-center">
+              <Button
+                onClick={handleClick}
+                variant="primary"
+                className="btn-primary"
+                type="submit"
+              >
+                Importar
+              </Button>
+            </div>
           </Form>
         </Col>
       </Row>
