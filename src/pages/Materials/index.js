@@ -2,23 +2,23 @@ import React, { useState } from 'react';
 import { get } from 'lodash';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-
 import axios from 'axios';
+import Loading from '../../components/Loading';
 
 import Result from './result';
 
 export default function inputMaterial() {
   const [reqmat, setReqmat] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [sipac, setSipac] = useState({});
-  const array1 = ['a', 'b', 'c'];
 
   const handleClick = async (e) => {
     e.preventDefault();
 
     try {
-      // setIsLoading(true);
+      setIsLoading(true);
       const response = await axios.get(
-        `http://192.168.0.25:3010/reqmaterial/${reqmat}`
+        `http://10.1.159.210:3010/reqmaterial/${reqmat}`
       );
       setSipac({ ...sipac, ...response.data });
 
@@ -27,7 +27,7 @@ export default function inputMaterial() {
 
       console.log(response.data);
 
-      // setIsLoading(false);
+      setIsLoading(false);
     } catch (err) {
       const status = get(err, 'response.status', 0);
 
@@ -37,12 +37,13 @@ export default function inputMaterial() {
         toast.error('Ocorreu um erro ao excluir aluno');
       }
 
-      // setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <Container>
+      <Loading isLoading={isLoading} />
       <Row className="my-2 py-2 justify-content-center">
         <Col xs="6" lg="3">
           <Form>
