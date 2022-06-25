@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from 'react';
 import { get } from 'lodash';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
@@ -18,14 +19,9 @@ export default function inputMaterial() {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `http://10.1.159.210:3010/reqmaterial/${reqmat}`
+        `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial/${reqmat}`
       );
       setSipac({ ...sipac, ...response.data });
-
-      console.log(sipac);
-      console.log(response);
-
-      console.log(response.data);
 
       setIsLoading(false);
     } catch (err) {
@@ -48,7 +44,7 @@ export default function inputMaterial() {
         <Col xs="6" lg="3">
           <Form>
             <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Nº Requisição de Material</Form.Label>
+              <Form.Label class="fs-1">Nº Requisição de Material</Form.Label>
               <Form.Control
                 type="text"
                 value={reqmat}

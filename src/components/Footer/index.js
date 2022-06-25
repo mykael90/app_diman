@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 // import {
 //   FaHome,
 //   FaSignInAlt,
@@ -13,12 +14,21 @@ import { Container } from 'react-bootstrap';
 const logoDiman = require('../../img/logo_infra_diman.png');
 
 export default function Footer() {
+  const navigate = useNavigate();
   return (
-    <footer className="py-5 my-5 bg-dark">
-      <Container className="px-4">
+    <footer className="py-5 mt-5 bg-dark">
+      <Container className="px-4 mb-0">
         <p className="text-center text-white">
           Copyright &copy; Your Website 2021
         </p>
+        <button
+          onClick={() => {
+            navigate(-1, { state: {}, replace: false });
+          }}
+          type="button"
+        >
+          Go back
+        </button>
       </Container>
     </footer>
   );

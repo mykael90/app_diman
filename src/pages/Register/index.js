@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { isEmail } from 'validator';
 import { useSelector, useDispatch } from 'react-redux';
+import { Container } from 'react-bootstrap';
 
 import Loading from '../../components/Loading';
 import * as actions from '../../store/modules/auth/actions';
@@ -52,7 +53,7 @@ export default function Register() {
     dispatch(actions.registerRequest({ name, email, password, id, navigate }));
   }
   return (
-    <>
+    <Container>
       <Loading isLoading={isLoading} />
       <Title>{id ? 'Editar dados' : 'Crie sua conta'}</Title>
       <Form onSubmit={handleSubmit}>
@@ -86,6 +87,6 @@ export default function Register() {
 
         <button type="submit">{id ? 'Salvar' : 'Criar minha conta'}</button>
       </Form>
-    </>
+    </Container>
   );
 }
