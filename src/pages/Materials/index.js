@@ -4,8 +4,9 @@ import { get } from 'lodash';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import Loading from '../../components/Loading';
 
+import { StyledForm } from './styled';
+import Loading from '../../components/Loading';
 import Result from './result';
 
 export default function inputMaterial() {
@@ -40,22 +41,27 @@ export default function inputMaterial() {
   return (
     <Container>
       <Loading isLoading={isLoading} />
-      <Row className="my-2 py-2 justify-content-center">
+      <Row className="py-5 justify-content-center">
         <Col xs="6" lg="3">
-          <Form>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label class="fs-1">Nº Requisição de Material</Form.Label>
-              <Form.Control
+          <Row className="border border-3 rounded-1 border-dark bg-primary justify-content-center">
+            TESTANDO
+          </Row>
+          <StyledForm py="5" px="5" my="5" mx="5">
+            <StyledForm.Group className="mb-3" controlId="formBasicEmail">
+              <StyledForm.Label class="fs-1">
+                Nº Requisição de Material
+              </StyledForm.Label>
+              <StyledForm.Control
                 type="text"
                 value={reqmat}
                 onChange={(e) => setReqmat(e.target.value)}
                 placeholder="requisição"
               />
-              <Form.Text className="text-muted">
+              <StyledForm.Text className="text-muted">
                 A requisição será importada do SIPAC. O processo pode demorar
                 alguns segundos.
-              </Form.Text>
-            </Form.Group>
+              </StyledForm.Text>
+            </StyledForm.Group>
 
             <div className="text-center">
               <Button
@@ -67,7 +73,7 @@ export default function inputMaterial() {
                 Importar
               </Button>
             </div>
-          </Form>
+          </StyledForm>
         </Col>
       </Row>
       {Object.keys(sipac).length === 0 ? (
@@ -75,6 +81,17 @@ export default function inputMaterial() {
       ) : (
         <Result {...sipac} />
       )}
+
+      <Form>
+        <Form.Group className="mb-3" controlId="formGroupEmail">
+          <Form.Label>Email address</Form.Label>
+          <Form.Control type="email" placeholder="Enter email" />
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="formGroupPassword">
+          <Form.Label>Password</Form.Label>
+          <Form.Control type="password" placeholder="Password" />
+        </Form.Group>
+      </Form>
     </Container>
   );
 }
