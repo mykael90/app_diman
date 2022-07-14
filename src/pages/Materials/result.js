@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaTrash } from 'react-icons/fa';
 import { Row, Col, Table, Button } from 'react-bootstrap';
 
 export default function result(props) {
@@ -52,6 +53,35 @@ export default function result(props) {
               <td>{item.Valor}</td>
               <td>{item['Valor A.']}</td>
               <td>{item.Total}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+      <Table striped bordered hover size="sm">
+        <thead>
+          <tr>
+            <th>Nr.</th>
+            <th>Código</th>
+            <th>Denominação</th>
+            <th>Unid. Med.</th>
+            <th>Qt.</th>
+            <th> </th>
+          </tr>
+        </thead>
+        <tbody>
+          {props.itensJSON.map((item) => (
+            <tr key={item.Nr}>
+              <td>{item.Nr}</td>
+              <td>{item['Código']}</td>
+              <td>{item['Denominação']}</td>
+              <td>{item['Unid. Med.']}</td>
+              <td>
+                <input type="number" min="0" step="1" value={item['Qt.']} />
+              </td>
+              <td>
+                <FaTrash />
+              </td>
             </tr>
           ))}
         </tbody>
