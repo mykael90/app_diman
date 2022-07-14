@@ -94,10 +94,10 @@ export default function Home() {
       </Row>
       <p className="text-end fs-6">
         Testes de palavras{' '}
-        <spam className="fw-bolder">
+        <span className="fw-bolder">
           {' '}
-          diferentes! <spam className="fw-bolder"> diferentes! </spam>{' '}
-        </spam>
+          diferentes! <span className="fw-bolder"> diferentes! </span>{' '}
+        </span>
       </p>
     </Container>
   );

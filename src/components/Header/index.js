@@ -14,6 +14,8 @@ import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap';
 import * as actions from '../../store/modules/auth/actions';
 import { Nav1 } from './styled';
 
+import { body1Color } from '../../config/colors';
+
 const logoDiman = require('../../img/logo_infra_diman.png');
 
 export default function Header() {
@@ -34,7 +36,7 @@ export default function Header() {
     <>
       <Nav1 />
 
-      <Navbar collapseOnSelect expand="md" bg="light">
+      <Navbar collapseOnSelect expand="md" style={{ background: body1Color }}>
         <Container>
           <Navbar.Brand>
             <Link to="/Home">

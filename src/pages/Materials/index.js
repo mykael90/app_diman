@@ -39,7 +39,7 @@ export default function inputMaterial() {
   };
 
   return (
-    <Container>
+    <Container className="bg-light">
       <Loading isLoading={isLoading} />
       <Row className="py-5 justify-content-center">
         <Col xs="6" lg="3">

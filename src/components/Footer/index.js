@@ -16,7 +16,7 @@ const logoDiman = require('../../img/logo_infra_diman.png');
 export default function Footer() {
   const navigate = useNavigate();
   return (
-    <footer className="py-5 mt-5 bg-dark">
+    <footer className="py-5 bg-dark">
       <Container className="px-4 mb-0">
         <p className="text-center text-white">
           Copyright &copy; Your Website 2021
