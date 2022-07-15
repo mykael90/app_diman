@@ -1,18 +1,17 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from 'react';
 import { get } from 'lodash';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
 import { StyledForm } from './styled';
+import { primaryDarkColor, body1Color } from '../../config/colors';
 import Loading from '../../components/Loading';
 import Result from './result';
 
 export default function inputMaterial() {
-  const [reqmat, setReqmat] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [sipac, setSipac] = useState({
+  const dataTest = {
     dadosJSON: {
       'Número da Requisição': '16013/2022',
       Tipo: 'REQUISIÇÃO DE MATERIAL',
@@ -181,9 +180,13 @@ export default function inputMaterial() {
         Status: 'CADASTRADO',
       },
     ],
-  });
+  };
 
-  const handleClick = async (e) => {
+  const [reqmat, setReqmat] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [sipac, setSipac] = useState({});
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
@@ -207,60 +210,65 @@ export default function inputMaterial() {
     }
   };
 
+  const handleClear = async (e) => {
+    e.preventDefault();
+    setReqmat('');
+    setSipac({});
+  };
+
   return (
-    <Container className="bg-light">
-      <Loading isLoading={isLoading} />
-      <Row className="py-5 justify-content-center">
-        <Col xs="6" lg="3">
-          <Row className="border border-3 rounded-1 border-dark bg-primary justify-content-center">
-            TESTANDO
-          </Row>
-          <StyledForm py="5" px="5" my="5" mx="5">
-            <StyledForm.Group className="mb-3" controlId="formBasicEmail">
-              <StyledForm.Label class="fs-1">
-                Nº Requisição de Material
-              </StyledForm.Label>
-              <StyledForm.Control
-                type="text"
-                value={reqmat}
-                onChange={(e) => setReqmat(e.target.value)}
-                placeholder="requisição"
-              />
-              <StyledForm.Text className="text-muted">
-                A requisição será importada do SIPAC. O processo pode demorar
-                alguns segundos.
-              </StyledForm.Text>
-            </StyledForm.Group>
+    <>
+      <Container className="bg-light my-2">
+        <Loading isLoading={isLoading} />
+        <Row className="py-3 justify-content-center">
+          <Col
+            xs="11"
+            lg="3"
+            className="border"
+            style={{ background: body1Color }}
+          >
+            <Row
+              className="justify-content-center fs-6"
+              style={{ background: primaryDarkColor, color: 'white' }}
+            >
+              IMPORTAR REQUISIÇÕES
+            </Row>
+            <StyledForm py="5" px="5" my="5" mx="5" onSubmit={handleSubmit}>
+              <StyledForm.Group className="mb-3" controlId="formBasicEmail">
+                <StyledForm.Label class="fs-6">
+                  Nº Requisição de Material:
+                </StyledForm.Label>
+                <StyledForm.Control
+                  type="text"
+                  value={reqmat}
+                  onChange={(e) => setReqmat(e.target.value)}
+                  placeholder="Insira aqui cód. RM"
+                />
+                <StyledForm.Text className="text-muted">
+                  A requisição será importada do SIPAC. O processo pode demorar
+                  alguns segundos.
+                </StyledForm.Text>
+              </StyledForm.Group>
 
-            <div className="text-center">
-              <Button
-                onClick={handleClick}
-                variant="primary"
-                className="btn-primary"
-                type="submit"
-              >
-                Importar
-              </Button>
-            </div>
-          </StyledForm>
-        </Col>
-      </Row>
-      {Object.keys(sipac).length === 0 ? (
-        <p>Nada importado ainda.</p>
-      ) : (
-        <Result {...sipac} />
-      )}
-
-      <Form>
-        <Form.Group className="mb-3" controlId="formGroupEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control type="email" placeholder="Enter email" />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formGroupPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control type="password" placeholder="Password" />
-        </Form.Group>
-      </Form>
-    </Container>
+              <div className="text-center">
+                <Button variant="warning" onClick={handleClear}>
+                  Limpar
+                </Button>{' '}
+                <Button variant="primary" className="btn-primary" type="submit">
+                  Importar
+                </Button>
+              </div>
+            </StyledForm>
+          </Col>
+        </Row>
+      </Container>
+      <Container className="bg-light my-2">
+        {Object.keys(sipac).length === 0 ? (
+          <p>Nada importado ainda.</p>
+        ) : (
+          <Result {...sipac} />
+        )}
+      </Container>
+    </>
   );
 }

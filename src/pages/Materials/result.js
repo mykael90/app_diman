@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaTrash } from 'react-icons/fa';
-import { Row, Col, Table, Button } from 'react-bootstrap';
+import { Row, Col, Table, Button, Badge } from 'react-bootstrap';
 
 export default function result(props) {
   return (
@@ -27,7 +27,7 @@ export default function result(props) {
         <Col>ITENS DA REQUISIÇÃO</Col>
       </Row>
 
-      <Table striped bordered hover size="sm">
+      {/* <Table striped bordered hover size="sm">
         <thead>
           <tr>
             <th>Nr.</th>
@@ -56,7 +56,7 @@ export default function result(props) {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </Table> */}
 
       <Table striped bordered hover size="sm">
         <thead>
@@ -77,10 +77,20 @@ export default function result(props) {
               <td>{item['Denominação']}</td>
               <td>{item['Unid. Med.']}</td>
               <td>
-                <input type="number" min="0" step="1" value={item['Qt.']} />
+                <Badge bg="danger">-</Badge>{' '}
+                <input
+                  readOnly
+                  className="text-center"
+                  type="text"
+                  value={item['Qt.']}
+                  style={{ width: '3rem' }}
+                />{' '}
+                <Badge bg="success">+</Badge>
               </td>
-              <td>
-                <FaTrash />
+              <td className="text-center">
+                <Badge bg="danger">
+                  <FaTrash />
+                </Badge>
               </td>
             </tr>
           ))}
