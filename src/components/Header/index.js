@@ -16,7 +16,7 @@ import { Nav1 } from './styled';
 
 import { body1Color } from '../../config/colors';
 
-const logoDiman = require('../../img/logo_infra_diman.png');
+const logoSisman = require('../../img/logo-sisman.png');
 
 export default function Header() {
   const dispatch = useDispatch();
@@ -36,13 +36,18 @@ export default function Header() {
     <>
       <Nav1 />
 
-      <Navbar collapseOnSelect expand="md" style={{ background: body1Color }}>
+      <Navbar
+        collapseOnSelect
+        expand="md"
+        className="border-bottom border-2 justify-content-center"
+        style={{ background: '#F8F9FA' }}
+      >
         <Container>
-          <Navbar.Brand>
+          <Navbar.Brand className="mt-1">
             <Link to="/Home">
               <img
-                src={logoDiman}
-                height="40"
+                src={logoSisman}
+                height="25"
                 className="d-inline-block align-top"
                 alt="React Bootstrap logo"
               />
@@ -53,13 +58,14 @@ export default function Header() {
             id="responsive-navbar-nav"
             clas="d-flex justify-content-between"
           >
-            <Nav className="me-auto mt-2">
-              <Nav.Link href="#pricing">Colaboradores</Nav.Link>
+            <Nav className="me-auto mt-2 px-2">
+              <Nav.Link href="#pricing">COLAB</Nav.Link>
               <Nav.Link>
-                <Link to="/materials">Materiais</Link>
+                <Link to="/materials">MATERIAL</Link>
               </Nav.Link>
-              <Nav.Link href="#pricing">Ferramentas</Nav.Link>
-              <NavDropdown title="Saneamento" id="collasible-nav-dropdown">
+              <Nav.Link href="#pricing">EQUIP</Nav.Link>
+              <Nav.Link href="#pricing">ELÉTRICA</Nav.Link>
+              <NavDropdown title="AGUA" id="collasible-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">
                   Abastecimento de água
                 </NavDropdown.Item>
@@ -72,9 +78,10 @@ export default function Header() {
                   Separated link
                 </NavDropdown.Item>
               </NavDropdown>
-              <Nav.Link href="#pricing">Elétrica</Nav.Link>
-              <Nav.Link href="#pricing">Pavimentação</Nav.Link>
-              <Nav.Link href="#pricing">Edificações</Nav.Link>
+              <Nav.Link href="#pricing">ESGOTO</Nav.Link>
+              <Nav.Link href="#pricing">DRENAGEM</Nav.Link>
+              <Nav.Link href="#pricing">PAVIMENTO</Nav.Link>
+              <Nav.Link href="#pricing">EDIFÍCIO</Nav.Link>
             </Nav>
             <Nav className="me-0 mt-2">
               {isLoggedIn ? (
