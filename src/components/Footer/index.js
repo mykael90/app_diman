@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 // import { Link, useNavigate } from 'react-router-dom';
 // import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap';
 
-const logoDiman = require('../../img/logo_infra_diman.png');
+const logoDiman = require('../../assets/img/logo_infra_diman.png');
 
 export default function Footer() {
   const navigate = useNavigate();

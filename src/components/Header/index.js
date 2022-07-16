@@ -16,7 +16,7 @@ import { Nav1 } from './styled';
 
 import { body1Color } from '../../config/colors';
 
-const logoSisman = require('../../img/logo-sisman.png');
+const logoSisman = require('../../assets/img/logo-sisman.png');
 
 export default function Header() {
   const dispatch = useDispatch();
@@ -60,11 +60,24 @@ export default function Header() {
           >
             <Nav className="me-auto mt-2 px-2">
               <Nav.Link href="#pricing">COLAB</Nav.Link>
-              <Nav.Link>
-                <Link to="/materials">MATERIAL</Link>
-              </Nav.Link>
+
+              <NavDropdown title="MATERIAL" id="collasible-nav-dropdown">
+                <NavDropdown.Item>
+                  <Link to="/materials/in/sipac">Entrada</Link>
+                </NavDropdown.Item>
+                <NavDropdown.Item>
+                  <Link to="/materials/out/use">Saída</Link>
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item href="#action/3.4">
+                  Relatórios
+                </NavDropdown.Item>
+              </NavDropdown>
+
               <Nav.Link href="#pricing">EQUIP</Nav.Link>
+
               <Nav.Link href="#pricing">ELÉTRICA</Nav.Link>
+
               <NavDropdown title="AGUA" id="collasible-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">
                   Abastecimento de água
@@ -78,11 +91,16 @@ export default function Header() {
                   Separated link
                 </NavDropdown.Item>
               </NavDropdown>
+
               <Nav.Link href="#pricing">ESGOTO</Nav.Link>
+
               <Nav.Link href="#pricing">DRENAGEM</Nav.Link>
+
               <Nav.Link href="#pricing">PAVIMENTO</Nav.Link>
+
               <Nav.Link href="#pricing">EDIFÍCIO</Nav.Link>
             </Nav>
+
             <Nav className="me-0 mt-2">
               {isLoggedIn ? (
                 <>

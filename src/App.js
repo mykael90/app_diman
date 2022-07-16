@@ -15,7 +15,9 @@ function App() {
       <PersistGate persistor={persistor}>
         <Router>
           <Header />
-          <RoutesPages />
+          <div style={{ minHeight: 'calc(100vh - 66px - 186px)' }}>
+            <RoutesPages />
+          </div>
           <Footer />
           <ToastContainer autoClose={3000} className="toast-container" />
         </Router>

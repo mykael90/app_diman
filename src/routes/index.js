@@ -28,7 +28,7 @@ export default function RoutesPages() {
       <Route path="/login" element={<Login />} />
       <Route path="/novologin" element={<NovoLogin />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/materials" element={<Materials />} />
+      <Route exact path="/materials/*" element={<Materials />} />
 
       <Route path="/Unauthorized" element={<Unauthorized />} />
       {/* we want to protect these routes */}
