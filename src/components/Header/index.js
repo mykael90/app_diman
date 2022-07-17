@@ -9,12 +9,12 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap';
+import { Container, Nav, NavDropdown } from 'react-bootstrap';
 
 import * as actions from '../../store/modules/auth/actions';
-import { Nav1 } from './styled';
+import { StyledNav, StyledNavbar } from './styled';
 
-import { body1Color } from '../../config/colors';
+import { primaryDarkColor } from '../../config/colors';
 
 const logoSisman = require('../../assets/img/logo-sisman.png');
 
@@ -34,71 +34,91 @@ export default function Header() {
 
   return (
     <>
-      <Nav1 />
+      <StyledNav />
 
-      <Navbar
+      <StyledNavbar
         collapseOnSelect
         expand="md"
         className="border-bottom border-2 justify-content-center"
         style={{ background: '#F8F9FA' }}
       >
         <Container>
-          <Navbar.Brand className="mt-1">
+          <StyledNavbar.Brand className="mt-1">
             <Link to="/Home">
               <img
                 src={logoSisman}
                 height="25"
                 className="d-inline-block align-top"
-                alt="React Bootstrap logo"
+                alt="Sisman logo"
               />
             </Link>
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-          <Navbar.Collapse
-            id="responsive-navbar-nav"
+          </StyledNavbar.Brand>
+          <StyledNavbar.Toggle aria-controls="responsive-StyledNavbar-nav" />
+          <StyledNavbar.Collapse
+            id="responsive-StyledNavbar-nav"
             clas="d-flex justify-content-between"
           >
             <Nav className="me-auto mt-2 px-2">
-              <Nav.Link href="#pricing">COLAB</Nav.Link>
+              <Nav.Link href="#1" onClick={() => navigate('/colaboradores')}>
+                COLAB
+              </Nav.Link>
 
               <NavDropdown title="MATERIAL" id="collasible-nav-dropdown">
-                <NavDropdown.Item>
-                  <Link to="/materials/in/sipac">Entrada</Link>
+                <NavDropdown.Item
+                  href="#2"
+                  onClick={() => navigate('/materials/in/sipac')}
+                >
+                  Entrada
                 </NavDropdown.Item>
-                <NavDropdown.Item>
-                  <Link to="/materials/out/use">Saída</Link>
+                <NavDropdown.Item
+                  href="#3"
+                  onClick={() => navigate('/materials/out/use')}
+                >
+                  Saída
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="#action/3.4">
+                <NavDropdown.Item
+                  href="#4"
+                  onClick={() => navigate('/materials/reports/inventory')}
+                >
                   Relatórios
                 </NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link href="#pricing">EQUIP</Nav.Link>
+              <Nav.Link href="#5" onClick={() => navigate('/equip')}>
+                EQUIP
+              </Nav.Link>
 
-              <Nav.Link href="#pricing">ELÉTRICA</Nav.Link>
+              <Nav.Link href="#6" onClick={() => navigate('/eletrica')}>
+                ELÉTRICA
+              </Nav.Link>
 
               <NavDropdown title="AGUA" id="collasible-nav-dropdown">
-                <NavDropdown.Item href="#action/3.1">
-                  Abastecimento de água
-                </NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">Drenagem</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">
-                  Something
+                <NavDropdown.Item href="#7">Poços artesianos</NavDropdown.Item>
+                <NavDropdown.Item href="#8">
+                  Reservatórios Elevados
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="#action/3.4">
-                  Separated link
-                </NavDropdown.Item>
+                <NavDropdown.Item href="#9">Manobras</NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item href="#10">Relatórios</NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link href="#pricing">ESGOTO</Nav.Link>
+              <Nav.Link href="#11" onClick={() => navigate('/esgoto')}>
+                ESGOTO
+              </Nav.Link>
 
-              <Nav.Link href="#pricing">DRENAGEM</Nav.Link>
+              <Nav.Link href="#12" onClick={() => navigate('/drenagem')}>
+                DRENAGEM
+              </Nav.Link>
 
-              <Nav.Link href="#pricing">PAVIMENTO</Nav.Link>
+              <Nav.Link href="#13" onClick={() => navigate('/pavimento')}>
+                PAVIMENTO
+              </Nav.Link>
 
-              <Nav.Link href="#pricing">EDIFÍCIO</Nav.Link>
+              <Nav.Link href="#14" onClick={() => navigate('/edificio')}>
+                EDIFÍCIO
+              </Nav.Link>
             </Nav>
 
             <Nav className="me-0 mt-2">
@@ -121,7 +141,7 @@ export default function Header() {
                       </div>
                     </Link>
                   </Nav.Link>
-                  <Nav.Link>
+                  <Nav.Link href="#15">
                     <Link to="/register">
                       <div className="text-nowrap flex-nowrap">
                         <FaUserEdit className="pb-1" size={18} />
@@ -131,18 +151,26 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Nav.Link>
+                  <Nav.Link href="#16">
                     <Link to="/login">
                       <div className="text-nowrap flex-nowrap">
-                        <FaUser className="pb-1" size={18} />
+                        <FaUser
+                          className="pb-1"
+                          size={18}
+                          style={{ color: primaryDarkColor }}
+                        />
                         <span className="ms-2">Login</span>
                       </div>
                     </Link>
                   </Nav.Link>
-                  <Nav.Link>
+                  <Nav.Link href="#17">
                     <Link to="/register">
                       <div className="text-nowrap flex-nowrap">
-                        <FaUserPlus className="pb-1" size={18} />
+                        <FaUserPlus
+                          className="pb-1"
+                          size={18}
+                          style={{ color: primaryDarkColor }}
+                        />
                         <span className="ms-2">Registro</span>
                       </div>
                     </Link>
@@ -150,9 +178,9 @@ export default function Header() {
                 </>
               )}
             </Nav>
-          </Navbar.Collapse>
+          </StyledNavbar.Collapse>
         </Container>
-      </Navbar>
+      </StyledNavbar>
     </>
   );
 }

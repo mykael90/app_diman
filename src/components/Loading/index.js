@@ -8,7 +8,7 @@ export default function Loading({ isLoading }) {
   if (!isLoading) return <></>;
 
   return (
-    <Container>
+    <Container style={{ height: '100vh' }}>
       <div />
       <span>Carregando&nbsp;&nbsp;</span>
       <Spinner

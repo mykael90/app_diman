@@ -1,14 +1,13 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from 'react';
 import { get } from 'lodash';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Card } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-import { StyledForm } from './styled';
-import { primaryDarkColor, body1Color } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
-import Result from './result';
+import ImportSipac from './ImportSipac';
+import Result1 from './ResponseSipac';
 
 export default function inputMaterial() {
   const dataTest = {
@@ -194,6 +193,11 @@ export default function inputMaterial() {
       const response = await axios.get(
         `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial/${reqmat}`
       );
+      if (typeof response.data === 'string') {
+        toast.error('A requisição procurada não existe');
+        setIsLoading(false);
+        return;
+      }
       setSipac({ ...sipac, ...response.data });
 
       setIsLoading(false);
@@ -203,7 +207,9 @@ export default function inputMaterial() {
       if (status === 401) {
         toast.error('Você precisa fazer login');
       } else {
-        toast.error('Ocorreu um erro ao excluir aluno');
+        toast.error(
+          'Ocorreu um erro ao importar a requisição, verifique a conexão'
+        );
       }
 
       setIsLoading(false);
@@ -218,55 +224,23 @@ export default function inputMaterial() {
 
   return (
     <>
-      <Container className="bg-light my-2">
-        <Loading isLoading={isLoading} />
-        <Row className="py-3 justify-content-center">
-          <Col
-            xs="11"
-            lg="3"
-            className="border"
-            style={{ background: body1Color }}
-          >
-            <Row
-              className="justify-content-center fs-6"
-              style={{ background: primaryDarkColor, color: 'white' }}
-            >
-              IMPORTAR REQUISIÇÕES
-            </Row>
-            <StyledForm py="5" px="5" my="5" mx="5" onSubmit={handleSubmit}>
-              <StyledForm.Group className="mb-3" controlId="formBasicEmail">
-                <StyledForm.Label class="fs-6">
-                  Nº Requisição de Material:
-                </StyledForm.Label>
-                <StyledForm.Control
-                  type="text"
-                  value={reqmat}
-                  onChange={(e) => setReqmat(e.target.value)}
-                  placeholder="Insira aqui cód. RM"
-                />
-                <StyledForm.Text className="text-muted">
-                  A requisição será importada do SIPAC. O processo pode demorar
-                  alguns segundos.
-                </StyledForm.Text>
-              </StyledForm.Group>
+      <Loading isLoading={isLoading} />
+      <Container>
+        <Card.Title>Entrada de material via almoxarifado central</Card.Title>
+        <Card.Text>
+          Referências e quantitativos de materiais automaticamente extraídos via
+          SIPAC.
+        </Card.Text>
 
-              <div className="text-center">
-                <Button variant="warning" onClick={handleClear}>
-                  Limpar
-                </Button>{' '}
-                <Button variant="primary" className="btn-primary" type="submit">
-                  Importar
-                </Button>
-              </div>
-            </StyledForm>
-          </Col>
-        </Row>
-      </Container>
-      <Container className="bg-light my-2">
         {Object.keys(sipac).length === 0 ? (
-          <p>Nada importado ainda.</p>
+          <ImportSipac
+            handleSubmit={handleSubmit}
+            handleClear={handleClear}
+            reqmat={reqmat}
+            setReqmat={setReqmat}
+          />
         ) : (
-          <Result {...sipac} />
+          <Result1 {...sipac} handleClear={handleClear} />
         )}
       </Container>
     </>
