@@ -7,22 +7,19 @@ import { PersistGate } from 'redux-persist/integration/react';
 import store, { persistor } from './store';
 import RoutesPages from './routes';
 import Header from './components/Header';
-import GlobalStyle, { Container } from './styles/GlobalStyles';
-import { AuthProvider } from './context/AuthProvider';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <Router>
-          <AuthProvider>
-            <Header />
-            <Container>
-              <RoutesPages />
-            </Container>
-            <GlobalStyle />
-            <ToastContainer autoClose={3000} className="toast-container" />
-          </AuthProvider>
+          <Header />
+          <div style={{ minHeight: 'calc(100vh - 66px - 186px)' }}>
+            <RoutesPages />
+          </div>
+          <Footer />
+          <ToastContainer autoClose={3000} className="toast-container" />
         </Router>
       </PersistGate>
     </Provider>
