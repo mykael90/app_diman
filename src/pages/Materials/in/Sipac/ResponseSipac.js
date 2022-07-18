@@ -15,31 +15,37 @@ export default function result({ dadosJSON, itensJSON, handleClear }) {
             {' '}
             <Container>
               <Row>
-                <Col xs="auto">Req. nº: {Object.values(dadosJSON)[0]}</Col>
-                <Col xs="auto">Valor: {Object.values(dadosJSON)[11]}</Col>
-                <Col xs="auto">Cadastro: {Object.values(dadosJSON)[9]}</Col>
+                <Col xs="auto">
+                  Req. nº: {dadosJSON['Número da Requisição']}
+                </Col>
+                <Col xs="auto">
+                  Valor: {dadosJSON['Valor do Total Atendido']}
+                </Col>
+                <Col xs="auto">Cadastro: {dadosJSON['Data de Cadastro']}</Col>
                 <Col xs="auto">
                   Usuário:{' '}
-                  {Object.values(dadosJSON)[7].substring(
+                  {dadosJSON['Usuário'].substring(
                     0,
-                    Object.values(dadosJSON)[7].indexOf(' ')
+                    dadosJSON['Usuário'].indexOf(' ')
                   )}
                   {/* {Pegando apenas o login do usuario, descartando o nome} */}
                 </Col>
                 <Col xs="auto">
                   Man. nº:{' '}
-                  {Object.values(dadosJSON)[13].substring(
+                  {dadosJSON['Número da Requisição Relacionada'].substring(
                     0,
-                    Object.values(dadosJSON)[13].indexOf(' ')
+                    dadosJSON['Número da Requisição Relacionada'].indexOf(' ')
                   )}
                   {/* {Pegando apenas o codigo da manutencao, descartando o nome} */}
                 </Col>
               </Row>
               <Row className="mt-2">
-                <Col>Unidade de Custo: {Object.values(dadosJSON)[4]}</Col>
+                <Col>Unidade de Custo: {dadosJSON['Unidade de Custo']}</Col>
               </Row>
               <Row className="mt-2">
-                <Col>Unidade Requisitante: {Object.values(dadosJSON)[5]}</Col>
+                <Col>
+                  Unidade Requisitante: {dadosJSON['Unidade Requisitante']}
+                </Col>
               </Row>
             </Container>
           </Accordion.Header>
