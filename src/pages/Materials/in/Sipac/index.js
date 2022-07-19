@@ -7,7 +7,7 @@ import axios from 'axios';
 
 import Loading from '../../../../components/Loading';
 import ImportSipac from './ImportSipac';
-import Result1 from './ResponseSipac';
+import ResponseSipac from './ResponseSipac';
 
 export default function inputMaterial() {
   const dataTest = {
@@ -183,22 +183,24 @@ export default function inputMaterial() {
 
   const [reqmat, setReqmat] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sipac, setSipac] = useState({});
+  const [sipac, setSipac] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial/${reqmat}`
+      const requisicoes = { requisicoes: reqmat.split(',') };
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial`,
+        requisicoes
       );
       if (typeof response.data === 'string') {
         toast.error('A requisição procurada não existe');
         setIsLoading(false);
         return;
       }
-      setSipac({ ...sipac, ...response.data });
+      setSipac([...sipac, ...response.data]);
 
       setIsLoading(false);
     } catch (err) {
@@ -216,10 +218,17 @@ export default function inputMaterial() {
     }
   };
 
+  const handleDelete = async (e, index) => {
+    e.preventDefault();
+    const novoSipac = [...sipac];
+    novoSipac.splice(index, 1);
+    setSipac([...novoSipac]);
+  };
+
   const handleClear = async (e) => {
     e.preventDefault();
     setReqmat('');
-    setSipac({});
+    setSipac([]);
   };
 
   return (
@@ -232,7 +241,7 @@ export default function inputMaterial() {
           SIPAC.
         </Card.Text>
 
-        {Object.keys(sipac).length === 0 ? (
+        {sipac.length === 0 ? (
           <ImportSipac
             handleSubmit={handleSubmit}
             handleClear={handleClear}
@@ -240,7 +249,7 @@ export default function inputMaterial() {
             setReqmat={setReqmat}
           />
         ) : (
-          <Result1 {...sipac} handleClear={handleClear} />
+          <ResponseSipac sipac={sipac} handleDelete={handleDelete} />
         )}
       </Container>
     </>
