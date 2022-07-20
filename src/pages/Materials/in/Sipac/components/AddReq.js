@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
 
 import { StyledForm } from '../styled';
 
@@ -12,23 +13,24 @@ export default function AddReq({ newReq, setNewReq, submitReq }) {
   return (
     <StyledForm onSubmit={submitReq}>
       <StyledForm.Group>
-        <Row>
+        <Row className="d-flex align-items-center">
           <Col>
-            <StyledForm.Label htmlFor="addReq">
+            <FloatingLabel controlId="reqmat" label="Nº RM" className="mb-3">
               <StyledForm.Control
                 autoFocus
                 ref={inputRef}
-                id="addReq"
+                id="reqmat"
                 type="text"
-                placeholder="Digitar requisição"
+                placeholder="codigo/ano"
                 required
                 value={newReq}
                 onChange={(e) => setNewReq(e.target.value)}
               />
-            </StyledForm.Label>
+            </FloatingLabel>
           </Col>
-          <Col>
+          <Col xs="auto">
             <Button
+              className="pb-2"
               variant="dark"
               type="submit"
               aria-label="Add Req"

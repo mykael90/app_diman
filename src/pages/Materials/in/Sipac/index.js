@@ -592,9 +592,12 @@ export default function inputMaterial() {
   const [isLoading, setIsLoading] = useState(false);
   const [sipac, setSipac] = useState([]);
 
+  const currentYear = new Date().getFullYear();
+
   const addReq = (req) => {
     const id = reqs.length ? reqs[reqs.length - 1].id + 1 : 1;
-    const myNewReq = { id, req };
+    const reqYear = `${req}/${currentYear}`;
+    const myNewReq = req.includes('/') ? { id, req } : { id, req: reqYear };
     const listReqs = [...reqs, myNewReq];
     setReqs(listReqs);
   };
@@ -618,7 +621,6 @@ export default function inputMaterial() {
       const requisicoes = {
         requisicoes: Object.values(reqs).map((item) => item.req),
       };
-      console.log(requisicoes);
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial`,
         requisicoes
@@ -630,6 +632,7 @@ export default function inputMaterial() {
       }
       setSipac([...sipac, ...response.data]);
 
+      setReqs('');
       setIsLoading(false);
     } catch (err) {
       const status = get(err, 'response.status', 0);
