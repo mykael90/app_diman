@@ -1,63 +1,41 @@
 import React from 'react';
 
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
-import { StyledForm } from '../styled';
-import { primaryDarkColor, body1Color } from '../../../../../config/colors';
+import AddReq from './AddReq';
+import Content from './Content';
+import { primaryDarkColor } from '../../../../../config/colors';
 
 export default function importSipac({
   handleSubmit,
-  reqmat,
-  setReqmat,
+  reqs,
+  deleteReq,
   handleClear,
+  newReq,
+  setNewReq,
+  submitReq,
 }) {
   return (
-    <Container>
-      <Row className="py-2 justify-content-center">
-        <Col
-          xs="11"
-          lg="6"
-          xl="4"
-          className="border"
-          style={{ background: body1Color }}
+    <Row className="my-3">
+      <Col xs={10} md={8} lg={4} className="border">
+        <Row
+          className="justify-content-center fs-6"
+          style={{ background: primaryDarkColor, color: 'white' }}
         >
-          <Row
-            className="justify-content-center fs-6"
-            style={{ background: primaryDarkColor, color: 'white' }}
-          >
-            Lista de importação
-          </Row>
-          <StyledForm my="2" mx="2" onSubmit={handleSubmit}>
-            <StyledForm.Group className="mb-1" controlId="formBasicEmail">
-              <StyledForm.Label className="fs-6">
-                Nº Requisição de Material:
-              </StyledForm.Label>
-              <StyledForm.Control
-                type="text"
-                value={reqmat}
-                onChange={(e) => setReqmat(e.target.value)}
-                placeholder="Insira aqui cód. RM"
-              />
-              <StyledForm.Text className="text-muted">
-                A requisição será importada do SIPAC. O processo pode demorar
-                alguns segundos.
-              </StyledForm.Text>
-            </StyledForm.Group>
-            <Row className="text-center justify-content-center">
-              <Col xs="auto" className="my-1">
-                <Button variant="warning" onClick={handleClear}>
-                  Limpar
-                </Button>
-              </Col>
-              <Col xs="auto" className="my-1">
-                <Button variant="primary" className="btn-primary" type="submit">
-                  Importar
-                </Button>
-              </Col>
-            </Row>
-          </StyledForm>
-        </Col>
-      </Row>
-    </Container>
+          Lista de importação
+        </Row>
+        <Row>
+          <AddReq newReq={newReq} setNewReq={setNewReq} submitReq={submitReq} />
+        </Row>
+        <Row>
+          <Content
+            reqs={reqs}
+            deleteReq={deleteReq}
+            handleClear={handleClear}
+            handleSubmit={handleSubmit}
+          />
+        </Row>
+      </Col>
+    </Row>
   );
 }

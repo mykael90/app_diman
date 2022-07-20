@@ -1,15 +1,13 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from 'react';
 import { get } from 'lodash';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container, Row, Card } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
 import Loading from '../../../../components/Loading';
 import ImportSipac from './components/ImportSipac';
 import ResponseSipac from './components/ResponseSipac';
-import AddReq from './components/AddReq';
-import Content from './components/Content';
 
 export default function inputMaterial() {
   const dataTest = [
@@ -591,7 +589,6 @@ export default function inputMaterial() {
 
   const [reqs, setReqs] = useState('');
   const [newReq, setNewReq] = useState('');
-  const [reqmat, setReqmat] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sipac, setSipac] = useState([]);
 
@@ -618,7 +615,10 @@ export default function inputMaterial() {
 
     try {
       setIsLoading(true);
-      const requisicoes = { requisicoes: reqmat.split(',') };
+      const requisicoes = {
+        requisicoes: Object.values(reqs).map((item) => item.req),
+      };
+      console.log(requisicoes);
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial`,
         requisicoes
@@ -668,7 +668,6 @@ export default function inputMaterial() {
 
   const handleClear = async (e) => {
     e.preventDefault();
-    setReqmat('');
     setSipac([]);
   };
 
@@ -684,28 +683,16 @@ export default function inputMaterial() {
           </Card.Text>
         </Row>
 
-        <Row className="my-3">
-          <Col xs={10} md={8} lg={4} className="border">
-            <Row>
-              <AddReq
-                newReq={newReq}
-                setNewReq={setNewReq}
-                submitReq={submitReq}
-              />
-            </Row>
-            <Row>
-              <Content reqs={reqs} deleteReq={deleteReq} />
-            </Row>
-          </Col>
-        </Row>
-
         <Row>
           {sipac.length === 0 ? (
             <ImportSipac
               handleSubmit={handleSubmit}
               handleClear={handleClear}
-              reqmat={reqmat}
-              setReqmat={setReqmat}
+              reqs={reqs}
+              deleteReq={deleteReq}
+              newReq={newReq}
+              setNewReq={setNewReq}
+              submitReq={submitReq}
             />
           ) : (
             <ResponseSipac
