@@ -2,8 +2,8 @@ import React from 'react';
 
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
-import { StyledForm } from './styled';
-import { primaryDarkColor, body1Color } from '../../../../config/colors';
+import { StyledForm } from '../styled';
+import { primaryDarkColor, body1Color } from '../../../../../config/colors';
 
 export default function importSipac({
   handleSubmit,
@@ -25,7 +25,7 @@ export default function importSipac({
             className="justify-content-center fs-6"
             style={{ background: primaryDarkColor, color: 'white' }}
           >
-            IMPORTAR REQUISIÇÕES
+            Lista de importação
           </Row>
           <StyledForm my="2" mx="2" onSubmit={handleSubmit}>
             <StyledForm.Group className="mb-1" controlId="formBasicEmail">

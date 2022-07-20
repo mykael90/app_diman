@@ -1,9 +1,10 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { Accordion, Container, Row, Col, Table, Button } from 'react-bootstrap';
 
-import { body1Color, primaryDarkColor } from '../../../../config/colors';
+import { body1Color, primaryDarkColor } from '../../../../../config/colors';
 
-export default function result({ sipac, handleDelete }) {
+export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
   return (
     <>
       <Row className="pt-2 text-center align-content-center">
@@ -101,7 +102,12 @@ export default function result({ sipac, handleDelete }) {
                     </Button>
                   </Col>
                   <Col xs="auto" className="text-center">
-                    <Button variant="success">Receber</Button>
+                    <Button
+                      variant="success"
+                      onClick={(e) => handleStore(e, index)}
+                    >
+                      Receber
+                    </Button>
                   </Col>
                 </Row>
               </Container>
