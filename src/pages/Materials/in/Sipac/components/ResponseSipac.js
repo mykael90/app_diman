@@ -65,17 +65,16 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
                 </Row>
               </Container>
             </Accordion.Header>
-            <Accordion.Body>
-              <Container>
+            <Accordion.Body style={{ padding: 0 }}>
+              <Container style={{ padding: 0 }}>
                 <Row className="pt-2 text-center">
                   <Col>ITENS DA REQUISIÇÃO</Col>
                 </Row>
-                <Table striped bordered hover size="sm">
+                <Table style={{ padding: 0 }} striped bordered hover size="sm">
                   <thead>
                     <tr>
                       <th>Nr.</th>
-                      <th>Código</th>
-                      <th>Denominação</th>
+                      <th>(Cod) Denominação</th>
                       <th>Und.</th>
                       <th>Qtd.</th>
                     </tr>
@@ -84,9 +83,11 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
                     {req.itensJSON.map((item) => (
                       <tr key={item.Nr}>
                         <td>{item.Nr}</td>
-                        <td>{item['Código']}</td>
-                        <td>{item['Denominação']}</td>
-                        <td>{item['Unid. Med.']}</td>
+                        <td>
+                          ({item['Código']}) - {item['Denominação']}
+                        </td>
+
+                        <td>{item['Unid. Med.'].substr(0, 3)}</td>
                         <td>{item.A}</td>
                       </tr>
                     ))}

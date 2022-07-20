@@ -17,7 +17,7 @@ export default function importSipac({
 }) {
   return (
     <Row className="my-3">
-      <Col xs={10} md={8} lg={4} className="border">
+      <Col xs={12} md={8} lg={4} className="border">
         <Row
           className="justify-content-center fs-6"
           style={{ background: primaryDarkColor, color: 'white' }}
