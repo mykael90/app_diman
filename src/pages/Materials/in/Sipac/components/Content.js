@@ -10,7 +10,7 @@ export default function Content({
   handleSubmit,
 }) {
   return (
-    <main>
+    <div className="border">
       {reqs.length ? (
         <ReqList
           reqs={reqs}
@@ -21,6 +21,6 @@ export default function Content({
       ) : (
         <p style={{ marginTop: '2rem' }}>Lista de importação vazia.</p>
       )}
-    </main>
+    </div>
   );
 }

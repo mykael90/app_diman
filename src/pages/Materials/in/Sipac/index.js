@@ -684,14 +684,18 @@ export default function inputMaterial() {
           </Card.Text>
         </Row>
 
-        <Row>
-          <Col xs={10} md={8} lg={4}>
-            <AddReq
-              newReq={newReq}
-              setNewReq={setNewReq}
-              submitReq={submitReq}
-            />
-            <Content reqs={reqs} deleteReq={deleteReq} />
+        <Row className="my-3">
+          <Col xs={10} md={8} lg={4} className="border">
+            <Row>
+              <AddReq
+                newReq={newReq}
+                setNewReq={setNewReq}
+                submitReq={submitReq}
+              />
+            </Row>
+            <Row>
+              <Content reqs={reqs} deleteReq={deleteReq} />
+            </Row>
           </Col>
         </Row>
 
