@@ -11,8 +11,6 @@ export default function importSipac({
   reqs,
   deleteReq,
   handleClear,
-  newReq,
-  setNewReq,
   submitReq,
 }) {
   return (
@@ -25,7 +23,7 @@ export default function importSipac({
           Lista de importação
         </Row>
         <Row className="my-3">
-          <AddReq newReq={newReq} setNewReq={setNewReq} submitReq={submitReq} />
+          <AddReq submitReq={submitReq} />
         </Row>
         <Row className="border-top">
           <Content

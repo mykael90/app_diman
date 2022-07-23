@@ -12,13 +12,7 @@ function ReqList({ reqs, deleteReq, handleClear, handleSubmit }) {
           <ListGroup>
             <ListGroup.Item>
               {reqs.map((req) => (
-                <LineReq
-                  key={req.id}
-                  req={req}
-                  deleteReq={deleteReq}
-                  handleClear={handleClear}
-                  handleSubmit={handleSubmit}
-                />
+                <LineReq key={req.id} req={req} deleteReq={deleteReq} />
               ))}
             </ListGroup.Item>
           </ListGroup>

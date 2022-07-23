@@ -588,7 +588,6 @@ export default function inputMaterial() {
   ];
 
   const [reqs, setReqs] = useState('');
-  const [newReq, setNewReq] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sipac, setSipac] = useState([]);
 
@@ -596,8 +595,9 @@ export default function inputMaterial() {
 
   const addReq = (req) => {
     const id = reqs.length ? reqs[reqs.length - 1].id + 1 : 1;
-    const reqYear = `${req}/${currentYear}`;
-    const myNewReq = req.includes('/') ? { id, req } : { id, req: reqYear };
+    const myNewReq = req.includes('/')
+      ? { id, req }
+      : { id, req: `${req}/${currentYear}` };
     const listReqs = [...reqs, myNewReq];
     setReqs(listReqs);
   };
@@ -606,11 +606,10 @@ export default function inputMaterial() {
     const listReqs = reqs.filter((req) => req.id !== id);
     setReqs(listReqs);
   };
-  const submitReq = (e) => {
-    e.preventDefault();
+  const submitReq = ({ newReq }, resetForm) => {
     if (!newReq) return;
     addReq(newReq);
-    setNewReq('');
+    resetForm();
   };
 
   const handleSubmit = async (e) => {
@@ -693,8 +692,6 @@ export default function inputMaterial() {
               handleClear={handleClear}
               reqs={reqs}
               deleteReq={deleteReq}
-              newReq={newReq}
-              setNewReq={setNewReq}
               submitReq={submitReq}
             />
           ) : (
