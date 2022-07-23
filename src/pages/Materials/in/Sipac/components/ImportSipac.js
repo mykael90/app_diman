@@ -19,15 +19,15 @@ export default function importSipac({
     <Row className="my-3">
       <Col xs={12} md={8} lg={4} className="border">
         <Row
-          className="justify-content-center fs-6"
+          className="justify-content-center fs-5 py-2"
           style={{ background: primaryDarkColor, color: 'white' }}
         >
           Lista de importação
         </Row>
-        <Row>
+        <Row className="my-3">
           <AddReq newReq={newReq} setNewReq={setNewReq} submitReq={submitReq} />
         </Row>
-        <Row>
+        <Row className="border-top">
           <Content
             reqs={reqs}
             deleteReq={deleteReq}

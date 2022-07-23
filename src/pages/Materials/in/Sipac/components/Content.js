@@ -10,7 +10,7 @@ export default function Content({
   handleSubmit,
 }) {
   return (
-    <div className="border">
+    <div>
       {reqs.length ? (
         <ReqList
           reqs={reqs}

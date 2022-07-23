@@ -26,16 +26,12 @@ function ReqList({ reqs, deleteReq, handleClear, handleSubmit }) {
       </Row>
       <Row className="my-4 text-center justify-content-center">
         <Col xs="auto" className="my-1">
-          <Button variant="warning" onClick={handleClear}>
+          <Button variant="secondary" onClick={handleClear}>
             Limpar
           </Button>
         </Col>
         <Col xs="auto" className="my-1">
-          <Button
-            variant="primary"
-            className="btn-primary"
-            onClick={handleSubmit}
-          >
+          <Button variant="primary" onClick={handleSubmit}>
             Importar
           </Button>
         </Col>

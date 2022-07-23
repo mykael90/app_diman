@@ -2,21 +2,19 @@
 /* eslint-disable react/prop-types */
 import React, { useRef } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Row, Col, Form } from 'react-bootstrap';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
-
-import { StyledForm } from '../styled';
 
 export default function AddReq({ newReq, setNewReq, submitReq }) {
   const inputRef = useRef();
 
   return (
-    <StyledForm onSubmit={submitReq}>
-      <StyledForm.Group>
+    <Form noValidate onSubmit={submitReq}>
+      <Form.Group>
         <Row className="d-flex align-items-center">
           <Col>
-            <FloatingLabel controlId="reqmat" label="Nº RM" className="mb-3">
-              <StyledForm.Control
+            <FloatingLabel controlId="reqmat" label="Nº RM">
+              <Form.Control
                 autoFocus
                 ref={inputRef}
                 id="reqmat"
@@ -28,10 +26,10 @@ export default function AddReq({ newReq, setNewReq, submitReq }) {
               />
             </FloatingLabel>
           </Col>
-          <Col xs="auto">
+          <Col xs="auto" className="center-text ps-0">
             <Button
-              className="pb-2"
-              variant="dark"
+              size="sm"
+              variant="success"
               type="submit"
               aria-label="Add Req"
               onClick={() => inputRef.current.focus()}
@@ -40,7 +38,7 @@ export default function AddReq({ newReq, setNewReq, submitReq }) {
             </Button>
           </Col>
         </Row>
-      </StyledForm.Group>
-    </StyledForm>
+      </Form.Group>
+    </Form>
   );
 }

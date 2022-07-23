@@ -671,7 +671,7 @@ export default function inputMaterial() {
 
   const handleClear = async (e) => {
     e.preventDefault();
-    setSipac([]);
+    setReqs('');
   };
 
   return (
