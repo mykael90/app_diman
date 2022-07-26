@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { isEmail } from 'validator';
 import { useSelector, useDispatch } from 'react-redux';
-import { Container } from 'react-bootstrap';
+import { Container, Form, Row, Col } from 'react-bootstrap';
+
+import FormComp from './FormComp';
 
 import Loading from '../../components/Loading';
 import * as actions from '../../store/modules/auth/actions';
-import { Title, Form } from './styled';
 
 export default function Register() {
   const dispatch = useDispatch();
@@ -17,14 +18,14 @@ export default function Register() {
   const emailStored = useSelector((state) => state.auth.user.email);
   const isLoading = useSelector((state) => state.auth.isLoading);
 
-  const [name, setname] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!id) return;
-    setname(nameStored);
+    setName(nameStored);
     setEmail(emailStored);
   }, [emailStored, id, nameStored]);
 
@@ -53,40 +54,30 @@ export default function Register() {
     dispatch(actions.registerRequest({ name, email, password, id, navigate }));
   }
   return (
-    <Container>
+    <Container className="d-flex justify-content-center py-5">
       <Loading isLoading={isLoading} />
-      <Title>{id ? 'Editar dados' : 'Crie sua conta'}</Title>
-      <Form onSubmit={handleSubmit}>
-        <label htmlFor="name">
-          Nome:
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setname(e.target.value)}
-            placeholder="Seu nome"
-          />
-        </label>
-        <label htmlFor="email">
-          E-mail:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Seu email"
-          />
-        </label>
-        <label htmlFor="password">
-          Senha:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Seu password"
-          />
-        </label>
-
-        <button type="submit">{id ? 'Salvar' : 'Criar minha conta'}</button>
-      </Form>
+      <Col
+        xs={10}
+        sm={6}
+        md={4}
+        className="border rounded-2 px-4 py-4 bg-light"
+      >
+        <Row>
+          <p className="h4 text-center pb-4">
+            {id ? 'Editar dados' : 'Crie sua conta'}
+          </p>
+        </Row>
+        <FormComp
+          handleSubmit={handleSubmit}
+          id={id}
+          name={name}
+          setName={setName}
+          password={password}
+          setPassword={setPassword}
+          email={email}
+          setEmail={setEmail}
+        />
+      </Col>
     </Container>
   );
 }
