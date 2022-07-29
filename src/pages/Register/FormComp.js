@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FaUser, FaStarOfLife } from 'react-icons/fa';
+import { FaUser, FaMale, FaLock } from 'react-icons/fa';
 
 import { Form, InputGroup, Row, Button } from 'react-bootstrap';
 
@@ -9,6 +9,8 @@ export default function form({
   id,
   name,
   setName,
+  username,
+  setUsername,
   email,
   setEmail,
   password,
@@ -19,14 +21,14 @@ export default function form({
       <Row>
         <InputGroup className="mb-3">
           <InputGroup.Text id="basic-addon1">
-            <FaUser />
+            <FaMale />
           </InputGroup.Text>
           <Form.Control
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Digite seu nome"
-            aria-label="Email"
+            aria-label="Name"
             aria-describedby="basic-addon1"
           />
         </InputGroup>
@@ -42,8 +44,21 @@ export default function form({
           />
         </InputGroup>
         <InputGroup className="mb-3">
+          <InputGroup.Text id="basic-addon1">
+            <FaUser />
+          </InputGroup.Text>
+          <Form.Control
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Digite seu usuário de acesso"
+            aria-label="Username"
+            aria-describedby="basic-addon1"
+          />
+        </InputGroup>
+        <InputGroup className="mb-3">
           <InputGroup.Text id="basic-addon3">
-            <FaStarOfLife />
+            <FaLock />
           </InputGroup.Text>
           <Form.Control
             type="password"

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { isEmail } from 'validator';
 import { useSelector, useDispatch } from 'react-redux';
-import { Container, Form, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 
 import FormComp from './FormComp';
 
@@ -19,6 +19,7 @@ export default function Register() {
   const isLoading = useSelector((state) => state.auth.isLoading);
 
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -39,6 +40,11 @@ export default function Register() {
       toast.error('Nome deve ter entre 3 e 255 caracteres');
     }
 
+    if (username.length < 3 || username.length > 35) {
+      formErrors = true;
+      toast.error('Login deve ter entre 3 e 35 caracteres');
+    }
+
     if (!isEmail(email)) {
       formErrors = true;
       toast.error('Email inválido');
@@ -51,7 +57,16 @@ export default function Register() {
 
     if (formErrors) return;
 
-    dispatch(actions.registerRequest({ name, email, password, id, navigate }));
+    dispatch(
+      actions.registerRequest({
+        name,
+        email,
+        username,
+        password,
+        id,
+        navigate,
+      })
+    );
   }
   return (
     <Container className="d-flex justify-content-center py-5">
@@ -72,6 +87,8 @@ export default function Register() {
           id={id}
           name={name}
           setName={setName}
+          username={username}
+          setUsername={setUsername}
           password={password}
           setPassword={setPassword}
           email={email}

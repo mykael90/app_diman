@@ -19,6 +19,7 @@ export default function (state = initialState, action) {
       newState.token = action.payload.token;
       newState.user = action.payload.user;
       newState.isLoading = false;
+      console.log(newState);
       return newState;
     }
     case types.LOGIN_FAILURE: {
@@ -40,6 +41,7 @@ export default function (state = initialState, action) {
       const newState = { ...state };
       newState.user.name = action.payload.name;
       newState.user.email = action.payload.email;
+      newState.user.username = action.payload.username;
       newState.isLoading = false;
       return newState;
     }

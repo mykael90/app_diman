@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { isEmail } from 'validator';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { FaUser, FaSignInAlt, FaStarOfLife } from 'react-icons/fa';
+import { FaUser, FaSignInAlt, FaLock } from 'react-icons/fa';
 
 import { Form, Container, InputGroup, Row, Col, Button } from 'react-bootstrap';
 
@@ -21,7 +20,7 @@ export default function Login() {
 
   const isLoading = useSelector((state) => state.auth.isLoading);
 
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
@@ -29,18 +28,18 @@ export default function Login() {
 
     let formErrors = false;
 
-    if (!isEmail(email)) {
+    if (username.length < 6 || username.length > 35) {
       formErrors = true;
-      toast.error('Email inválido');
+      toast.error('Login inválido');
     }
-
     if (password.length < 6 || password.length > 50) {
       formErrors = true;
       toast.error('Senha inválida');
     }
+
     if (formErrors) return;
 
-    dispatch(actions.loginRequest({ email, password, prevPath, navigate }));
+    dispatch(actions.loginRequest({ username, password, prevPath, navigate }));
   };
 
   return (
@@ -61,17 +60,17 @@ export default function Login() {
               <FaUser />
             </InputGroup.Text>
             <Form.Control
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Digite seu e-mail"
-              aria-label="Email"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Digite seu usuário"
+              aria-label="Login"
               aria-describedby="basic-addon1"
             />
           </InputGroup>
           <InputGroup className="mb-3">
             <InputGroup.Text id="basic-addon3">
-              <FaStarOfLife />
+              <FaLock />
             </InputGroup.Text>
             <Form.Control
               type="password"
