@@ -19,6 +19,8 @@ import Input from './Reports/Input';
 import Output from './Reports/Output';
 import Inventory from './Reports/Inventory';
 
+import Record from './Record';
+
 export default function MaterialsRoutes() {
   return (
     <Routes>
@@ -42,6 +44,8 @@ export default function MaterialsRoutes() {
         <Route path="Input" element={<Input />} />{' '}
         <Route path="output" element={<Output />} />{' '}
       </Route>
+
+      <Route path="record" element={<Record />} />
     </Routes>
   );
 }

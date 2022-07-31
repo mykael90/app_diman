@@ -1,0 +1,152 @@
+{"sipac":[
+  {
+    "id": "2325205",
+    "id_sipac": "3024000000023",
+    "id_catmat": "358823",
+    "date_record": "06/04/2010",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA REGULÁVEL - 1/2\" A 3/4\"",
+    "specification": "Abraçadeira regulável rosca sem fim 13 X 19mm, aproximadamente 13 a 19mm; recomendadas para uso em mangueiras de material semirrígido ou fixação de elementos (placas, antenas, luminosos e outros) devido à sua grande capacidade de aperto e dimensões reduzidas; aço; parafuso de 8mm com fenda; largura mínima da fita 9mm; Diâmetro mínimo ideal para uso: 13 milímetros; diâmetro máximo: 19 milímetros (diâmetro mínimo: 1/2 polegadas e diâmetro máximo: 3/4 polegadas). CATMAT: 358823"
+},
+{
+    "id": "306294",
+    "id_sipac": "302400014270",
+    "id_catmat": "373688",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA REGULÁVEL - 3/4\" A 1\"",
+    "specification": "Abraçadeira rosca sem fim de aproximadamente 19a25mm; Recomendadas para uso em mangueiras de material semirrígido ou fixação de elementos (placas, antenas, luminosos e outros) devido à sua grande capacidade de aperto e dimensões reduzidas; em aço; parafuso com no mínimo 8mm com fenda; largura mínima da fita 9mm; diâmetro mínimo ideal para uso: 19 milímetros; diâmetro máximo: 25 milímetros (diâmetro mínimo: 3/4 polegadas e diâmetro máximo: 1 polegadas). CATMAT: 373688"
+},
+{
+    "id": "305674",
+    "id_sipac": "302400007265",
+    "id_catmat": "368898",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 1\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 1\", tipo \"D\", com porca e parafuso, e largura de 19mm. Ref.: Tramontina, Kala ou similares. CATMAT: 368898"
+},
+{
+    "id": "306990",
+    "id_sipac": "302400022043",
+    "id_catmat": "241345",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 1.1/2\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 1.1/2\", tipo \"D\", com porca e parafuso, e largura mínima de 27mm. Ref.: Tramontina, Kala ou similares. CATMAT: 241345"
+},
+{
+    "id": "305931",
+    "id_sipac": "302400010193",
+    "id_catmat": "355153",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 1.1/4\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 1.1/4\", tipo \"D\", com porca e parafuso, e largura mínima de 27mm. Ref.: Tramontina, Kala ou similares. CATMAT: 355153"
+},
+{
+    "id": "305214",
+    "id_sipac": "302400002409",
+    "id_catmat": "373983",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 1/2\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 1/2\", tipo \"D\", com porca e parafuso, e largura de 19mm. Ref.: Tramontina, Kala ou similares. CATMAT: 373983"
+},
+{
+    "id": "2232698",
+    "id_sipac": "302400029273",
+    "id_catmat": "355155",
+    "date_record": "18/04/2006",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 2\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 2\", tipo \"D\", com porca e parafuso, e largura mínima de 27mm. Ref.: Tramontina, Kala ou similares. CATMAT: 355155"
+},
+{
+    "id": "2276653",
+    "id_sipac": "302400029828",
+    "id_catmat": "264791",
+    "date_record": "13/03/2008",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 2.1/2\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 2.1/2\", tipo \"D\", com porca e parafuso, e largura mínima de 27mm. Ref.: Tramontina, Kala ou similares. CATMAT: 264791"
+},
+{
+    "id": "2245080",
+    "id_sipac": "302400029458",
+    "id_catmat": "374231",
+    "date_record": "10/08/2006",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 3\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 3\", tipo \"D\", com porca e parafuso, e largura mínima de 27mm. Ref.: Tramontina, Kala ou similares. CATMAT: 374231"
+},
+{
+    "id": "307553",
+    "id_sipac": "302400027973",
+    "id_catmat": "373985",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 3/4\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 3/4\", tipo \"D\", com porca e parafuso, e largura de 19mm. Ref.: Tramontina, Kala ou similares. CATMAT: 373985"
+},
+{
+    "id": "2285276",
+    "id_sipac": "302400029922",
+    "id_catmat": "373990",
+    "date_record": "22/07/2008",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ABRAÇADEIRA TIPO \"D\" EM FERRO GALVANIZADO - 4\"",
+    "specification": "Abraçadeira metálica em aço carbono com acabamento galvanizado eletroliticamente, com bitola de 4\", tipo \"D\", com porca e parafuso, e largura mínima de 27mm. Ref.: Tramontina, Kala ou similares. CATMAT: 373990"
+},
+{
+    "id": "2344750",
+    "id_sipac": "3024000000115",
+    "id_catmat": "406083",
+    "date_record": "17/08/2010",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ACABAMENTO PARA VÁLVULA DE DESCARGA HIDRAMAX",
+    "specification": "Acabamento reposição para válvula Hidra Max cromado para reposição. CATMAT: 406083"
+},
+{
+    "id": "305182",
+    "id_sipac": "302400002085",
+    "id_catmat": "243772",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ADAPTADOR EM PVC, SOLDA-ROSCA, ÁGUA FRIA - 110MM (4\")",
+    "specification": "Adaptador curto com solda/rosca, atenda a norma técnica NBR 5648 e 5626, marrom, sistema de água fria, uso indicado para conectar uma conexão ou registro roscável, bolsa soldável e ponta roscável padrão BSP, pressão máxima de funcionamento de 10,0 Kgf/cm² à 20°C. CATMAT: 243772"
+},
+{
+    "id": "304984",
+    "id_sipac": "302400000040",
+    "id_catmat": "248726",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ADAPTADOR EM PVC, SOLDA-ROSCA, ÁGUA FRIA - 20MM (1/2\")",
+    "specification": "Adaptador curto com solda/rosca, atenda a norma técnica NBR 5648 e 5626, marrom, sistema de água fria, uso indicado para conectar uma conexão ou registro roscável, bolsa soldável e ponta roscável padrão BSP, pressão máxima de funcionamento de 7,5 Kgf/cm² à 20°C. CATMAT:248726"
+},
+{
+    "id": "307468",
+    "id_sipac": "302400027113",
+    "id_catmat": "248727",
+    "date_record": "",
+    "unit": "UNIDADE",
+    "group_sipac": "3024",
+    "name": "ADAPTADOR EM PVC, SOLDA-ROSCA, ÁGUA FRIA - 25MM (3/4\")",
+    "specification": "Adaptador curto com solda/rosca, atenda a norma técnica NBR 5648 e 5626, marrom, sistema de água fria, uso indicado para conectar uma conexão ou registro roscável, bolsa soldável e ponta roscável padrão BSP, pressão máxima de funcionamento de 7,5 Kgf/cm² à 20°C. CATMAT: 248727"
+}
+]}

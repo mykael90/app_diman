@@ -83,6 +83,13 @@ export default function Header() {
                 >
                   Relatórios
                 </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#4"
+                  onClick={() => navigate('/materials/record')}
+                >
+                  Cadastro
+                </NavDropdown.Item>
               </NavDropdown>
 
               <Nav.Link href="#5" onClick={() => navigate('/equip')}>
