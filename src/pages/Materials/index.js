@@ -13,6 +13,7 @@ import OutDonation from './out/Donation';
 import Devolution from './out/Devolution';
 import Loss from './out/Loss';
 import Discard from './out/Discard';
+import Loan from './out/Loan';
 
 import Reports from './Reports';
 import Input from './Reports/Input';
@@ -20,6 +21,9 @@ import Output from './Reports/Output';
 import Inventory from './Reports/Inventory';
 
 import Record from './Record';
+import List from './Record/List';
+import Add from './Record/Add';
+import Remove from './Record/Remove';
 
 export default function MaterialsRoutes() {
   return (
@@ -37,6 +41,7 @@ export default function MaterialsRoutes() {
         <Route path="devolution" element={<Devolution />} />{' '}
         <Route path="discard" element={<Discard />} />{' '}
         <Route path="loss" element={<Loss />} />{' '}
+        <Route path="loan" element={<Loan />} />{' '}
       </Route>
 
       <Route path="reports" element={<Reports />}>
@@ -45,7 +50,11 @@ export default function MaterialsRoutes() {
         <Route path="output" element={<Output />} />{' '}
       </Route>
 
-      <Route path="record" element={<Record />} />
+      <Route path="record" element={<Record />}>
+        <Route path="list" element={<List />} />{' '}
+        <Route path="add" element={<Add />} />{' '}
+        <Route path="remove" element={<Remove />} />{' '}
+      </Route>
     </Routes>
   );
 }

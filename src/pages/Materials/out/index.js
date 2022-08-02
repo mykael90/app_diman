@@ -58,6 +58,17 @@ export default function index() {
                 </Link>
               </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="#6">
+                <Link
+                  className="text-decoration-none"
+                  to="/materials/out/loan"
+                  style={{ color: 'inherit' }}
+                >
+                  Empréstimo
+                </Link>
+              </Nav.Link>
+            </Nav.Item>
           </Nav>
         </Container>
       </Card.Header>
