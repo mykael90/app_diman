@@ -17,7 +17,6 @@ import Esgoto from '../pages/Esgoto';
 import Drenagem from '../pages/Drenagem';
 import Pavimento from '../pages/Pavimento';
 import Edificio from '../pages/Edificio';
-import NovoLogin from '../pages/NovoLogin';
 import Page404 from '../pages/Page404';
 import Unauthorized from '../components/Unauthorized';
 
@@ -34,7 +33,6 @@ export default function RoutesPages() {
       <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/novologin" element={<NovoLogin />} />
       <Route path="/register" element={<Register />} />
       <Route exact path="/colaboradores/*" element={<Colaboradores />} />
       <Route exact path="/materials/*" element={<Materials />} />

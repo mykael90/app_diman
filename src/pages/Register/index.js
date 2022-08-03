@@ -1,14 +1,16 @@
 /* eslint-disable react/jsx-no-bind */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { isEmail } from 'validator';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Row, Col } from 'react-bootstrap';
+import { get } from 'lodash';
 
 import FormComp from './FormComp';
 
 import Loading from '../../components/Loading';
+import axios from '../../services/axios';
 import * as actions from '../../store/modules/auth/actions';
 
 export default function Register() {
@@ -19,16 +21,34 @@ export default function Register() {
   const isLoading = useSelector((state) => state.auth.isLoading);
 
   const [name, setName] = useState('');
+  const [position, setPosition] = useState('');
+  const [positions, setPositions] = useState([]);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!id) return;
     setName(nameStored);
     setEmail(emailStored);
   }, [emailStored, id, nameStored]);
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        // setIsLoading(true);
+        const response = await axios.get('/userspositions/types');
+        setPositions(response.data);
+        // setIsLoading(false);
+      } catch (err) {
+        const errors = get(err, 'response.data.errors', []);
+        errors.map((error) => toast.error(error));
+        // setIsLoading(false);
+      }
+    }
+    getData();
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -60,6 +80,7 @@ export default function Register() {
     dispatch(
       actions.registerRequest({
         name,
+        position,
         email,
         username,
         password,
@@ -87,6 +108,8 @@ export default function Register() {
           id={id}
           name={name}
           setName={setName}
+          setPosition={setPosition}
+          positions={positions}
           username={username}
           setUsername={setUsername}
           password={password}
