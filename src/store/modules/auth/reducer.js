@@ -19,7 +19,6 @@ export default function (state = initialState, action) {
       newState.token = action.payload.token;
       newState.user = action.payload.user;
       newState.isLoading = false;
-      console.log(newState);
       return newState;
     }
     case types.LOGIN_FAILURE: {
