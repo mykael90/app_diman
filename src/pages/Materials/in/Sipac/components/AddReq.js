@@ -28,7 +28,10 @@ export default function AddReq({ submitReq, handleClear }) {
     newReq: yup
       .string()
       .required('Requerido')
-      .matches(/^[0-9/]+$/, 'Formato de requisição não permitido'),
+      .matches(
+        /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
+        'Formato de requisição não permitido'
+      ),
   });
 
   console.log(Formik);

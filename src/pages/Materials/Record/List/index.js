@@ -81,6 +81,33 @@ function DefaultColumnFilter({
 export default function index() {
   const dataset = [...data3024.sipac, ...data3026.sipac];
 
+  const filterTypes = React.useMemo(
+    () => ({
+      // Override the default text filter to use
+      // "startWith"
+      text: (rows, ids, filterValue) => {
+        rows = rows.filter((row) =>
+          ids.some((id) => {
+            const rowValue = row.values[id];
+            const arrayFilter = String(filterValue).split(' ');
+
+            return arrayFilter.reduce((res, cur) => {
+              // res -> response; cur -> currency (atual)
+              res =
+                res &&
+                String(rowValue)
+                  .toLowerCase()
+                  .includes(String(cur).toLowerCase());
+              return res;
+            }, true);
+          })
+        );
+        return rows;
+      },
+    }),
+    []
+  );
+
   const data = React.useMemo(() => dataset, []);
 
   const columns = React.useMemo(
@@ -115,6 +142,8 @@ export default function index() {
       columns,
       data,
       defaultColumn,
+      globalFilter: 'text',
+      filterTypes,
       initialState: {
         sortBy: [
           {
