@@ -11,7 +11,7 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
         <Col>REQUISIÇÕES IMPORTADAS</Col>
       </Row>
       <Accordion>
-        {sipac.map((req, index) => (
+        {sipac.info?.map((req, index) => (
           <Accordion.Item
             style={{ borderTop: `1px solid ${primaryDarkColor}` }}
             key={req.dadosJSON['Número da Requisição']}

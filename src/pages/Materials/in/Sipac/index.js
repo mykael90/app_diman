@@ -589,7 +589,7 @@ export default function inputMaterial() {
 
   const [reqs, setReqs] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sipac, setSipac] = useState([]);
+  const [sipac, setSipac] = useState({});
 
   const currentYear = new Date().getFullYear();
 
@@ -612,6 +612,10 @@ export default function inputMaterial() {
     resetForm();
   };
 
+  const showErrorsSipac = (errorsArray) => {
+    errorsArray.forEach((error) => toast.error(error));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -624,15 +628,11 @@ export default function inputMaterial() {
         `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial`,
         requisicoes
       );
-      if (typeof response.data === 'string') {
-        toast.error('A requisição procurada não existe');
-        setIsLoading(false);
-        return;
-      }
-      setSipac([...sipac, ...response.data]);
+      setSipac({ ...sipac, ...response.data });
 
       setReqs('');
       setIsLoading(false);
+      if (response.data.errors) showErrorsSipac(response.data.errors);
     } catch (err) {
       const status = get(err, 'response.status', 0);
 
@@ -650,22 +650,22 @@ export default function inputMaterial() {
 
   const handleDelete = async (e, index) => {
     e.preventDefault();
-    const novoSipac = [...sipac];
-    const req = novoSipac.splice(index, 1)[0];
+    const novoSipac = { ...sipac };
+    const req = novoSipac.info.splice(index, 1)[0];
     toast.warning(
       `A requisição ${req.dadosJSON['Número da Requisição']} foi excluída da lista`
     );
-    setSipac([...novoSipac]);
+    setSipac({ ...novoSipac });
   };
 
   const handleStore = async (e, index) => {
     e.preventDefault();
-    const novoSipac = [...sipac];
-    const req = novoSipac.splice(index, 1)[0];
+    const novoSipac = { ...sipac };
+    const req = novoSipac.info.splice(index, 1)[0];
     toast.success(
       `Material da requisição ${req.dadosJSON['Número da Requisição']} recebido com sucesso`
     );
-    setSipac([...novoSipac]);
+    setSipac({ ...novoSipac });
   };
 
   const handleClear = async (e) => {
@@ -686,7 +686,7 @@ export default function inputMaterial() {
         </Row>
 
         <Row>
-          {sipac.length === 0 ? (
+          {!sipac.info?.length ? (
             <ImportSipac
               handleSubmit={handleSubmit}
               handleClear={handleClear}
