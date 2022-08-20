@@ -19,7 +19,7 @@ function App() {
             <RoutesPages />
           </div>
           <Footer />
-          <ToastContainer autoClose={3000} className="toast-container" />
+          <ToastContainer autoClose={3000} />
         </Router>
       </PersistGate>
     </Provider>

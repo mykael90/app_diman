@@ -12,11 +12,10 @@ export function Logger() {
   const formik = useFormikContext();
 
   React.useEffect(() => {
-    console.group('Formik State');
-    console.log('values', formik.values);
-    console.log('errors', formik.errors);
-
-    console.groupEnd();
+    // console.group('Formik State');
+    // console.log('values', formik.values);
+    // console.log('errors', formik.errors);
+    // console.groupEnd();
   }, [formik.values, formik.errors]);
   return null;
 }
@@ -33,8 +32,6 @@ export default function AddReq({ submitReq, handleClear }) {
         'Formato de requisição não permitido'
       ),
   });
-
-  console.log(Formik);
 
   return (
     <Formik
