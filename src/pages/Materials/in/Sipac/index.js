@@ -4,10 +4,12 @@ import { get } from 'lodash';
 import { Container, Row, Card } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import axiosRest from '../../../../services/axios';
 
 import Loading from '../../../../components/Loading';
 import ImportSipac from './components/ImportSipac';
 import ResponseSipac from './components/ResponseSipac';
+import renameKeys from '../../../../assets/script/renameKeys';
 
 export default function inputMaterial() {
   const [reqs, setReqs] = useState('');
@@ -123,10 +125,64 @@ export default function inputMaterial() {
     e.preventDefault();
     const novoSipac = { ...sipac };
     const req = novoSipac.info.splice(index, 1)[0];
-    toast.success(
-      `Material da requisição ${req.dadosJSON['Número da Requisição']} recebido com sucesso`
-    );
-    setSipac({ ...novoSipac });
+
+    const renamedReq = {
+      materialIntypeId: '1',
+      req: req.dadosJSON['Número da Requisição'],
+      userId: '1', // pegar id user context
+      value: req.dadosJSON['Valor do Total Atendido']
+        .replace(/,/g, '.')
+        .replace(/[^0-9\.]+/g, ''),
+      requiredBy: req.dadosJSON['Usuário'].substring(
+        0,
+        req.dadosJSON['Usuário'].indexOf(' ')
+      ),
+      reqMaintenance: req.dadosJSON[
+        'Número da Requisição Relacionada'
+      ].substring(
+        0,
+        req.dadosJSON['Número da Requisição Relacionada'].indexOf(' ')
+      ),
+      reqUnit: req.dadosJSON['Unidade Requisitante'].replace(/[^0-9]+/g, ''), // ajustar regex
+      costUnit: req.dadosJSON['Unidade de Custo'].replace(/[^0-9]+/g, ''), // ajustar regex
+      registerDate: req.dadosJSON['Data de Cadastro'].replace(
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
+        '$3-$2-$1'
+      ), // ajustar regex
+    };
+
+    renamedReq.items = req.itensJSON.map((item) => ({
+      MaterialId: item['Código'],
+      quantity: item.A.replace(/,/g, '.'), // ajustar regex
+      value: item.Valor.replace(/,/g, '.').replace(/[^0-9\.]+/g, ''), // ajustar regex
+    }));
+
+    console.log(renamedReq);
+
+    try {
+      setIsLoading(true);
+
+      const response = await axiosRest.post(`/materials/in/`, renamedReq);
+      setSipac({ ...novoSipac });
+
+      setIsLoading(false);
+
+      toast.success(
+        `Material da requisição ${response.req} recebido com sucesso`
+      );
+    } catch (err) {
+      const status = get(err, 'response.status', 0);
+
+      if (status === 401) {
+        toast.error('Você precisa fazer login');
+      } else {
+        toast.error(
+          'Ocorreu um erro ao importar a requisição, verifique a conexão'
+        );
+      }
+
+      setIsLoading(false);
+    }
   };
 
   const handleClear = async (e) => {

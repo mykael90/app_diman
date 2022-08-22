@@ -1,11 +1,10 @@
-export default function removeAccent(texto) {
-  texto = texto.replace(/[ÀÁÂÃÄÅ]/, 'A');
-  texto = texto.replace(/[àáâãäå]/, 'a');
-  texto = texto.replace(/[ÈÉÊË]/, 'E');
-  texto = texto.replace(/[Ç]/, 'C');
-  texto = texto.replace(/[ç]/, 'c');
-
-  return texto;
+export default function removeAccent(text) {
+  text = text.toUpperCase();
+  text = text.replace(new RegExp('[ÁÀÂÃ]', 'gi'), 'a');
+  text = text.replace(new RegExp('[ÉÈÊ]', 'gi'), 'e');
+  text = text.replace(new RegExp('[ÍÌÎ]', 'gi'), 'i');
+  text = text.replace(new RegExp('[ÓÒÔÕ]', 'gi'), 'o');
+  text = text.replace(new RegExp('[ÚÙÛ]', 'gi'), 'u');
+  text = text.replace(new RegExp('[Ç]', 'gi'), 'c');
+  return text;
 }
-
-console.log(removeAccent('água'));

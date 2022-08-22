@@ -93,7 +93,7 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
                     ))}
                   </tbody>
                 </Table>
-                <Row className="justify-content-center">
+                <Row className="justify-content-center pb-3">
                   <Col xs="auto" className="text-center">
                     <Button
                       variant="warning"
