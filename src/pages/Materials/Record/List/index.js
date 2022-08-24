@@ -112,9 +112,17 @@ export default function index() {
 
   const columns = React.useMemo(
     () => [
-      { Header: 'ID', accessor: 'id_sipac' },
+      {
+        Header: 'ID',
+        accessor: 'id_sipac',
+        size: 30,
+      },
       { Header: 'Denominação', accessor: 'name' },
-      { Header: 'Unidade', accessor: 'unit' },
+      {
+        Header: 'Unidade',
+        accessor: 'unit',
+        size: 20,
+      },
     ],
     []
   );
@@ -195,6 +203,10 @@ export default function index() {
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                    {console.log(
+                      column.getHeaderProps(column.getSortByToggleProps()),
+                      column
+                    )}
                     {column.render('Header')}
                     <span>
                       {' '}
