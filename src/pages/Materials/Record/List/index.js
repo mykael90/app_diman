@@ -6,6 +6,8 @@ import {
   useFilters,
   useGlobalFilter,
   useAsyncDebounce,
+  useFlexLayout,
+  useResizeColumns,
 } from 'react-table';
 import { Container, Form, Table, Row, Col, Card } from 'react-bootstrap';
 import {
@@ -17,6 +19,8 @@ import {
 
 import data3024 from '../../../../assets/JSON/materials3024JSON.json';
 import data3026 from '../../../../assets/JSON/materials3026JSON.json';
+
+console.log(window.innerWidth);
 
 function GlobalFilter({
   preGlobalFilteredRows,
@@ -115,13 +119,16 @@ export default function index() {
       {
         Header: 'ID',
         accessor: 'id_sipac',
-        size: 30,
+        width: 125,
+        disableResizing: true,
+        isVisible: window.innerWidth > 576,
       },
       { Header: 'Denominação', accessor: 'name' },
       {
         Header: 'Unidade',
         accessor: 'unit',
-        size: 20,
+        width: 100,
+        disableResizing: true,
       },
     ],
     []
@@ -131,6 +138,9 @@ export default function index() {
     () => ({
       // Let's set up our default Filter UI
       Filter: DefaultColumnFilter,
+      minWidth: 30,
+      width: 120,
+      maxWidth: 800,
     }),
     []
   );
@@ -142,7 +152,6 @@ export default function index() {
     rows,
     prepareRow,
     state,
-    visibleColumns,
     preGlobalFilteredRows,
     setGlobalFilter,
   } = useTable(
@@ -159,11 +168,16 @@ export default function index() {
             asc: true,
           },
         ],
+        hiddenColumns: columns
+          .filter((col) => col.isVisible === false)
+          .map((col) => col.accessor),
       },
     },
     useFilters,
     useGlobalFilter,
-    useSortBy
+    useSortBy,
+    useFlexLayout,
+    useResizeColumns
   );
 
   return (
@@ -203,10 +217,6 @@ export default function index() {
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                    {console.log(
-                      column.getHeaderProps(column.getSortByToggleProps()),
-                      column
-                    )}
                     {column.render('Header')}
                     <span>
                       {' '}
