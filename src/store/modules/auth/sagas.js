@@ -17,7 +17,10 @@ function* loginRequest({ payload }) {
 
     payload.navigate(payload.prevPath, { replace: true });
   } catch (e) {
-    toast.error('Usuário ou senha inválidos');
+    const { errors } = e.response.data;
+
+    errors.map((error) => toast.error(error));
+
     yield put(actions.loginFailure());
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FaUser, FaMale, FaLock, FaIdCard, FaIdCardAlt } from 'react-icons/fa';
+import { FaUser, FaMale, FaLock } from 'react-icons/fa';
 
 import { Form, InputGroup, Row, Button } from 'react-bootstrap';
 
@@ -9,8 +9,6 @@ export default function form({
   id,
   name,
   setName,
-  setPosition,
-  positions,
   username,
   setUsername,
   email,
@@ -34,37 +32,7 @@ export default function form({
             aria-describedby="basic-addon1"
           />
         </InputGroup>
-        <InputGroup className="mb-3">
-          <InputGroup.Text id="basic-addon1">
-            <FaIdCard />
-          </InputGroup.Text>
-          <Form.Select
-            aria-label="Select position"
-            onChange={(e) => setPosition(e.target.value)}
-          >
-            <option value="" disabled selected>
-              Selecione um cargo
-            </option>
-            {positions.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.position}
-              </option>
-            ))}
-          </Form.Select>
-        </InputGroup>
-        <InputGroup className="mb-3">
-          <InputGroup.Text id="basic-addon1">
-            <FaIdCardAlt />
-          </InputGroup.Text>
-          <Form.Control
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Digite sua matrícula SIAPE"
-            aria-label="Siape"
-            aria-describedby="basic-addon1"
-          />
-        </InputGroup>
+
         <InputGroup className="mb-3">
           <InputGroup.Text id="basic-addon1">@</InputGroup.Text>
           <Form.Control

@@ -157,8 +157,6 @@ export default function inputMaterial() {
       value: item.Valor.replace(/,/g, '.').replace(/[^0-9\.]+/g, ''), // ajustar regex
     }));
 
-    console.log(renamedReq);
-
     try {
       setIsLoading(true);
 
@@ -168,18 +166,18 @@ export default function inputMaterial() {
       setIsLoading(false);
 
       toast.success(
-        `Material da requisição ${response.req} recebido com sucesso`
+        `Material da requisição ${response.data.req} recebido com sucesso`
       );
     } catch (err) {
-      const status = get(err, 'response.status', 0);
+      const { errors } = err.response.data;
 
-      if (status === 401) {
-        toast.error('Você precisa fazer login');
-      } else {
-        toast.error(
-          'Ocorreu um erro ao importar a requisição, verifique a conexão'
-        );
-      }
+      errors.map((error) =>
+        toast.error(error, {
+          autoClose: false,
+          draggable: true,
+          closeOnClick: true,
+        })
+      );
 
       setIsLoading(false);
     }
