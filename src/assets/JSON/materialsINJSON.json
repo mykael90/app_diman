@@ -1,0 +1,245 @@
+{"materialsIn":[
+	{
+		"id": 2,
+		"materialIntypeId": 1,
+		"userId": 1,
+		"receivedBy": "mykael.mello",
+		"req": "1552/2022",
+		"value": 565.56,
+		"requiredBy": "joao.paulo",
+		"reqMaintenance": "323/2022",
+		"reqUnit": 110805,
+		"costUnit": 113030,
+		"registerDate": "2022-10-30",
+		"created_At": "2022-08-22T01:55:12.000Z",
+		"MaterialInItems": [
+			{
+				"material_id": 302400000040,
+				"name": "ADAPTADOR EM PVC, SOLDA-ROSCA, AGUA FRIA - 20MM (1/2\")",
+				"unit": "UNIDADE",
+				"quantity": 10,
+				"value": 37.8
+			},
+			{
+				"material_id": 302400000082,
+				"name": "AZULEJO 15CM X 15CM - BRANCO",
+				"unit": "METRO QUADRADO",
+				"quantity": 22,
+				"value": 42.58
+			}
+		],
+		"User": {
+			"username": "mykael.mello"
+		}
+	},
+	{
+		"id": 3,
+		"materialIntypeId": 1,
+		"userId": 1,
+		"receivedBy": "mykael.mello",
+		"req": "1552/2022",
+		"value": 565.56,
+		"requiredBy": "joao.paulo",
+		"reqMaintenance": "323/2022",
+		"reqUnit": 110805,
+		"costUnit": 113030,
+		"registerDate": "2022-10-30",
+		"created_At": "2022-08-22T01:55:24.000Z",
+		"MaterialInItems": [
+			{
+				"material_id": 302400000040,
+				"name": "ADAPTADOR EM PVC, SOLDA-ROSCA, AGUA FRIA - 20MM (1/2\")",
+				"unit": "UNIDADE",
+				"quantity": 10,
+				"value": 37.8
+			},
+			{
+				"material_id": 302400000082,
+				"name": "AZULEJO 15CM X 15CM - BRANCO",
+				"unit": "METRO QUADRADO",
+				"quantity": 22,
+				"value": 42.58
+			}
+		],
+		"User": {
+			"username": "mykael.mello"
+		}
+	},
+	{
+		"id": 4,
+		"materialIntypeId": 1,
+		"userId": 1,
+		"receivedBy": "mykael.mello",
+		"req": "19170/2022",
+		"value": 914.85,
+		"requiredBy": "jonatas.silva",
+		"reqMaintenance": "6124/2022",
+		"reqUnit": 110805,
+		"costUnit": 1102,
+		"registerDate": "2022-08-18",
+		"created_At": "2022-08-22T02:33:18.000Z",
+		"MaterialInItems": [
+			{
+				"material_id": 302400029251,
+				"name": "TINTA ACRILICA PREMIUM FOSCO - COR: BRANCO NEVE",
+				"unit": "GALÃO",
+				"quantity": 2,
+				"value": 80.2
+			},
+			{
+				"material_id": 302400030019,
+				"name": "TINTA ACRILICA PREMIUM SEMIBRILHO - COR: BRANCO GELO",
+				"unit": "GALÃO",
+				"quantity": 6,
+				"value": 108.88
+			},
+			{
+				"material_id": 3024000000126,
+				"name": "TINTA ESMALTE SINTETICO A BASE DE AGUA - COR: BRANCO NEVE",
+				"unit": "GALÃO",
+				"quantity": 1,
+				"value": 101.17
+			}
+		],
+		"User": {
+			"username": "mykael.mello"
+		}
+	},
+	{
+		"id": 5,
+		"materialIntypeId": 1,
+		"userId": 1,
+		"receivedBy": "mykael.mello",
+		"req": "1552/2022",
+		"value": 565.56,
+		"requiredBy": "joao.paulo",
+		"reqMaintenance": "323/2022",
+		"reqUnit": 110805,
+		"costUnit": 113030,
+		"registerDate": "2022-10-30",
+		"created_At": "2022-08-22T02:34:57.000Z",
+		"MaterialInItems": [
+			{
+				"material_id": 302400000040,
+				"name": "ADAPTADOR EM PVC, SOLDA-ROSCA, AGUA FRIA - 20MM (1/2\")",
+				"unit": "UNIDADE",
+				"quantity": 10,
+				"value": 37.8
+			},
+			{
+				"material_id": 302400000082,
+				"name": "AZULEJO 15CM X 15CM - BRANCO",
+				"unit": "METRO QUADRADO",
+				"quantity": 22,
+				"value": 42.58
+			}
+		],
+		"User": {
+			"username": "mykael.mello"
+		}
+	},
+	{
+		"id": 6,
+		"materialIntypeId": 1,
+		"userId": 1,
+		"receivedBy": "mykael.mello",
+		"req": "593/2022",
+		"value": 33.95,
+		"requiredBy": "jonatas.silva",
+		"reqMaintenance": "91/2022",
+		"reqUnit": 110805,
+		"costUnit": 1500,
+		"registerDate": "2022-01-20",
+		"created_At": "2022-08-27T12:58:17.000Z",
+		"MaterialInItems": [
+			{
+				"material_id": 302400020962,
+				"name": "FECHADURA DE CILINDRO, EXTERNA, LATAO CROMADO - REF. 03001.0711.01",
+				"unit": "UNIDADE",
+				"quantity": 1,
+				"value": 33.95
+			}
+		],
+		"User": {
+			"username": "mykael.mello"
+		}
+	},
+	{
+		"id": 7,
+		"materialIntypeId": 1,
+		"userId": 1,
+		"receivedBy": "mykael.mello",
+		"req": "1002/2022",
+		"value": 17.8,
+		"requiredBy": "iranilton.sousa",
+		"reqMaintenance": "4467/2021",
+		"reqUnit": 110805,
+		"costUnit": 1169,
+		"registerDate": "2022-02-01",
+		"created_At": "2022-08-27T13:06:06.000Z",
+		"MaterialInItems": [
+			{
+				"material_id": 302400000074,
+				"name": "ASSENTO SANITARIO PLASTICO",
+				"unit": "UNIDADE",
+				"quantity": 1,
+				"value": 17.8
+			}
+		],
+		"User": {
+			"username": "mykael.mello"
+		}
+	},
+	{
+		"id": 8,
+		"materialIntypeId": 1,
+		"userId": 32,
+		"receivedBy": "denis.ferreira",
+		"req": "19997/2022",
+		"value": 11.63,
+		"requiredBy": "dennis.ferreira",
+		"reqMaintenance": "6027/2022",
+		"reqUnit": 110805,
+		"costUnit": 1102,
+		"registerDate": "2022-08-25",
+		"created_At": "2022-08-28T13:25:35.000Z",
+		"MaterialInItems": [
+			{
+				"material_id": 302400002280,
+				"name": "AREIA DE GRANULOMETRIA MEDIA",
+				"unit": "METRO CÚBICO",
+				"quantity": 0.2,
+				"value": 58.17
+			}
+		],
+		"User": {
+			"username": "denis.ferreira"
+		}
+	},
+	{
+		"id": 9,
+		"materialIntypeId": 1,
+		"userId": 32,
+		"receivedBy": "denis.ferreira",
+		"req": "19998/2022",
+		"value": 31.5,
+		"requiredBy": "dennis.ferreira",
+		"reqMaintenance": "6027/2022",
+		"reqUnit": 110805,
+		"costUnit": 1102,
+		"registerDate": "2022-08-25",
+		"created_At": "2022-08-28T13:25:38.000Z",
+		"MaterialInItems": [
+			{
+				"material_id": 3024000000076,
+				"name": "TIJOLO CERAMICO VERMELHO DE 8 FUROS 90 X 190 X 190MM",
+				"unit": "UNIDADE",
+				"quantity": 50,
+				"value": 0.63
+			}
+		],
+		"User": {
+			"username": "denis.ferreira"
+		}
+	}
+]}
