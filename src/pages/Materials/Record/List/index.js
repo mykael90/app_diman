@@ -8,6 +8,7 @@ import {
   useAsyncDebounce,
   useFlexLayout,
   useResizeColumns,
+  useExpanded,
 } from 'react-table';
 import { Container, Form, Table, Row, Col, Card } from 'react-bootstrap';
 import {
@@ -19,8 +20,6 @@ import {
 
 import data3024 from '../../../../assets/JSON/materials3024JSON.json';
 import data3026 from '../../../../assets/JSON/materials3026JSON.json';
-
-console.log(window.innerWidth);
 
 function GlobalFilter({
   preGlobalFilteredRows,
@@ -114,8 +113,34 @@ export default function index() {
 
   const data = React.useMemo(() => dataset, []);
 
+  // Create a function that will render our row sub components
+  const renderRowSubComponent = React.useCallback(
+    ({ row }) => (
+      <>
+        <spam className="fw-bold">Especificação:</spam>{' '}
+        {row.original.specification}
+      </>
+    ),
+    []
+  );
+
   const columns = React.useMemo(
     () => [
+      {
+        // Make an expander cell
+        Header: () => null, // No header
+        id: 'expander', // It needs an ID
+        width: 30,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          // Use Cell to render an expander for each row.
+          // We can use the getToggleRowExpandedProps prop-getter
+          // to build the expander.
+          <span {...row.getToggleRowExpandedProps()}>
+            {row.isExpanded ? '▽' : '▷'}
+          </span>
+        ),
+      },
       {
         Header: 'ID',
         accessor: 'id_sipac',
@@ -151,6 +176,7 @@ export default function index() {
     headerGroups,
     rows,
     prepareRow,
+    visibleColumns,
     state,
     preGlobalFilteredRows,
     setGlobalFilter,
@@ -177,7 +203,8 @@ export default function index() {
     useGlobalFilter,
     useSortBy,
     useFlexLayout,
-    useResizeColumns
+    useResizeColumns,
+    useExpanded
   );
 
   return (
@@ -243,17 +270,41 @@ export default function index() {
             {rows.map((row) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => (
-                    <td
-                      className="py-3"
-                      style={{ verticalAlign: 'middle' }}
-                      {...cell.getCellProps()}
-                    >
-                      {cell.render('Cell')}
-                    </td>
-                  ))}
-                </tr>
+                <>
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell) => (
+                      <td
+                        className="py-3"
+                        style={{ verticalAlign: 'middle' }}
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render('Cell')}
+                      </td>
+                    ))}
+                  </tr>
+                  {/*
+                    If the row is in an expanded state, render a row with a
+                    column that fills the entire length of the table.
+                  */}
+                  {row.isExpanded ? (
+                    <tr className="border-0">
+                      <td
+                        colSpan={visibleColumns.length}
+                        style={{ borderColor: 'rgb(222,226,230)' }}
+                      >
+                        {/*
+                          Inside it, call our renderRowSubComponent function. In reality,
+                          you could pass whatever you want as props to
+                          a component like this, including the entire
+                          table instance. But for this example, we'll just
+                          pass the row
+                        */}
+                        {console.dir(row)}
+                        {renderRowSubComponent({ row })}
+                      </td>
+                    </tr>
+                  ) : null}
+                </>
               );
             })}
           </tbody>
