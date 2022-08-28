@@ -11,6 +11,9 @@ import Loading from '../../../../components/Loading';
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../../components/TableGfilterNestedRow';
 
+import data3024 from '../../../../assets/JSON/materials3024JSON.json';
+import data3026 from '../../../../assets/JSON/materials3026JSON.json';
+
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [materials, setMaterials] = useState([]);
@@ -51,7 +54,7 @@ export default function Index() {
       },
       {
         Header: 'ID',
-        accessor: 'id',
+        accessor: 'id_sipac',
         width: 125,
         disableResizing: true,
         isVisible: window.innerWidth > 576,
@@ -67,7 +70,9 @@ export default function Index() {
     []
   );
 
-  const data = React.useMemo(() => materials, [materials]);
+  const dataset = [...data3024.sipac, ...data3026.sipac];
+
+  const data = React.useMemo(() => dataset, []);
 
   const defaultColumn = React.useMemo(
     () => ({

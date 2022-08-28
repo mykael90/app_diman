@@ -9,7 +9,7 @@ export const StyledNav = styled.nav`
   align-items: center;
   justify-content: center;
   a {
-    color: #fff;
+    text-decoration: none;
     margin: 0 10px 0 0;
     font-weight: bold;
   }
@@ -21,7 +21,6 @@ export const StyledNavbar = styled(Navbar)`
   a:visited,
   a:hover,
   a:active {
-    color: inherit;
     text-decoration: none;
   }
 `;

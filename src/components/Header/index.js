@@ -64,7 +64,7 @@ export default function Header() {
               </Nav.Link>
 
               <NavDropdown title="MATERIAL" id="collasible-nav-dropdown">
-                <NavDropdown.Item
+                <NavDropdown.Item // teste
                   href="#2"
                   onClick={() => navigate('/materials/in/sipac')}
                 >
@@ -166,7 +166,9 @@ export default function Header() {
                           size={18}
                           style={{ color: primaryDarkColor }}
                         />
-                        <span className="ms-2">Login</span>
+                        <span className="ms-2" style={{ color: 'gray' }}>
+                          Login
+                        </span>
                       </div>
                     </Link>
                   </Nav.Link>
@@ -178,7 +180,9 @@ export default function Header() {
                           size={18}
                           style={{ color: primaryDarkColor }}
                         />
-                        <span className="ms-2">Registro</span>
+                        <span className="ms-2" style={{ color: 'gray' }}>
+                          Registro
+                        </span>
                       </div>
                     </Link>
                   </Nav.Link>

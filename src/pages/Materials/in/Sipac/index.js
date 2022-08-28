@@ -4,14 +4,15 @@ import { get } from 'lodash';
 import { Container, Row, Card } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 import axiosRest from '../../../../services/axios';
 
 import Loading from '../../../../components/Loading';
 import ImportSipac from './components/ImportSipac';
 import ResponseSipac from './components/ResponseSipac';
-import renameKeys from '../../../../assets/script/renameKeys';
 
 export default function inputMaterial() {
+  const userId = useSelector((state) => state.auth.user.id);
   const [reqs, setReqs] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sipac, setSipac] = useState({});
@@ -129,7 +130,7 @@ export default function inputMaterial() {
     const renamedReq = {
       materialIntypeId: '1',
       req: req.dadosJSON['Número da Requisição'],
-      userId: '1', // pegar id user context
+      userId, // pegar id user context
       value: req.dadosJSON['Valor do Total Atendido']
         .replace(/,/g, '.')
         .replace(/[^0-9\.]+/g, ''),
