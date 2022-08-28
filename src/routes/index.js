@@ -21,9 +21,10 @@ import Page404 from '../pages/Page404';
 import Unauthorized from '../components/Unauthorized';
 
 const ROLES = {
-  User: 2001,
-  Editor: 1984,
-  Admin: 5150,
+  adm: 100,
+  adm_materials: 200,
+  super_materials: 201,
+  common_materials: 202,
 };
 
 export default function RoutesPages() {
@@ -35,7 +36,7 @@ export default function RoutesPages() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route exact path="/colaboradores/*" element={<Colaboradores />} />
-      <Route exact path="/materials/*" element={<Materials />} />
+
       <Route exact path="/equip/*" element={<Equip />} />
       <Route exact path="/eletrica/*" element={<Eletrica />} />
       <Route exact path="/agua/*" element={<Agua />} />
@@ -46,11 +47,19 @@ export default function RoutesPages() {
 
       <Route path="/Unauthorized" element={<Unauthorized />} />
       {/* we want to protect these routes */}
-      <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-        <Route path="/aluno/:id/edit" element={<Aluno />} />
-        <Route path="/aluno/" element={<Aluno />} />
-        <Route path="/fotos/:id" element={<Fotos />} />
-        <Route path="/alunos" element={<Alunos />} />
+      <Route
+        element={
+          <RequireAuth
+            allowedRoles={[
+              ROLES.adm,
+              ROLES.adm_materials,
+              ROLES.super_materials,
+              ROLES.common_materials,
+            ]}
+          />
+        }
+      >
+        <Route exact path="/materials/*" element={<Materials />} />
       </Route>
 
       {/* catch all */}

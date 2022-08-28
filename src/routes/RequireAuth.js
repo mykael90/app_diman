@@ -8,10 +8,8 @@ function RequireAuth({ allowedRoles }) {
   const auth = useSelector((state) => state.auth);
   const location = useLocation();
 
-  if (auth.user.id) auth.roles = [5150];
-
   // eslint-disable-next-line no-nested-ternary
-  return auth?.roles?.find((role) => allowedRoles?.includes(role)) ? (
+  return auth?.user?.roles?.find((role) => allowedRoles?.includes(role.id)) ? (
     <Outlet />
   ) : auth?.user.id ? (
     <Navigate to="/unauthorized" state={{ from: location }} replace />

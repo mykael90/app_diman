@@ -1,6 +1,9 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+import RequireAuth from '../../routes/RequireAuth';
+import Unauthorized from '../../components/Unauthorized';
+
 import In from './in';
 import Sipac from './in/Sipac';
 import InDonation from './in/Donation';
@@ -25,23 +28,44 @@ import List from './Record/List';
 import Add from './Record/Add';
 import Remove from './Record/Remove';
 
+const ROLES = {
+  adm: 100,
+  adm_materials: 200,
+  super_materials: 201,
+  common_materials: 202,
+};
+
 export default function MaterialsRoutes() {
   return (
     <Routes>
-      <Route path="in" element={<In />}>
-        <Route path="sipac" element={<Sipac />} />{' '}
-        <Route path="donation" element={<InDonation />} />{' '}
-        <Route path="returned" element={<Returned />} />{' '}
-        <Route path="first" element={<First />} />{' '}
-      </Route>
+      <Route path="/Unauthorized" element={<Unauthorized />} />
+      {/* we want to protect these routes */}
+      <Route
+        element={
+          <RequireAuth
+            allowedRoles={[
+              ROLES.adm,
+              ROLES.adm_materials,
+              ROLES.super_materials,
+            ]}
+          />
+        }
+      >
+        <Route path="in" element={<In />}>
+          <Route path="sipac" element={<Sipac />} />{' '}
+          <Route path="donation" element={<InDonation />} />{' '}
+          <Route path="returned" element={<Returned />} />{' '}
+          <Route path="first" element={<First />} />{' '}
+        </Route>
 
-      <Route path="out" element={<Out />}>
-        <Route path="use" element={<Use />} />{' '}
-        <Route path="donation" element={<OutDonation />} />{' '}
-        <Route path="devolution" element={<Devolution />} />{' '}
-        <Route path="discard" element={<Discard />} />{' '}
-        <Route path="loss" element={<Loss />} />{' '}
-        <Route path="loan" element={<Loan />} />{' '}
+        <Route path="out" element={<Out />}>
+          <Route path="use" element={<Use />} />{' '}
+          <Route path="donation" element={<OutDonation />} />{' '}
+          <Route path="devolution" element={<Devolution />} />{' '}
+          <Route path="discard" element={<Discard />} />{' '}
+          <Route path="loss" element={<Loss />} />{' '}
+          <Route path="loan" element={<Loan />} />{' '}
+        </Route>
       </Route>
 
       <Route path="reports" element={<Reports />}>
