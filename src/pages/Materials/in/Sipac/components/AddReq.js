@@ -59,7 +59,7 @@ export default function AddReq({ submitReq, handleClear }) {
               <Col>
                 <FloatingLabel label="Nº RM">
                   <Form.Control
-                    type="text"
+                    type="tel"
                     name="newReq"
                     value={values.newReq}
                     onChange={handleChange}

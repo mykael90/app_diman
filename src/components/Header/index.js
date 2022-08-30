@@ -144,6 +144,7 @@ export default function Header() {
                           className="pb-1"
                           size={18}
                           onClick={handleLogout}
+                          style={{ color: primaryDarkColor }}
                         />
                       </div>
                     </Link>
@@ -151,7 +152,11 @@ export default function Header() {
                   <Nav.Link href="#15">
                     <Link to="/register">
                       <div className="text-nowrap flex-nowrap">
-                        <FaUserEdit className="pb-1" size={18} />
+                        <FaUserEdit
+                          className="pb-1"
+                          size={18}
+                          style={{ color: primaryDarkColor }}
+                        />
                       </div>
                     </Link>
                   </Nav.Link>

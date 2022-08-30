@@ -33,7 +33,7 @@ export default function Footer() {
                 letterSpacing: '2px',
               }}
             >
-              CONTACT
+              DEVELOPMENT
             </spam>
             <div>
               <FaUserCircle /> mykael.mello@ufrn.br
