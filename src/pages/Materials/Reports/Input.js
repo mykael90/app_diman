@@ -10,6 +10,7 @@ import Loading from '../../../components/Loading';
 
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../components/TableGfilterNestedRow';
+import TableNestedrow from '../components/TableNestedRow';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
@@ -152,31 +153,86 @@ export default function Index() {
     []
   );
 
+  const renderRowSubSubComponent = React.useCallback(
+    ({ row }) => (
+      <>
+        <spam className="fw-bold">Especificação:</spam>{' '}
+        {row.original.specification}
+      </>
+    ),
+    []
+  );
+
   // Create a function that will render our row sub components
   const renderRowSubComponent = React.useCallback(
     ({ row }) => (
-      <Table style={{ padding: 0 }} striped bordered hover size="sm">
-        <thead>
-          <tr>
-            <th>Nr.</th>
-            <th>Denominação</th>
-            <th>Und.</th>
-            <th>Qtd.</th>
-            <th>Preço</th>
-          </tr>
-        </thead>
-        <tbody>
-          {row.original.MaterialInItems.map((item) => (
-            <tr key={item.material_id}>
-              <td>{item.material_id}</td>
-              <td>{item.name}</td>
-              <td>{item.unit.substr(0, 3)}</td>
-              <td>{item.quantity}</td>
-              <td>{item.value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <TableNestedrow
+        style={{ padding: 0, margin: 0 }}
+        columns={[
+          {
+            // Make an expander cell
+            Header: () => null, // No header
+            id: 'expander', // It needs an ID
+            width: 30,
+            disableResizing: true,
+            Cell: ({ row }) => (
+              // Use Cell to render an expander for each row.
+              // We can use the getToggleRowExpandedProps prop-getter
+              // to build the expander.
+              <span {...row.getToggleRowExpandedProps()}>
+                {row.isExpanded ? '▽' : '▷'}
+              </span>
+            ),
+          },
+          {
+            Header: 'ID',
+            accessor: 'material_id',
+            width: 125,
+            disableResizing: true,
+            isVisible: window.innerWidth > 576,
+          },
+          { Header: 'Denominação', accessor: 'name', width: 500 },
+          {
+            Header: 'Unidade',
+            accessor: 'unit',
+            width: 100,
+            disableResizing: true,
+          },
+          {
+            Header: 'Qtd',
+            accessor: 'quantity',
+            width: 100,
+            disableResizing: true,
+          },
+          {
+            Header: 'Valor',
+            accessor: 'value',
+            width: 100,
+            disableResizing: true,
+          },
+        ]}
+        data={row.original.MaterialInItems}
+        defaultColumn={{
+          // Let's set up our default Filter UI
+          // Filter: DefaultColumnFilter,
+          minWidth: 30,
+          width: 120,
+          maxWidth: 800,
+        }}
+        initialState={{
+          sortBy: [
+            {
+              id: 'name',
+              asc: true,
+            },
+          ],
+          hiddenColumns: columns
+            .filter((col) => col.isVisible === false)
+            .map((col) => col.accessor),
+        }}
+        filterTypes={filterTypes}
+        renderRowSubComponent={renderRowSubSubComponent}
+      />
     ),
     []
   );

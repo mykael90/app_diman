@@ -41,7 +41,7 @@ export default function TableGfilterNestedrow({
   );
 
   return (
-    <Row className="py-3">
+    <Row>
       <Table bordered hover size="sm" {...getTableProps()} responsive="sm">
         <thead>
           {headerGroups.map((headerGroup) => (

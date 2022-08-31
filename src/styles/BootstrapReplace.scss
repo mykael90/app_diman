@@ -14,9 +14,9 @@ $dropdown-link-active-bg:          sismanColors.$primaryDarkColor;
 
 
 //Customizing tables
-$table-hover-color:           sismanColors.$body2Color;
-$table-hover-bg-factor:       .9;
-$table-hover-bg:              rgba(#456296, $table-hover-bg-factor);
+// $table-hover-color:           sismanColors.$body2Color;
+$table-hover-bg-factor:       .8;
+$table-hover-bg:              rgba(#f0f0f0, $table-hover-bg-factor);
 
 
 /* import bootstrap to set changes */
