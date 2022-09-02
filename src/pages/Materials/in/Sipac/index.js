@@ -132,6 +132,7 @@ export default function inputMaterial() {
       req: req.dadosJSON['Número da Requisição'],
       userId, // pegar id user context
       value: req.dadosJSON['Valor do Total Atendido']
+        .replace(/\./g, '')
         .replace(/,/g, '.')
         .replace(/[^0-9\.]+/g, ''),
       requiredBy: req.dadosJSON['Usuário'].substring(
@@ -172,7 +173,6 @@ export default function inputMaterial() {
         `Material da requisição ${response.data.req} recebido com sucesso`
       );
     } catch (err) {
-      
       const { errors } = err.response.data;
 
       errors.map((error) =>
