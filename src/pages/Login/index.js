@@ -19,6 +19,7 @@ export default function Login() {
   const prevPath = location.state?.from?.pathname || '/';
 
   const isLoading = useSelector((state) => state.auth.isLoading);
+  console.log(isLoading);
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

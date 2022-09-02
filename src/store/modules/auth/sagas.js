@@ -17,9 +17,11 @@ function* loginRequest({ payload }) {
 
     payload.navigate(payload.prevPath, { replace: true });
   } catch (e) {
-    const { errors } = e.response.data;
+    const errors = get(e, 'response.data.errors');
 
-    errors.map((error) => toast.error(error));
+    if (errors) errors.map((error) => toast.error(error));
+
+    if (!errors) toast.error(e.message);
 
     yield put(actions.loginFailure());
   }

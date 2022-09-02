@@ -172,6 +172,7 @@ export default function inputMaterial() {
         `Material da requisição ${response.data.req} recebido com sucesso`
       );
     } catch (err) {
+      
       const { errors } = err.response.data;
 
       errors.map((error) =>
