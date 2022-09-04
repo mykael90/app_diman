@@ -1,9 +1,11 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable react/prop-types */
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
-import { get } from 'lodash';
 import { toast } from 'react-toastify';
 
-import { Table, Container, Row, Card } from 'react-bootstrap';
+import { Container, Row, Card } from 'react-bootstrap';
 
 import axios from '../../../services/axios';
 import Loading from '../../../components/Loading';
@@ -24,8 +26,10 @@ export default function Index() {
         setReqs(response.data);
         setIsLoading(false);
       } catch (err) {
-        const errors = get(err, 'response.data.errors', []);
-        errors.map((error) => toast.error(error));
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
         setIsLoading(false);
       }
     }
@@ -67,6 +71,8 @@ export default function Index() {
         accessor: 'value',
         width: 120,
         disableResizing: true,
+        // eslint-disable-next-line react/destructuring-assignment
+        Cell: (props) => <span>R$ {props.value}</span>,
       },
       {
         Header: 'Pedido em:',
@@ -79,6 +85,13 @@ export default function Index() {
         accessor: 'requiredBy',
         width: 150,
         disableResizing: true,
+        Cell: (props) => {
+          const custom = String(props.value).replace(
+            /(^[a-z]*)\.([a-z]*).*/gm,
+            '$1.$2'
+          ); // deixar só os dois primeiros nomes
+          return <span> {custom}</span>;
+        },
       },
       {
         Header: 'Receb. em:',
@@ -91,11 +104,27 @@ export default function Index() {
         accessor: 'receivedBy',
         width: 150,
         disableResizing: true,
+        Cell: (props) => {
+          const custom = String(props.value).replace(
+            /(^[a-z]*)\.([a-z]*).*/gm,
+            '$1.$2'
+          ); // deixar só os dois primeiros nomes
+          return <span> {custom}</span>;
+        },
       },
       {
         Header: 'Unidade de Custo',
         accessor: 'costUnit',
         isVisible: window.innerWidth > 576,
+        // eslint-disable-next-line react/destructuring-assignment
+        Cell: (props) => {
+          const custom = String(props.value).replace(/([0-9]{2})/gm, '$1.');
+          return (
+            <span title={props.row.original.costUnitNome}>
+              {custom} {props.row.original.costUnitSigla}
+            </span>
+          );
+        },
       },
     ],
     []
@@ -156,7 +185,7 @@ export default function Index() {
   const renderRowSubSubComponent = React.useCallback(
     ({ row }) => (
       <>
-        <spam className="fw-bold">Especificação:</spam>{' '}
+        <span className="fw-bold">Especificação:</span>{' '}
         {row.original.specification}
       </>
     ),
@@ -209,6 +238,8 @@ export default function Index() {
             accessor: 'value',
             width: 100,
             disableResizing: true,
+            // eslint-disable-next-line react/destructuring-assignment
+            Cell: (props) => <span>R$ {props.value}</span>,
           },
         ]}
         data={row.original.MaterialInItems}

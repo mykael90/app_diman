@@ -17,11 +17,10 @@ function* loginRequest({ payload }) {
 
     payload.navigate(payload.prevPath, { replace: true });
   } catch (e) {
-    const errors = get(e, 'response.data.errors');
-
-    if (errors) errors.map((error) => toast.error(error));
-
-    if (!errors) toast.error(e.message);
+    // eslint-disable-next-line no-unused-expressions
+    e.response?.data?.errors
+      ? e.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+      : toast.error(e.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
 
     yield put(actions.loginFailure());
   }
@@ -67,7 +66,7 @@ function* registerRequest({ payload }) {
     const status = get(e, 'response.status', 0);
 
     if (status === 401) {
-      toast.error('Vocë precisa fazer login novamente');
+      toast.error('Você precisa fazer login novamente');
       yield put(actions.loginFailure());
       return navigate('/login', { replace: true });
     }

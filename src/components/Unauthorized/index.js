@@ -22,7 +22,7 @@ export default function Unauthorized() {
           <Link to="/Home" className="text-decoration-none">
             <Button className="d-flex justify-content-center">
               <FaHome className="me-2" style={{ fontSize: '1.5em' }} />
-              <spam>Página Inicial</spam>
+              <span>Página Inicial</span>
             </Button>
           </Link>
         </Col>
@@ -34,7 +34,7 @@ export default function Unauthorized() {
             >
               {' '}
               <FaEnvelope className="me-2" style={{ fontSize: '1.3em' }} />
-              <spam>Contactar Suporte</spam>
+              <span>Contactar Suporte</span>
             </Button>
           </Link>
         </Col>

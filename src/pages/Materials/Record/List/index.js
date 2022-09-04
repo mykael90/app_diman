@@ -23,8 +23,10 @@ export default function Index() {
         setMaterials(response.data);
         setIsLoading(false);
       } catch (err) {
-        const errors = get(err, 'response.data.errors', []);
-        errors.map((error) => toast.error(error));
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
         setIsLoading(false);
       }
     }
@@ -123,7 +125,7 @@ export default function Index() {
   const renderRowSubComponent = React.useCallback(
     ({ row }) => (
       <>
-        <spam className="fw-bold">Especificação:</spam>{' '}
+        <span className="fw-bold">Especificação:</span>{' '}
         {row.original.specification}
       </>
     ),

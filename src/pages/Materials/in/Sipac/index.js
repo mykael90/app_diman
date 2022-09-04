@@ -159,6 +159,8 @@ export default function inputMaterial() {
       value: item.Valor.replace(/\./g, '')
         .replace(/,/g, '.')
         .replace(/[^0-9\.]+/g, ''), // ajustar regex
+      name: item['Denominação'],
+      unit: item['Unid. Med.'],
     }));
 
     try {

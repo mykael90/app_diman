@@ -13,7 +13,7 @@ export default function Footer() {
       <Container className="py-1 ps-4 mb-0">
         <Row className="d-flex justify-content-between align-items-center py-2">
           <Col>
-            <spam
+            <span
               style={{
                 fontSize: '0.7em',
                 fontWeight: 'bold',
@@ -21,12 +21,12 @@ export default function Footer() {
               }}
             >
               ABOUT
-            </spam>
+            </span>
             <div>Sistema de gestão da manutenção predial</div>
           </Col>
           <Col>
             {' '}
-            <spam
+            <span
               style={{
                 fontSize: '0.7em',
                 fontWeight: 'bold',
@@ -34,7 +34,7 @@ export default function Footer() {
               }}
             >
               DEVELOPMENT
-            </spam>
+            </span>
             <div>
               <FaUserCircle /> mykael.mello@ufrn.br
             </div>

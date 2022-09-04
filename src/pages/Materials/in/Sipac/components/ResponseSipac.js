@@ -86,7 +86,6 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
                         <td>
                           ({item['Código']}) - {item['Denominação']}
                         </td>
-
                         <td>{item['Unid. Med.'].substr(0, 3)}</td>
                         <td>{item.A}</td>
                       </tr>
