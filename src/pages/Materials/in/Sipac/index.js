@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from 'react';
 import { get } from 'lodash';
