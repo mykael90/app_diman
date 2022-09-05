@@ -59,71 +59,100 @@ export default function Header() {
             clas="d-flex justify-content-between"
           >
             <Nav className="me-auto mt-2 px-2">
-              <Nav.Link href="#1" onClick={() => navigate('/colaboradores')}>
+              {/* <Nav.Link href="#1" onClick={() => navigate('/colaboradores')}>
                 COLAB
-              </Nav.Link>
+              </Nav.Link> */}
 
-              <NavDropdown title="MATERIAL" id="collasible-nav-dropdown">
+              <NavDropdown title="COLAB" id="collasible-nav-dropdown">
                 <NavDropdown.Item // teste
-                  href="#2"
+                  href="#1"
                   onClick={() => navigate('/materials/in/sipac')}
                 >
-                  Entrada
+                  Frequência
                 </NavDropdown.Item>
                 <NavDropdown.Item
-                  href="#3"
+                  href="#2"
                   onClick={() => navigate('/materials/out/use')}
                 >
-                  Saída
+                  Ocorrência
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
-                  href="#4"
-                  onClick={() => navigate('/materials/reports/inventory')}
+                  href="#3"
+                  onClick={() => navigate('/colaboradores/reports/')}
                 >
                   Relatórios
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#4"
+                  onClick={() => navigate('/colaboradores/record/list')}
+                >
+                  Cadastro
+                </NavDropdown.Item>
+              </NavDropdown>
+
+              <NavDropdown title="MATERIAL" id="collasible-nav-dropdown">
+                <NavDropdown.Item // teste
+                  href="#5"
+                  onClick={() => navigate('/materials/in/sipac')}
+                >
+                  Entrada
+                </NavDropdown.Item>
+                <NavDropdown.Item
+                  href="#6"
+                  onClick={() => navigate('/materials/out/use')}
+                >
+                  Saída
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#7"
+                  onClick={() => navigate('/materials/reports/inventory')}
+                >
+                  Relatórios
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#8"
                   onClick={() => navigate('/materials/record/list')}
                 >
                   Cadastro
                 </NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link href="#5" onClick={() => navigate('/equip')}>
+              <Nav.Link href="#9" onClick={() => navigate('/equip')}>
                 EQUIP
               </Nav.Link>
 
-              <Nav.Link href="#6" onClick={() => navigate('/eletrica')}>
+              <Nav.Link href="#10" onClick={() => navigate('/eletrica')}>
                 ELÉTRICA
               </Nav.Link>
 
               <NavDropdown title="AGUA" id="collasible-nav-dropdown">
-                <NavDropdown.Item href="#7">Poços artesianos</NavDropdown.Item>
-                <NavDropdown.Item href="#8">
+                <NavDropdown.Item href="#11">Poços artesianos</NavDropdown.Item>
+                <NavDropdown.Item href="#12">
                   Reservatórios Elevados
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="#9">Manobras</NavDropdown.Item>
+                <NavDropdown.Item href="#13">Manobras</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="#10">Relatórios</NavDropdown.Item>
+                <NavDropdown.Item href="#14">Relatórios</NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link href="#11" onClick={() => navigate('/esgoto')}>
+              <Nav.Link href="#15" onClick={() => navigate('/esgoto')}>
                 ESGOTO
               </Nav.Link>
 
-              <Nav.Link href="#12" onClick={() => navigate('/drenagem')}>
+              <Nav.Link href="#16" onClick={() => navigate('/drenagem')}>
                 DRENAGEM
               </Nav.Link>
 
-              <Nav.Link href="#13" onClick={() => navigate('/pavimento')}>
+              <Nav.Link href="#17" onClick={() => navigate('/pavimento')}>
                 PAVIMENTO
               </Nav.Link>
 
-              <Nav.Link href="#14" onClick={() => navigate('/edificio')}>
+              <Nav.Link href="#18" onClick={() => navigate('/edificio')}>
                 EDIFÍCIO
               </Nav.Link>
             </Nav>
@@ -149,7 +178,7 @@ export default function Header() {
                       </div>
                     </Link>
                   </Nav.Link>
-                  <Nav.Link href="#15">
+                  <Nav.Link href="#19">
                     <Link to="/register">
                       <div className="text-nowrap flex-nowrap">
                         <FaUserEdit
@@ -163,7 +192,7 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Nav.Link href="#16">
+                  <Nav.Link href="#20">
                     <Link to="/login">
                       <div className="text-nowrap flex-nowrap">
                         <FaUser
@@ -177,7 +206,7 @@ export default function Header() {
                       </div>
                     </Link>
                   </Nav.Link>
-                  <Nav.Link href="#17">
+                  <Nav.Link href="#21">
                     <Link to="/register">
                       <div className="text-nowrap flex-nowrap">
                         <FaUserPlus
