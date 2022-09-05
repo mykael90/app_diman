@@ -1,0 +1,45 @@
+{
+  "workers": [
+    {
+      "cpf": 55666577885,
+      "name": "João Lucas de Maia",
+      "birthdate": "05/12/1987",
+      "email": "joao.lucas@gmail.com",
+      "WorkersContact": [
+        {
+          "type": "telefone",
+          "contact": 5584999807445,
+          "default": false
+        },
+        {
+          "type": "telefone",
+          "contact": 5584999807445,
+          "default": true
+        }
+      ]
+    },
+    {
+      "cpf": 55666577885,
+      "name": "Rafael de Menezes Gouveia",
+      "birthdate": "08/06/1977",
+      "email": "rafael.menezes@gmail.com",
+      "WorkersContact": [
+        {
+          "contacttypeId": 1,
+          "contact": "5584996507887",
+          "default": false
+        },
+        {
+          "contacttypeId": 1,
+          "contact": "5584999714585",
+          "default": true
+        },
+        {
+          "contacttypeId": 2,
+          "contact": "@rafael.meneses25",
+          "default": true
+        }
+      ]
+    }
+  ]
+}
