@@ -56,7 +56,7 @@ export default function Index() {
     var contato = '';
 
     item.WorkersContact.map(function (item) {
-      if (item.default) {
+      if (item.default && item.contacttypeId == 1) {
         contato = item.contact;
       }
     });
