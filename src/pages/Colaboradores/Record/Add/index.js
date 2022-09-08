@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import { Button, Row, Col, Form } from 'react-bootstrap';
+import { Button, InputGroup, Row, Col, Form } from 'react-bootstrap';
 import { IMaskInput } from 'react-imask';
+import { FaPhone } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
@@ -253,18 +254,22 @@ export default function index({ submitReq }) {
                   className="pt-0"
                 >
                   <Form.Label>Telefone</Form.Label>
-                  <Form.Control
-                    type="text"
-                    as={IMaskInput}
-                    mask="(00) 00000-0000"
-                    value={values.telefone}
-                    onChange={handleChange}
-                    isInvalid={touched.telefone && !!errors.telefone}
-                    isValid={touched.telefone && !errors.telefone}
-                    placeholder="Digite o telefone"
-                    onBlur={handleBlur}
-                  />
-
+                  <InputGroup className="mb-3">
+                    <InputGroup.Text id="basic-addon1">
+                      <FaPhone />
+                    </InputGroup.Text>
+                    <Form.Control
+                      type="text"
+                      as={IMaskInput}
+                      mask="(00) 00000-0000"
+                      value={values.telefone}
+                      onChange={handleChange}
+                      isInvalid={touched.telefone && !!errors.telefone}
+                      isValid={touched.telefone && !errors.telefone}
+                      placeholder="Digite o telefone"
+                      onBlur={handleBlur}
+                    />
+                  </InputGroup>
                   <Form.Control.Feedback
                     tooltip
                     type="invalid"
@@ -282,15 +287,18 @@ export default function index({ submitReq }) {
                   className="pt-0"
                 >
                   <Form.Label>instagram</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={values.instagram}
-                    onChange={handleChange}
-                    isInvalid={touched.instagram && !!errors.instagram}
-                    isValid={touched.instagram && !errors.instagram}
-                    placeholder="Digite o CPF"
-                    onBlur={handleBlur}
-                  />
+                  <InputGroup className="mb-3">
+                    <InputGroup.Text id="basic-addon1">@</InputGroup.Text>
+                    <Form.Control
+                      type="text"
+                      value={values.instagram}
+                      onChange={handleChange}
+                      isInvalid={touched.instagram && !!errors.instagram}
+                      isValid={touched.instagram && !errors.instagram}
+                      placeholder="Digite o Instagram"
+                      onBlur={handleBlur}
+                    />
+                  </InputGroup>
 
                   <Form.Control.Feedback
                     tooltip
