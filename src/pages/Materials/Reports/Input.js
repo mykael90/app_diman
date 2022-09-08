@@ -220,7 +220,7 @@ export default function Index() {
             disableResizing: true,
             isVisible: window.innerWidth > 576,
           },
-          { Header: 'Denominação', accessor: 'name', width: 500 },
+          { Header: 'Denominação', accessor: 'name' },
           {
             Header: 'Unidade',
             accessor: 'unit',
@@ -247,7 +247,7 @@ export default function Index() {
           // Let's set up our default Filter UI
           // Filter: DefaultColumnFilter,
           minWidth: 30,
-          width: 120,
+          width: 50,
           maxWidth: 800,
         }}
         initialState={{

@@ -93,7 +93,7 @@ export default function TableGfilterNestedrow({
                   <tr {...row.getRowProps()} className="border-0">
                     <td
                       colSpan={visibleColumns.length}
-                      style={{ borderColor: 'rgb(222,226,230)' }}
+                      style={{ width: '100%', borderColor: 'rgb(222,226,230)' }}
                     >
                       {/*
                           Inside it, call our renderRowSubComponent function. In reality,
