@@ -16,13 +16,23 @@ export default function index({ submitReq }) {
   const inputRef = useRef();
 
   const schema = yup.object().shape({
-    newReq: yup
+    reqMaintenance: yup
       .string()
       .required('Requerido')
       .matches(
         /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
         'Formato de requisição não permitido'
       ),
+    removedBy: yup.number().positive().integer().required('Requerido'),
+    costUnit: yup.number().positive().integer().required('Requerido'),
+    destination: yup.number().positive().integer().required('Requerido'),
+    obs: yup.string(),
+    // eslint-disable-next-line react/forbid-prop-types
+    items: yup.array().of(
+      yup.object().shape({
+        quantity: yup.number().required('Requerido').positive().integer(),
+      })
+    ),
   });
 
   return (
@@ -36,7 +46,7 @@ export default function index({ submitReq }) {
       <Row className="px-0 pt-2">
         <Formik
           initialValues={{
-            newReq: '',
+            reqMaintenance: '',
           }}
           validationSchema={schema}
           onSubmit={(values, { resetForm }) => {
@@ -53,24 +63,27 @@ export default function index({ submitReq }) {
             errors,
           }) => (
             <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
-              <Form.Group controlId="validationFormik01">
+              <Form.Group controlId="reqMaintenance">
                 <Row className="d-flex align-items-end pt-2">
                   <Col xs={8} md={6} lg={4} xl={3}>
                     <Form.Label>Nº REQUISIÇÃO DE MANUTENÇÃO</Form.Label>
                     <Form.Control
                       type="tel"
-                      name="newReq"
-                      value={values.newReq}
+                      value={values.reqMaintenance}
                       onChange={handleChange}
-                      isInvalid={!!errors.newReq}
-                      isValid={values.newReq && !errors.newReq}
+                      isInvalid={!!errors.reqMaintenance}
+                      isValid={values.reqMaintenance && !errors.reqMaintenance}
                       autoFocus
                       ref={inputRef}
                       placeholder="Código/ano"
                       // onBlur={handleBlur}
                     />
-                    <Form.Control.Feedback tooltip type="invalid">
-                      {errors.newReq}
+                    <Form.Control.Feedback
+                      tooltip
+                      type="invalid"
+                      style={{ position: 'static' }}
+                    >
+                      {errors.reqMaintenance}
                     </Form.Control.Feedback>
                   </Col>
                   <Col xs="auto" className="ps-0 center-text">
@@ -85,33 +98,61 @@ export default function index({ submitReq }) {
                   </Col>
                 </Row>
               </Form.Group>
+            </Form>
+          )}
+        </Formik>
+        <Formik
+          initialValues={{
+            removedBy: '',
+            costUnit: '',
+            destination: '',
+            obs: '',
+          }}
+          validationSchema={schema}
+          onSubmit={(values, { resetForm }) => {
+            submitReq(values, resetForm);
+          }}
+        >
+          {({
+            handleSubmit,
+            handleChange,
+            handleBlur,
+            values,
+            touched,
+            isValid,
+            errors,
+          }) => (
+            <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
               <hr />
               <Row>
                 <Form.Group
                   as={Col}
                   xs={12}
                   md={6}
-                  controlId="validationFormik01"
+                  controlId="removedBy"
                   className="pt-2"
                 >
                   <Form.Label>RETIRADO POR:</Form.Label>
                   <Form.Select
                     type="text"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.removedBy}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={touched.removedBy && !!errors.removedBy}
+                    isValid={touched.removedBy && !errors.removedBy}
                     placeholder="Selecione o profissional"
-                    // onBlur={handleBlur}
+                    onBlur={handleBlur}
                   >
                     <option>Selecione o profissional</option>
                     <option value="1">JOSE FERREIRA</option>
                     <option value="2">MARCONDES</option>
                     <option value="3">DANIEL</option>
                   </Form.Select>
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.removedBy}
                   </Form.Control.Feedback>
                 </Form.Group>
 
@@ -119,67 +160,72 @@ export default function index({ submitReq }) {
                   as={Col}
                   xs={12}
                   md={6}
-                  controlId="validationFormik01"
+                  controlId="costUnit"
                   className="pt-2"
                 >
                   <Form.Label>UIDADE DE CUSTO:</Form.Label>
                   <Form.Control
                     type="text"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.costUnit}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={touched.costUnit && !!errors.costUnit}
+                    isValid={touched.costUnit && !errors.costUnit}
                     placeholder="Selecione o local"
-                    // onBlur={handleBlur}
+                    onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.costUnit}
                   </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group
                   as={Col}
                   xs={12}
-                  controlId="validationFormik01"
+                  controlId="destination"
                   className="pt-2"
                 >
                   <Form.Label>DESTINO:</Form.Label>
                   <Form.Control
                     type="text"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.destination}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={touched.destination && !!errors.destination}
+                    isValid={touched.destination && !errors.destination}
                     placeholder="Selecione o local"
-                    // onBlur={handleBlur}
+                    onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.destination}
                   </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Group
-                  xs={12}
-                  controlId="validationFormik01"
-                  className="pt-2"
-                >
+                <Form.Group xs={12} controlId="obs" className="pt-2">
                   <Form.Label>OBSERVAÇÕES GERAIS:</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={2}
                     type="text"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.obs}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
-                    placeholder="Selecione o local"
-                    // onBlur={handleBlur}
+                    isInvalid={touched.obs && !!errors.obs}
+                    isValid={touched.obs && !errors.obs}
+                    placeholder="Observações gerais"
+                    onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.obs}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
@@ -199,17 +245,16 @@ export default function index({ submitReq }) {
                   as={Col}
                   xs={12}
                   sm={10}
-                  controlId="validationFormik01"
+                  controlId="search"
                   className="d-flex align-items-end pt-2"
                 >
                   <Form.Label className="pe-2">PESQUISAR:</Form.Label>
                   <Form.Select
                     type="text"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.search}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.search}
+                    isValid={values.search && !errors.search}
                     placeholder="Selecione o profissional"
                     // onBlur={handleBlur}
                   >
@@ -218,8 +263,12 @@ export default function index({ submitReq }) {
                     <option value="2">TE</option>
                     <option value="3">CONEXAO</option>
                   </Form.Select>
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.search}
                   </Form.Control.Feedback>
                 </Form.Group>
 
@@ -227,17 +276,16 @@ export default function index({ submitReq }) {
                   as={Col}
                   xs={12}
                   sm={2}
-                  controlId="validationFormik01"
+                  controlId="reqMaterial"
                   className="d-flex align-items-end pt-2"
                 >
                   <Form.Label className="pe-2">RM:</Form.Label>
                   <Form.Select
                     type="text"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.reqMaterial}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.reqMaterial}
+                    isValid={values.reqMaterial && !errors.reqMaterial}
                     placeholder="Selecione o profissional"
                     // onBlur={handleBlur}
                   >
@@ -246,8 +294,12 @@ export default function index({ submitReq }) {
                     <option value="2">TE</option>
                     <option value="3">CONEXAO</option>
                   </Form.Select>
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.reqMaterial}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
@@ -272,22 +324,25 @@ export default function index({ submitReq }) {
                   sm={4}
                   md={3}
                   lg={2}
-                  controlId="validationFormik01"
+                  controlId="MaterialId"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.MaterialId}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.MaterialId}
+                    isValid={values.MaterialId && !errors.MaterialId}
                     placeholder="CODIGO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.MaterialId}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -296,22 +351,25 @@ export default function index({ submitReq }) {
                   sm={8}
                   md={7}
                   lg={8}
-                  controlId="validationFormik01"
+                  controlId="name"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.name}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.name}
+                    isValid={values.name && !errors.name}
                     placeholder="DENOMINAÇÃO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.name}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -319,22 +377,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="unit"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.unit}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.unit}
+                    isValid={values.unit && !errors.unit}
                     placeholder="UND"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.unit}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -342,22 +403,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="quantity"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.quantity}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.quantity}
+                    isValid={values.quantity && !errors.quantity}
                     placeholder="QTD"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.quantity}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
@@ -368,22 +432,25 @@ export default function index({ submitReq }) {
                   sm={4}
                   md={3}
                   lg={2}
-                  controlId="validationFormik01"
+                  controlId="MaterialId"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.MaterialId}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.MaterialId}
+                    isValid={values.MaterialId && !errors.MaterialId}
                     placeholder="CODIGO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.MaterialId}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -392,22 +459,25 @@ export default function index({ submitReq }) {
                   sm={8}
                   md={7}
                   lg={8}
-                  controlId="validationFormik01"
+                  controlId="name"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.name}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.name}
+                    isValid={values.name && !errors.name}
                     placeholder="DENOMINAÇÃO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.name}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -415,22 +485,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="unit"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.unit}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.unit}
+                    isValid={values.unit && !errors.unit}
                     placeholder="UND"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.unit}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -438,22 +511,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="quantity"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.quantity}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.quantity}
+                    isValid={values.quantity && !errors.quantity}
                     placeholder="QTD"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.quantity}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
@@ -464,22 +540,25 @@ export default function index({ submitReq }) {
                   sm={4}
                   md={3}
                   lg={2}
-                  controlId="validationFormik01"
+                  controlId="MaterialId"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.MaterialId}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.MaterialId}
+                    isValid={values.MaterialId && !errors.MaterialId}
                     placeholder="CODIGO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.MaterialId}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -488,22 +567,25 @@ export default function index({ submitReq }) {
                   sm={8}
                   md={7}
                   lg={8}
-                  controlId="validationFormik01"
+                  controlId="name"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.name}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.name}
+                    isValid={values.name && !errors.name}
                     placeholder="DENOMINAÇÃO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.name}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -511,22 +593,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="unit"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.unit}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.unit}
+                    isValid={values.unit && !errors.unit}
                     placeholder="UND"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.unit}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -534,22 +619,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="quantity"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.quantity}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.quantity}
+                    isValid={values.quantity && !errors.quantity}
                     placeholder="QTD"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.quantity}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
@@ -560,22 +648,25 @@ export default function index({ submitReq }) {
                   sm={4}
                   md={3}
                   lg={2}
-                  controlId="validationFormik01"
+                  controlId="MaterialId"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.MaterialId}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.MaterialId}
+                    isValid={values.MaterialId && !errors.MaterialId}
                     placeholder="CODIGO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.MaterialId}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -584,22 +675,25 @@ export default function index({ submitReq }) {
                   sm={8}
                   md={7}
                   lg={8}
-                  controlId="validationFormik01"
+                  controlId="name"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.name}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.name}
+                    isValid={values.name && !errors.name}
                     placeholder="DENOMINAÇÃO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.name}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -607,22 +701,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="unit"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.unit}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.unit}
+                    isValid={values.unit && !errors.unit}
                     placeholder="UND"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.unit}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -630,22 +727,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="quantity"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.quantity}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.quantity}
+                    isValid={values.quantity && !errors.quantity}
                     placeholder="QTD"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.quantity}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
@@ -656,22 +756,25 @@ export default function index({ submitReq }) {
                   sm={4}
                   md={3}
                   lg={2}
-                  controlId="validationFormik01"
+                  controlId="MaterialId"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.MaterialId}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.MaterialId}
+                    isValid={values.MaterialId && !errors.MaterialId}
                     placeholder="CODIGO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.MaterialId}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -680,22 +783,25 @@ export default function index({ submitReq }) {
                   sm={8}
                   md={7}
                   lg={8}
-                  controlId="validationFormik01"
+                  controlId="name"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.name}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.name}
+                    isValid={values.name && !errors.name}
                     placeholder="DENOMINAÇÃO"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.name}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -703,22 +809,25 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="unit"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.unit}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.unit}
+                    isValid={values.unit && !errors.unit}
                     placeholder="UND"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.unit}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
@@ -726,121 +835,29 @@ export default function index({ submitReq }) {
                   xs={4}
                   sm={4}
                   md={1}
-                  controlId="validationFormik01"
+                  controlId="quantity"
                   className="py-0 px-0"
                 >
                   <Form.Control
                     type="text"
                     size="sm"
-                    name="newReq"
-                    value={values.newReq}
+                    value={values.quantity}
                     onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
+                    isInvalid={!!errors.quantity}
+                    isValid={values.quantity && !errors.quantity}
                     placeholder="QTD"
                     // onBlur={handleBlur}
                   />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
+                  <Form.Control.Feedback
+                    tooltip
+                    type="invalid"
+                    style={{ position: 'static' }}
+                  >
+                    {errors.quantity}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
-              <Row style={{ background: body2Color }}>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={3}
-                  lg={2}
-                  controlId="validationFormik01"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    name="newReq"
-                    value={values.newReq}
-                    onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
-                    placeholder="CODIGO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={8}
-                  sm={8}
-                  md={7}
-                  lg={8}
-                  controlId="validationFormik01"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    name="newReq"
-                    value={values.newReq}
-                    onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
-                    placeholder="DENOMINAÇÃO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="validationFormik01"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    name="newReq"
-                    value={values.newReq}
-                    onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
-                    placeholder="UND"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="validationFormik01"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    name="newReq"
-                    value={values.newReq}
-                    onChange={handleChange}
-                    isInvalid={!!errors.newReq}
-                    isValid={values.newReq && !errors.newReq}
-                    placeholder="QTD"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback tooltip type="invalid">
-                    {errors.newReq}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Row>
+
               <hr />
               <Row className="justify-content-center pt-2 pb-4">
                 <Col xs="auto" className="text-center">
