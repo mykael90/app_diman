@@ -232,7 +232,10 @@ export default function index({ submitReq }) {
                                   <option value="telefone">Telefone</option>
                                   <option value="linkedin">Linkedin</option>
                                 </Field>
-                                <Field name={`contacts[${i}].contact`} />
+                                <Field
+                                  placeholder="Digite o contato"
+                                  name={`contacts[${i}].contact`}
+                                />
                                 {console.log(values.contacts.length)}
                                 {values.contacts.length <= 1 ? (
                                   <Button
