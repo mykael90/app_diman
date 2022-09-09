@@ -1,9 +1,11 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { IMaskInput } from 'react-imask';
-import { FaPhone, FaPlus } from 'react-icons/fa';
+import { FaPhone, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
@@ -209,12 +211,17 @@ export default function index({ submitReq }) {
                     console.log('fieldArrayProps', fieldArrayProps);
                     const { push, remove } = fieldArrayProps;
                     return (
-                      <Col>
+                      <Col
+                        xs={12}
+                        md={12}
+                        className="d-flex justify-content-center"
+                      >
                         <div>
                           {values.contacts.length > 0 &&
                             values.contacts.map((contato, i) => (
                               <div key={i}>
                                 <Field
+                                  className="me-1"
                                   as="select"
                                   name={`contacts[${i}].contacttypeId`}
                                 >
@@ -229,6 +236,7 @@ export default function index({ submitReq }) {
                                 {console.log(values.contacts.length)}
                                 {values.contacts.length <= 1 ? (
                                   <Button
+                                    className="ms-1"
                                     size="sm"
                                     variant="success"
                                     onClick={() =>
@@ -237,16 +245,27 @@ export default function index({ submitReq }) {
                                   >
                                     <FaPlus />
                                   </Button>
+                                ) : values.contacts.length - 1 < i ? (
+                                  <Button
+                                    className="ms-1"
+                                    size="sm"
+                                    variant="outline-secondary"
+                                    onClick={() => remove(i)}
+                                  >
+                                    <FaTrashAlt />
+                                  </Button>
                                 ) : (
                                   <>
                                     <Button
+                                      className="ms-1"
                                       size="sm"
-                                      variant="success"
+                                      variant="outline-secondary"
                                       onClick={() => remove(i)}
                                     >
-                                      --
+                                      <FaTrashAlt />
                                     </Button>
                                     <Button
+                                      className="ms-1"
                                       size="sm"
                                       variant="success"
                                       onClick={() =>
