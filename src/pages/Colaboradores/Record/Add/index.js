@@ -1,19 +1,13 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import { Button, InputGroup, Row, Col, Form } from 'react-bootstrap';
+import { Button, Row, Col, Form } from 'react-bootstrap';
 import { IMaskInput } from 'react-imask';
-import { FaPhone } from 'react-icons/fa';
+import { FaPhone, FaPlus } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
-import {
-  Formik,
-  Field,
-  ErrorMessage,
-  FieldArray,
-  Form as FormFormik,
-} from 'formik'; // FormValidation
+import { Formik, Field, ErrorMessage, FieldArray } from 'formik'; // FormValidation
 import { primaryDarkColor } from '../../../../config/colors';
 
 export default function index({ submitReq }) {
@@ -31,59 +25,6 @@ export default function index({ submitReq }) {
       .max(new Date(), 'Não é possível incluir uma data futura')
       .required('Campo obrigatório'),
   });
-
-  const addReq = (submitReq) => {
-    const currentYear = new Date().getFullYear();
-    console.log(submitReq);
-
-    // limitar a 10 itens
-    if (reqs.length > 9) {
-      toast.error('Lista de importação limitada a 10 itens', {
-        autoClose: false,
-        draggable: true,
-        closeOnClick: true,
-      });
-      return;
-    }
-
-    // não incluir repetido na lista
-    if (reqs.length > 0) {
-      let exists = false;
-
-      reqs.every((value) => {
-        if (Object.values(value).includes(submitReq)) {
-          exists = true;
-          return false;
-        }
-        return true;
-      });
-
-      if (exists) {
-        toast.error('Item já incluído na lista de importação', {
-          autoClose: false,
-          draggable: true,
-          closeOnClick: true,
-        });
-        return;
-      }
-    }
-
-    const id = reqs.length ? reqs[reqs.length - 1].id + 1 : 1;
-    const newReq = { id, req: submitReq };
-    const listReqs = [...reqs, newReq];
-    setReqs(listReqs);
-  };
-
-  const deleteReq = (id) => {
-    // forma diferente de escrever, poderia usar splice
-    const listReqs = reqs.filter((req) => req.id !== id);
-    setReqs(listReqs);
-  };
-  const addContact = ({ newReq }, resetForm) => {
-    if (!newReq) return;
-    addReq(newReq);
-    resetForm();
-  };
 
   return (
     <Row className="bg-light border rounded d-flex justify-content-center pt-2">
@@ -256,147 +197,73 @@ export default function index({ submitReq }) {
                 </Form.Group>
               </Row>
               <hr />
-              <Row>
-                <Form.Group
-                  as={Col}
-                  xs={12}
-                  md={6}
-                  controlId="telefone"
-                  className="pt-0"
-                >
-                  <Form.Label>Telefone</Form.Label>
-                  <InputGroup className="mb-3">
-                    <InputGroup.Text id="basic-addon1">
-                      <FaPhone />
-                    </InputGroup.Text>
-                    <Form.Control
-                      type="text"
-                      as={IMaskInput}
-                      mask="(00) 00000-0000"
-                      value={values.telefone}
-                      onChange={handleChange}
-                      isInvalid={touched.telefone && !!errors.telefone}
-                      isValid={touched.telefone && !errors.telefone}
-                      placeholder="Digite o telefone"
-                      onBlur={handleBlur}
-                    />
-                  </InputGroup>
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.telefone}
-                  </Form.Control.Feedback>
-                </Form.Group>
-
-                <Form.Group
-                  as={Col}
-                  xs={12}
-                  md={6}
-                  controlId="instagram"
-                  className="pt-0"
-                >
-                  <Form.Label>instagram</Form.Label>
-                  <InputGroup className="mb-3">
-                    <InputGroup.Text id="basic-addon1">@</InputGroup.Text>
-                    <Form.Control
-                      type="text"
-                      value={values.instagram}
-                      onChange={handleChange}
-                      isInvalid={touched.instagram && !!errors.instagram}
-                      isValid={touched.instagram && !errors.instagram}
-                      placeholder="Digite o Instagram"
-                      onBlur={handleBlur}
-                    />
-                  </InputGroup>
-
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.instagram}
-                  </Form.Control.Feedback>
-                </Form.Group>
+              <Row
+                className="d-flex text-center"
+                style={{ background: primaryDarkColor, color: 'white' }}
+              >
+                <span className="fs-6">CONTATOS</span>
               </Row>
-              <hr />
               <Row className="justify-content-center pt-2 pb-4">
-                <FormFormik>
-                  <FieldArray name="friends">
-                    {({ insert, remove, push }) => (
-                      <div>
-                        {values.contacts.length > 0 &&
-                          values.contacts.map((contato, index) => (
-                            <div className="row" key={index}>
-                              <div className="col">
-                                <Form.Group
-                                  as={Col}
-                                  xs={12}
-                                  md={6}
-                                  controlId="contactType"
-                                  className="pt-2"
+                <FieldArray name="contacts">
+                  {(fieldArrayProps) => {
+                    console.log('fieldArrayProps', fieldArrayProps);
+                    const { push, remove } = fieldArrayProps;
+                    return (
+                      <Col>
+                        <div>
+                          {values.contacts.length > 0 &&
+                            values.contacts.map((contato, i) => (
+                              <div key={i}>
+                                <Field
+                                  as="select"
+                                  name={`contacts[${i}].contacttypeId`}
                                 >
-                                  <Form.Label>Tipo</Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    defaultValue={
-                                      values.contacts[index].contacttypeId
+                                  <option value="selecione">
+                                    Selecione o Tipo
+                                  </option>
+                                  <option value="instagram">Instagram</option>
+                                  <option value="telefone">Telefone</option>
+                                  <option value="linkedin">Linkedin</option>
+                                </Field>
+                                <Field name={`contacts[${i}].contact`} />
+                                {console.log(values.contacts.length)}
+                                {values.contacts.length <= 1 ? (
+                                  <Button
+                                    size="sm"
+                                    variant="success"
+                                    onClick={() =>
+                                      push({ contacttypeId: '', contact: '' })
                                     }
-                                    onChange={handleChange}
-                                    placeholder="Digite o tipo"
-                                    onBlur={handleBlur}
-                                  />
-                                  {console.log(
-                                    values.contacts[index].contacttypeId
-                                  )}
-                                </Form.Group>
+                                  >
+                                    <FaPlus />
+                                  </Button>
+                                ) : (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="success"
+                                      onClick={() => remove(i)}
+                                    >
+                                      --
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="success"
+                                      onClick={() =>
+                                        push({ contacttypeId: '', contact: '' })
+                                      }
+                                    >
+                                      <FaPlus />
+                                    </Button>
+                                  </>
+                                )}
                               </div>
-                              <div className="col">
-                                <Form.Group
-                                  as={Col}
-                                  xs={12}
-                                  md={6}
-                                  controlId="contact"
-                                  className="pt-2"
-                                >
-                                  <Form.Label>Contato</Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    defaultValue={
-                                      values.contacts[index].contact
-                                    }
-                                    onChange={handleChange}
-                                    placeholder="Digite o contato"
-                                    onBlur={handleBlur}
-                                  />
-                                </Form.Group>
-                              </div>
-                              <div className="col">
-                                <button
-                                  type="button"
-                                  className="secondary"
-                                  onClick={() => remove(index)}
-                                >
-                                  X
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        <button
-                          type="button"
-                          className="secondary"
-                          onClick={() =>
-                            push({ contacttypeId: '', contact: '' })
-                          }
-                        >
-                          Add Friend
-                        </button>
-                      </div>
-                    )}
-                  </FieldArray>
-                  <button type="submit">Invite</button>
-                </FormFormik>
+                            ))}
+                        </div>
+                      </Col>
+                    );
+                  }}
+                </FieldArray>
               </Row>
 
               <hr />
@@ -407,7 +274,7 @@ export default function index({ submitReq }) {
                   </Button>
                 </Col>
                 <Col xs="auto" className="text-center">
-                  <Button variant="success" onClick={addReq}>
+                  <Button variant="success" onClick={console.log(`click`)}>
                     Cadastrar
                   </Button>
                 </Col>
