@@ -7,7 +7,13 @@ import { FaPhone } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
-import { Formik } from 'formik'; // FormValidation
+import {
+  Formik,
+  Field,
+  ErrorMessage,
+  FieldArray,
+  Form as FormFormik,
+} from 'formik'; // FormValidation
 import { primaryDarkColor } from '../../../../config/colors';
 
 export default function index({ submitReq }) {
@@ -95,7 +101,12 @@ export default function index({ submitReq }) {
             birthdate: '',
             rg: '',
             cpf: '',
-            telefone: '',
+            contacts: [
+              {
+                contacttypeId: '',
+                contact: '',
+              },
+            ],
           }}
           validationSchema={schema}
           onSubmit={(values, { resetForm }) => {
@@ -309,6 +320,85 @@ export default function index({ submitReq }) {
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
+              <hr />
+              <Row className="justify-content-center pt-2 pb-4">
+                <FormFormik>
+                  <FieldArray name="friends">
+                    {({ insert, remove, push }) => (
+                      <div>
+                        {values.contacts.length > 0 &&
+                          values.contacts.map((contato, index) => (
+                            <div className="row" key={index}>
+                              <div className="col">
+                                <Form.Group
+                                  as={Col}
+                                  xs={12}
+                                  md={6}
+                                  controlId="contactType"
+                                  className="pt-2"
+                                >
+                                  <Form.Label>Tipo</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    defaultValue={
+                                      values.contacts[index].contacttypeId
+                                    }
+                                    onChange={handleChange}
+                                    placeholder="Digite o tipo"
+                                    onBlur={handleBlur}
+                                  />
+                                  {console.log(
+                                    values.contacts[index].contacttypeId
+                                  )}
+                                </Form.Group>
+                              </div>
+                              <div className="col">
+                                <Form.Group
+                                  as={Col}
+                                  xs={12}
+                                  md={6}
+                                  controlId="contact"
+                                  className="pt-2"
+                                >
+                                  <Form.Label>Contato</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    defaultValue={
+                                      values.contacts[index].contact
+                                    }
+                                    onChange={handleChange}
+                                    placeholder="Digite o contato"
+                                    onBlur={handleBlur}
+                                  />
+                                </Form.Group>
+                              </div>
+                              <div className="col">
+                                <button
+                                  type="button"
+                                  className="secondary"
+                                  onClick={() => remove(index)}
+                                >
+                                  X
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        <button
+                          type="button"
+                          className="secondary"
+                          onClick={() =>
+                            push({ contacttypeId: '', contact: '' })
+                          }
+                        >
+                          Add Friend
+                        </button>
+                      </div>
+                    )}
+                  </FieldArray>
+                  <button type="submit">Invite</button>
+                </FormFormik>
+              </Row>
+
               <hr />
               <Row className="justify-content-center pt-2 pb-4">
                 <Col xs="auto" className="text-center">
