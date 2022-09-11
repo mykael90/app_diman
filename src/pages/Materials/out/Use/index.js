@@ -1,19 +1,35 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
-import React, { useRef } from 'react';
-import { FaPlus } from 'react-icons/fa';
-import { Button, Row, Col, Form } from 'react-bootstrap';
+import React, { useState, useRef } from 'react';
+import { FaPlus, FaTrashAlt } from 'react-icons/fa';
+import {
+  Button,
+  Row,
+  Col,
+  Form,
+  Badge,
+  Dropdown,
+  ButtonGroup,
+  Modal,
+} from 'react-bootstrap';
 
 import * as yup from 'yup'; // RulesValidation
-import { Formik } from 'formik'; // FormValidation
+import { Formik, FieldArray } from 'formik'; // FormValidation
 import {
   primaryDarkColor,
   body1Color,
   body2Color,
 } from '../../../../config/colors';
 
+import SearchModal from './components/SearchModal';
+
 export default function index({ submitReq }) {
   const inputRef = useRef();
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const schema = yup.object().shape({
     reqMaintenance: yup
@@ -25,16 +41,31 @@ export default function index({ submitReq }) {
       ),
     removedBy: yup.number().positive().integer().required('Requerido'),
     costUnit: yup.number().positive().integer().required('Requerido'),
-    destination: yup.number().positive().integer().required('Requerido'),
+    property: yup.number().positive().integer().required('Requerido'),
     obs: yup.string(),
     // eslint-disable-next-line react/forbid-prop-types
-    items: yup.array().of(
-      yup.object().shape({
-        quantity: yup.number().required('Requerido').positive().integer(),
-      })
-    ),
+    items: yup
+      .array()
+      .of(
+        yup.object().shape({
+          MaterialId: yup.number().required('Requerido').positive().integer(),
+          name: yup.string().required('Requerido'),
+          unit: yup.string().required('Requerido'),
+          quantity: yup.number().required('Requerido').positive().integer(),
+        })
+      )
+      .required('A lista de materiais não pode ser vazia'),
   });
 
+  const initialValues = {
+    reqMaintenance: '',
+    removedBy: '',
+    costUnit: '',
+    property: '',
+    building: '',
+    obs: '',
+    items: [],
+  };
   return (
     <Row className="bg-light border rounded d-flex justify-content-center pt-2">
       <Row
@@ -44,10 +75,8 @@ export default function index({ submitReq }) {
         <span className="fs-5">SAÍDA DE MATERIAL</span>
       </Row>
       <Row className="px-0 pt-2">
-        <Formik
-          initialValues={{
-            reqMaintenance: '',
-          }}
+        <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
+          initialValues={initialValues}
           validationSchema={schema}
           onSubmit={(values, { resetForm }) => {
             submitReq(values, resetForm);
@@ -63,68 +92,37 @@ export default function index({ submitReq }) {
             errors,
           }) => (
             <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
-              <Form.Group controlId="reqMaintenance">
-                <Row className="d-flex align-items-end pt-2">
-                  <Col xs={8} md={6} lg={4} xl={3}>
-                    <Form.Label>Nº REQUISIÇÃO DE MANUTENÇÃO</Form.Label>
-                    <Form.Control
-                      type="tel"
-                      value={values.reqMaintenance}
-                      onChange={handleChange}
-                      isInvalid={!!errors.reqMaintenance}
-                      isValid={values.reqMaintenance && !errors.reqMaintenance}
-                      autoFocus
-                      ref={inputRef}
-                      placeholder="Código/ano"
-                      // onBlur={handleBlur}
-                    />
-                    <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.reqMaintenance}
-                    </Form.Control.Feedback>
-                  </Col>
-                  <Col xs="auto" className="ps-0 center-text">
-                    <Button
-                      variant="success"
-                      type="submit"
-                      aria-label="Add Req"
-                      onClick={() => inputRef.current.focus()}
-                    >
-                      <FaPlus />
-                    </Button>
-                  </Col>
-                </Row>
-              </Form.Group>
-            </Form>
-          )}
-        </Formik>
-        <Formik
-          initialValues={{
-            removedBy: '',
-            costUnit: '',
-            destination: '',
-            obs: '',
-          }}
-          validationSchema={schema}
-          onSubmit={(values, { resetForm }) => {
-            submitReq(values, resetForm);
-          }}
-        >
-          {({
-            handleSubmit,
-            handleChange,
-            handleBlur,
-            values,
-            touched,
-            isValid,
-            errors,
-          }) => (
-            <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
-              <hr />
               <Row>
+                <Form.Group controlId="reqMaintenance">
+                  <Row className="d-flex align-items-end pt-2">
+                    <Col xs={8} md={6} lg={4} xl={3}>
+                      <Form.Label>Nº REQUISIÇÃO DE MANUTENÇÃO</Form.Label>
+                      <Form.Control
+                        type="tel"
+                        value={values.reqMaintenance}
+                        onChange={handleChange}
+                        isInvalid={
+                          touched.reqMaintenance && !!errors.reqMaintenance
+                        }
+                        isValid={
+                          touched.reqMaintenance && !errors.reqMaintenance
+                        }
+                        autoFocus
+                        ref={inputRef}
+                        placeholder="Código/ano"
+                        onBlur={handleBlur}
+                      />
+                      <Form.Control.Feedback
+                        tooltip
+                        type="invalid"
+                        style={{ position: 'static' }}
+                      >
+                        {errors.reqMaintenance}
+                      </Form.Control.Feedback>
+                    </Col>
+                  </Row>
+                </Form.Group>
+
                 <Form.Group
                   as={Col}
                   xs={12}
@@ -185,16 +183,16 @@ export default function index({ submitReq }) {
                 <Form.Group
                   as={Col}
                   xs={12}
-                  controlId="destination"
+                  controlId="property"
                   className="pt-2"
                 >
-                  <Form.Label>DESTINO:</Form.Label>
+                  <Form.Label>IMÓVEL:</Form.Label>
                   <Form.Control
                     type="text"
-                    value={values.destination}
+                    value={values.property}
                     onChange={handleChange}
-                    isInvalid={touched.destination && !!errors.destination}
-                    isValid={touched.destination && !errors.destination}
+                    isInvalid={touched.property && !!errors.property}
+                    isValid={touched.property && !errors.property}
                     placeholder="Selecione o local"
                     onBlur={handleBlur}
                   />
@@ -203,7 +201,7 @@ export default function index({ submitReq }) {
                     type="invalid"
                     style={{ position: 'static' }}
                   >
-                    {errors.destination}
+                    {errors.property}
                   </Form.Control.Feedback>
                 </Form.Group>
 
@@ -237,636 +235,258 @@ export default function index({ submitReq }) {
               >
                 <span className="fs-6">LISTA DE MATERIAIS</span>
               </Row>
-              <Row
-                className="d-flex align-items-end py-2"
-                style={{ background: body1Color }}
-              >
-                <Form.Group
-                  as={Col}
-                  xs={12}
-                  sm={10}
-                  controlId="search"
-                  className="d-flex align-items-end pt-2"
-                >
-                  <Form.Label className="pe-2">PESQUISAR:</Form.Label>
-                  <Form.Select
-                    type="text"
-                    value={values.search}
-                    onChange={handleChange}
-                    isInvalid={!!errors.search}
-                    isValid={values.search && !errors.search}
-                    placeholder="Selecione o profissional"
-                    // onBlur={handleBlur}
-                  >
-                    <option>Selecione o material</option>
-                    <option value="1">JOELHO</option>
-                    <option value="2">TE</option>
-                    <option value="3">CONEXAO</option>
-                  </Form.Select>
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.search}
-                  </Form.Control.Feedback>
-                </Form.Group>
 
-                <Form.Group
-                  as={Col}
-                  xs={12}
-                  sm={2}
-                  controlId="reqMaterial"
-                  className="d-flex align-items-end pt-2"
-                >
-                  <Form.Label className="pe-2">RM:</Form.Label>
-                  <Form.Select
-                    type="text"
-                    value={values.reqMaterial}
-                    onChange={handleChange}
-                    isInvalid={!!errors.reqMaterial}
-                    isValid={values.reqMaterial && !errors.reqMaterial}
-                    placeholder="Selecione o profissional"
-                    // onBlur={handleBlur}
-                  >
-                    <option>Selecione o material</option>
-                    <option value="1">JOELHO</option>
-                    <option value="2">TE</option>
-                    <option value="3">CONEXAO</option>
-                  </Form.Select>
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.reqMaterial}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Row>
-              <Row className="pt-2">
-                <Col xs={4} sm={4} md={3} lg={2} className="border my-0 mx-0">
-                  CODIGO
-                </Col>
-                <Col xs={8} sm={8} md={7} lg={8} className="border my-0 mx-0">
-                  DENOMINAÇÃO
-                </Col>
-                <Col xs={4} sm={4} md={1} className="border my-0 mx-0">
-                  UND
-                </Col>
-                <Col xs={4} sm={4} md={1} className="border my-0 mx-0">
-                  QTD
-                </Col>
-              </Row>
-              <Row style={{ background: body2Color }}>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={3}
-                  lg={2}
-                  controlId="MaterialId"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.MaterialId}
-                    onChange={handleChange}
-                    isInvalid={!!errors.MaterialId}
-                    isValid={values.MaterialId && !errors.MaterialId}
-                    placeholder="CODIGO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.MaterialId}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={8}
-                  sm={8}
-                  md={7}
-                  lg={8}
-                  controlId="name"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.name}
-                    onChange={handleChange}
-                    isInvalid={!!errors.name}
-                    isValid={values.name && !errors.name}
-                    placeholder="DENOMINAÇÃO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.name}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="unit"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.unit}
-                    onChange={handleChange}
-                    isInvalid={!!errors.unit}
-                    isValid={values.unit && !errors.unit}
-                    placeholder="UND"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.unit}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="quantity"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.quantity}
-                    onChange={handleChange}
-                    isInvalid={!!errors.quantity}
-                    isValid={values.quantity && !errors.quantity}
-                    placeholder="QTD"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.quantity}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Row>
-              <Row style={{ background: body2Color }}>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={3}
-                  lg={2}
-                  controlId="MaterialId"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.MaterialId}
-                    onChange={handleChange}
-                    isInvalid={!!errors.MaterialId}
-                    isValid={values.MaterialId && !errors.MaterialId}
-                    placeholder="CODIGO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.MaterialId}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={8}
-                  sm={8}
-                  md={7}
-                  lg={8}
-                  controlId="name"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.name}
-                    onChange={handleChange}
-                    isInvalid={!!errors.name}
-                    isValid={values.name && !errors.name}
-                    placeholder="DENOMINAÇÃO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.name}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="unit"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.unit}
-                    onChange={handleChange}
-                    isInvalid={!!errors.unit}
-                    isValid={values.unit && !errors.unit}
-                    placeholder="UND"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.unit}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="quantity"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.quantity}
-                    onChange={handleChange}
-                    isInvalid={!!errors.quantity}
-                    isValid={values.quantity && !errors.quantity}
-                    placeholder="QTD"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.quantity}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Row>
-              <Row style={{ background: body2Color }}>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={3}
-                  lg={2}
-                  controlId="MaterialId"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.MaterialId}
-                    onChange={handleChange}
-                    isInvalid={!!errors.MaterialId}
-                    isValid={values.MaterialId && !errors.MaterialId}
-                    placeholder="CODIGO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.MaterialId}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={8}
-                  sm={8}
-                  md={7}
-                  lg={8}
-                  controlId="name"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.name}
-                    onChange={handleChange}
-                    isInvalid={!!errors.name}
-                    isValid={values.name && !errors.name}
-                    placeholder="DENOMINAÇÃO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.name}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="unit"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.unit}
-                    onChange={handleChange}
-                    isInvalid={!!errors.unit}
-                    isValid={values.unit && !errors.unit}
-                    placeholder="UND"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.unit}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="quantity"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.quantity}
-                    onChange={handleChange}
-                    isInvalid={!!errors.quantity}
-                    isValid={values.quantity && !errors.quantity}
-                    placeholder="QTD"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.quantity}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Row>
-              <Row style={{ background: body2Color }}>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={3}
-                  lg={2}
-                  controlId="MaterialId"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.MaterialId}
-                    onChange={handleChange}
-                    isInvalid={!!errors.MaterialId}
-                    isValid={values.MaterialId && !errors.MaterialId}
-                    placeholder="CODIGO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.MaterialId}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={8}
-                  sm={8}
-                  md={7}
-                  lg={8}
-                  controlId="name"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.name}
-                    onChange={handleChange}
-                    isInvalid={!!errors.name}
-                    isValid={values.name && !errors.name}
-                    placeholder="DENOMINAÇÃO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.name}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="unit"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.unit}
-                    onChange={handleChange}
-                    isInvalid={!!errors.unit}
-                    isValid={values.unit && !errors.unit}
-                    placeholder="UND"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.unit}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="quantity"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.quantity}
-                    onChange={handleChange}
-                    isInvalid={!!errors.quantity}
-                    isValid={values.quantity && !errors.quantity}
-                    placeholder="QTD"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.quantity}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Row>
-              <Row style={{ background: body2Color }}>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={3}
-                  lg={2}
-                  controlId="MaterialId"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.MaterialId}
-                    onChange={handleChange}
-                    isInvalid={!!errors.MaterialId}
-                    isValid={values.MaterialId && !errors.MaterialId}
-                    placeholder="CODIGO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.MaterialId}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={8}
-                  sm={8}
-                  md={7}
-                  lg={8}
-                  controlId="name"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.name}
-                    onChange={handleChange}
-                    isInvalid={!!errors.name}
-                    isValid={values.name && !errors.name}
-                    placeholder="DENOMINAÇÃO"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.name}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="unit"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.unit}
-                    onChange={handleChange}
-                    isInvalid={!!errors.unit}
-                    isValid={values.unit && !errors.unit}
-                    placeholder="UND"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.unit}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  xs={4}
-                  sm={4}
-                  md={1}
-                  controlId="quantity"
-                  className="py-0 px-0"
-                >
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    value={values.quantity}
-                    onChange={handleChange}
-                    isInvalid={!!errors.quantity}
-                    isValid={values.quantity && !errors.quantity}
-                    placeholder="QTD"
-                    // onBlur={handleBlur}
-                  />
-                  <Form.Control.Feedback
-                    tooltip
-                    type="invalid"
-                    style={{ position: 'static' }}
-                  >
-                    {errors.quantity}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Row>
+              <FieldArray name="items">
+                {(fieldArrayProps) => {
+                  console.log('fieldArrayProps', fieldArrayProps);
+                  console.log('values', values);
+                  console.log('errors', errors);
+                  console.log('touched', touched);
+                  const { insert, remove, push } = fieldArrayProps;
+                  return (
+                    <Row style={{ background: body2Color }}>
+                      <SearchModal // modal p/ pesquisa de materiais
+                        handleClose={handleClose}
+                        show={show}
+                        push={push}
+                        items={values.items}
+                      />
+                      <Row
+                        className="p-0 m-0 py-2"
+                        style={{ background: body1Color }}
+                      >
+                        <Col xs="auto">
+                          <Dropdown as={ButtonGroup}>
+                            <Button variant="light" onClick={handleShow}>
+                              Pesquisar
+                            </Button>
+
+                            <Dropdown.Toggle
+                              split
+                              variant="light"
+                              id="dropdown-split-basic"
+                            />
+
+                            <Dropdown.Menu>
+                              <Dropdown.Item href="#/action-1">
+                                Material sem saldo
+                              </Dropdown.Item>
+                              <Dropdown.Item href="#/action-2">
+                                Importar de outras RMs
+                              </Dropdown.Item>
+                              <Dropdown.Item href="#/action-3">
+                                Importar de outras saídas
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </Col>
+                        <Col xs="auto">
+                          <Dropdown>
+                            <Dropdown.Toggle
+                              variant="light"
+                              id="dropdown-basic"
+                            >
+                              Importar RM Associada{' '}
+                              <Badge bg="primary">3</Badge>
+                              <span className="visually-hidden">
+                                unread messages
+                              </span>
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                              <Dropdown.Item href="#/action-1">
+                                RM 1564
+                              </Dropdown.Item>
+                              <Dropdown.Item href="#/action-2">
+                                RM 4875
+                              </Dropdown.Item>
+                              <Dropdown.Item href="#/action-3">
+                                RM 1567
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </Col>
+                        <Col xs="auto">
+                          <Button
+                            onClick={() =>
+                              push({
+                                MaterialId: '',
+                                name: '',
+                                unit: '',
+                                quantity: '',
+                              })
+                            }
+                            variant="outline-success"
+                            size="sm"
+                            className="border-0"
+                          >
+                            <FaPlus size={18} />
+                          </Button>
+                        </Col>
+                      </Row>
+                      <Row className="p-0 m-0 pt-2">
+                        <Col
+                          xs={4}
+                          sm={4}
+                          md={3}
+                          lg={2}
+                          className="border my-0 mx-0"
+                        >
+                          CODIGO
+                        </Col>
+                        <Col className="border my-0 mx-0">DENOMINAÇÃO</Col>
+                        <Col xs={4} sm={4} md={1} className="border my-0 mx-0">
+                          UND
+                        </Col>
+                        <Col xs={4} sm={4} md={1} className="border my-0 mx-0">
+                          QTD
+                        </Col>
+                        <Col xs="auto" className="border my-0 mx-0">
+                          R
+                        </Col>
+                      </Row>
+                      {values.items.length > 0 &&
+                        values.items.map((item, index) => (
+                          <Row key={index} className="d-flex p-0 m-0">
+                            <Form.Group
+                              as={Col}
+                              xs={4}
+                              sm={4}
+                              md={3}
+                              lg={2}
+                              controlId={`items[${index}].MaterialId`}
+                              className="border m-0 p-0"
+                            >
+                              <Form.Control
+                                type="text"
+                                plaintext
+                                readOnly
+                                value={item.MaterialId}
+                                onChange={handleChange}
+                                // isInvalid={
+                                //   touched.items &&
+                                //   !!errors.items[index].MaterialId
+                                // }
+                                // isValid={
+                                //   touched.items &&
+                                //   !errors.items[index].MaterialId
+                                // }
+                                placeholder="Selecione o ID material"
+                                onBlur={handleBlur}
+                                size="sm"
+                                className="p-0 m-0 ps-2"
+                              />
+                            </Form.Group>
+                            <Form.Group
+                              as={Col}
+                              controlId={`items[${index}].name`}
+                              className="border m-0 p-0"
+                            >
+                              <Form.Control
+                                type="text"
+                                plaintext
+                                // readOnly
+                                value={item.name}
+                                onChange={handleChange}
+                                // isInvalid={
+                                //   touched.items &&
+                                //   !!errors.items[index].name
+                                // }
+                                // isValid={
+                                //   touched.items && !errors.items[index].name
+                                // }
+                                onBlur={handleBlur}
+                                placeholder="Selecione o ID material"
+                                size="sm"
+                                className="p-0 m-0 ps-2"
+                              />
+                            </Form.Group>
+                            <Form.Group
+                              as={Col}
+                              xs={4}
+                              sm={4}
+                              md={1}
+                              controlId={`items[${index}].unit`}
+                              className="border m-0 p-0"
+                            >
+                              <Form.Control
+                                type="text"
+                                plaintext
+                                // readOnly
+                                value={item.unit}
+                                onChange={handleChange}
+                                // isInvalid={
+                                //   touched.items &&
+                                //   !!errors.items[index].name
+                                // }
+                                // isValid={
+                                //   touched.items && !errors.items[index].name
+                                // }
+                                onBlur={handleBlur}
+                                placeholder="UND"
+                                size="sm"
+                                className="p-0 m-0 ps-2"
+                              />
+                            </Form.Group>
+                            <Form.Group
+                              as={Col}
+                              xs={4}
+                              sm={4}
+                              md={1}
+                              controlId={`items[${index}].quantity`}
+                              className="border m-0 p-0"
+                            >
+                              <Form.Control
+                                type="number"
+                                plaintext
+                                // readOnly
+                                value={item.quantity}
+                                onChange={handleChange}
+                                // isInvalid={
+                                //   touched.items &&
+                                //   !!errors.items[index].quantity
+                                // }
+                                // isValid={
+                                //   touched.items && !errors.items[index].quantity
+                                // }
+                                onBlur={handleBlur}
+                                placeholder="QTD"
+                                size="sm"
+                                className="p-0 m-0 ps-2"
+                              />
+                            </Form.Group>
+                            <Col xs="auto" className="border m-0 p-0">
+                              <Button
+                                onClick={() => remove(index)}
+                                variant="outline-danger"
+                                size="sm"
+                                className="border-0"
+                              >
+                                <FaTrashAlt size={18} />
+                              </Button>
+                            </Col>
+                          </Row>
+                        ))}
+                    </Row>
+                  );
+                }}
+              </FieldArray>
 
               <hr />
               <Row className="justify-content-center pt-2 pb-4">
                 <Col xs="auto" className="text-center">
-                  <Button variant="warning" onClick={console.log(`click`)}>
+                  <Button
+                    variant="warning"
+                    onClick={() => console.log(`click`)}
+                  >
                     Limpar
                   </Button>
                 </Col>
                 <Col xs="auto" className="text-center">
-                  <Button variant="success" onClick={console.log(`click`)}>
+                  <Button
+                    variant="success"
+                    onClick={() => console.log(`click`)}
+                  >
                     Confirmar saída
                   </Button>
                 </Col>
