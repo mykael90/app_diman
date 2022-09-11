@@ -66,6 +66,7 @@ export default function Index({ submitReq }) {
     removedBy: yup.number().positive().integer().required('Requerido'),
     costUnit: yup.number().positive().integer().required('Requerido'),
     property: yup.number().positive().integer().required('Requerido'),
+    building: yup.number().positive().integer().required('Requerido'),
     obs: yup.string(),
     // eslint-disable-next-line react/forbid-prop-types
     items: yup
@@ -105,7 +106,8 @@ export default function Index({ submitReq }) {
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
-              submitReq(values, resetForm);
+              console.log(values);
+              resetForm();
             }}
           >
             {({
@@ -236,7 +238,7 @@ export default function Index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={8}
-                    controlId="property"
+                    controlId="building"
                     className="pt-2"
                   >
                     <Form.Label>PRÉDIO:</Form.Label>
@@ -529,7 +531,11 @@ export default function Index({ submitReq }) {
                     <Button
                       type="submit"
                       variant="success"
-                      onClick={handleSubmit}
+                      onClick={() => {
+                        toast.success(
+                          'Saída de material realizada com sucesso'
+                        );
+                      }}
                     >
                       Confirmar saída
                     </Button>
