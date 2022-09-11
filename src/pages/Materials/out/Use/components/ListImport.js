@@ -1,22 +1,18 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus } from 'react-icons/fa';
 
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 
-import axios from '../../../../../services/axios';
-import Loading from '../../../../../components/Loading';
-
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../../../components/TableGfilterNestedRow';
 
 export default function Index(props) {
-  const { push, items } = props;
-  const [isLoading, setIsLoading] = useState(false);
-  const [materials, setMaterials] = useState([]);
+  const { push, items, materialsBalance } = props;
+  const [materials, setMaterials] = useState([...materialsBalance]);
 
   const handleQuantityChange = (e, row) => {
     const errors = [];
@@ -48,6 +44,7 @@ export default function Index(props) {
 
       if (exists) {
         toast.error('Item já incluído na lista de saída');
+        return;
       }
     }
 
@@ -64,25 +61,6 @@ export default function Index(props) {
     materialsCopy.splice(row.index, 1);
     setMaterials(materialsCopy);
   };
-
-  useEffect(() => {
-    async function getData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/in/items');
-        setMaterials(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
-
-    getData();
-  }, []);
 
   const columns = React.useMemo(
     () => [
@@ -214,26 +192,22 @@ export default function Index(props) {
   );
 
   return (
-    <>
-      {' '}
-      <Loading isLoading={isLoading} />
-      <Container>
-        <Row className="text-center py-3">
-          <Card.Title>Materiais Cadastrados</Card.Title>
-          <Card.Text>
-            Referências extraídas via SIPAC (grupos: 3024, 3026).
-          </Card.Text>
-        </Row>
+    <Container>
+      <Row className="text-center py-3">
+        <Card.Title>Materiais Cadastrados</Card.Title>
+        <Card.Text>
+          Referências extraídas via SIPAC (grupos: 3024, 3026).
+        </Card.Text>
+      </Row>
 
-        <TableGfilterNestedrow
-          columns={columns}
-          data={data}
-          defaultColumn={defaultColumn}
-          initialState={initialState}
-          filterTypes={filterTypes}
-          renderRowSubComponent={renderRowSubComponent}
-        />
-      </Container>
-    </>
+      <TableGfilterNestedrow
+        columns={columns}
+        data={data}
+        defaultColumn={defaultColumn}
+        initialState={initialState}
+        filterTypes={filterTypes}
+        renderRowSubComponent={renderRowSubComponent}
+      />
+    </Container>
   );
 }

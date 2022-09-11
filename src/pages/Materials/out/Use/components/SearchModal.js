@@ -5,7 +5,7 @@ import { Button, Modal } from 'react-bootstrap';
 import ListImport from './ListImport';
 
 export default function SearchModal(props) {
-  const { show, handleClose, push, items } = props;
+  const { show, handleClose, push, items, materialsBalance } = props;
 
   return (
     <Modal
@@ -19,7 +19,11 @@ export default function SearchModal(props) {
         <Modal.Title>Inventário</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <ListImport push={push} items={items} />
+        <ListImport
+          push={push}
+          items={items}
+          materialsBalance={materialsBalance}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
