@@ -208,38 +208,38 @@ export default function index({ submitReq }) {
               <Row className="justify-content-center pt-2 pb-4">
                 <FieldArray name="contacts">
                   {(fieldArrayProps) => {
-                    console.log('fieldArrayProps', fieldArrayProps);
                     const { push, remove } = fieldArrayProps;
                     return (
-                      <Col
-                        xs={12}
-                        md={12}
-                        className="d-flex justify-content-center"
-                      >
-                        <div>
-                          {values.contacts.length > 0 &&
-                            values.contacts.map((contato, i) => (
-                              <div key={i}>
-                                <Field
-                                  className="me-1"
-                                  as="select"
-                                  name={`contacts[${i}].contacttypeId`}
-                                >
-                                  <option value="selecione">
-                                    Selecione o Tipo
-                                  </option>
-                                  <option value="instagram">Instagram</option>
-                                  <option value="telefone">Telefone</option>
-                                  <option value="linkedin">Linkedin</option>
-                                </Field>
-                                <Field
-                                  placeholder="Digite o contato"
-                                  name={`contacts[${i}].contact`}
-                                />
-                                {console.log(values.contacts.length)}
+                      <Row>
+                        {values.contacts.length > 0 &&
+                          values.contacts.map((contato, i) => (
+                            <Col xs={6} md={4} key={i}>
+                              <Col sm>
+                                <Form.Group>
+                                  <Form.Select
+                                    className="me-1"
+                                    name={`contacts[${i}].contacttypeId`}
+                                  >
+                                    <option value="selecione">
+                                      Selecione o Tipo
+                                    </option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="telefone">Telefone</option>
+                                    <option value="linkedin">Linkedin</option>
+                                  </Form.Select>
+                                </Form.Group>
+                              </Col>
+                              <Col sm>
+                                <Form.Group>
+                                  <Form.Control
+                                    placeholder="Digite o contato"
+                                    name={`contacts[${i}].contact`}
+                                  />
+                                </Form.Group>
+                              </Col>
+                              <Col sm>
                                 {values.contacts.length <= 1 ? (
                                   <Button
-                                    className="ms-1"
                                     size="sm"
                                     variant="success"
                                     onClick={() =>
@@ -250,7 +250,6 @@ export default function index({ submitReq }) {
                                   </Button>
                                 ) : values.contacts.length - 1 < i ? (
                                   <Button
-                                    className="ms-1"
                                     size="sm"
                                     variant="outline-secondary"
                                     onClick={() => remove(i)}
@@ -260,7 +259,6 @@ export default function index({ submitReq }) {
                                 ) : (
                                   <>
                                     <Button
-                                      className="ms-1"
                                       size="sm"
                                       variant="outline-secondary"
                                       onClick={() => remove(i)}
@@ -268,21 +266,23 @@ export default function index({ submitReq }) {
                                       <FaTrashAlt />
                                     </Button>
                                     <Button
-                                      className="ms-1"
                                       size="sm"
                                       variant="success"
                                       onClick={() =>
-                                        push({ contacttypeId: '', contact: '' })
+                                        push({
+                                          contacttypeId: '',
+                                          contact: '',
+                                        })
                                       }
                                     >
                                       <FaPlus />
                                     </Button>
                                   </>
                                 )}
-                              </div>
-                            ))}
-                        </div>
-                      </Col>
+                              </Col>
+                            </Col>
+                          ))}
+                      </Row>
                     );
                   }}
                 </FieldArray>
