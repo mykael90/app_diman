@@ -1,18 +1,19 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus } from 'react-icons/fa';
 
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 
 // import generic table from material's components with global filter and nested row
-import TableGfilterNestedrow from '../../../components/TableGfilterNestedRow';
+import TableGfilterNestedRowHiddenRows from '../../../components/TableGfilterNestedRowHiddenRows';
 
 export default function Index(props) {
-  const { push, items, materialsBalance } = props;
-  const [materials, setMaterials] = useState([...materialsBalance]);
+  const { push, hiddenItems, materialsBalance } = props;
+
+  const [hiddenRows, setHiddenRows] = useState(hiddenItems);
 
   const handleQuantityChange = (e, row) => {
     const errors = [];
@@ -29,50 +30,64 @@ export default function Index(props) {
     row.values.quantity = e.target.value;
   };
 
-  const handlePushItem = (e, row) => {
-    // não incluir repetido na lista
-    if (items.length > 0) {
-      let exists = false;
-
-      items.every((value) => {
-        if (value.MaterialId === row.values.material_id) {
-          exists = true;
-          return false;
-        }
-        return true;
-      });
-
-      if (exists) {
-        toast.error('Item já incluído na lista de saída');
+  const handlePushItem = React.useMemo(
+    () => (e, row) => {
+      if (row.isExpanded === true) {
+        toast.error('Feche a linha de especificação para poder inserir o item');
         return;
       }
-    }
 
-    // adicionar na lista de saída
-    push({
-      MaterialId: row.values.material_id,
-      name: row.values.name,
-      unit: row.values.unit,
-      quantity: row.values.quantity ?? 0,
-    });
+      // row.isExpanded ? row.isExpanded = false;
+      // não incluir repetido na lista (não precisa mais pq nao aparece)
+      if (hiddenRows.length > 0) {
+        let exists = false;
 
-    // remover da lista de pesquisa (atrapalha a filtragem, tem que remover e automaticamente aplicar a filtragem pra dar certo), usar um filtro pra esconder a linha adicionada, pode ser filtro de coluna com o id. Outra opção é construir uma lista dos itens que foram enviados e não permitir repetições. O filtro de coluna me parece a melhor opção, inclusve pode ocultar aqueles itens que ja vem da lista na outra pagina
-    // const materialsCopy = [...materials];
-    // materialsCopy.splice(row.index, 1);
-    // setMaterials(materialsCopy);
-  };
+        hiddenRows.every((value) => {
+          if (value.MaterialId === row.values.material_id) {
+            exists = true;
+            return false;
+          }
+          return true;
+        });
+
+        if (exists) {
+          toast.error('Item já incluído na lista de saída');
+          return;
+        }
+      }
+
+      // adicionar na lista de saída
+      push({
+        MaterialId: row.values.material_id,
+        name: row.values.name,
+        unit: row.values.unit,
+        quantity: row.values.quantity ?? 0,
+      });
+
+      const newHiddenRows = [...hiddenRows, row.values.material_id];
+      setHiddenRows(newHiddenRows);
+    },
+    [hiddenRows, push]
+  );
 
   // Define a custom filter filter function!
-  function filterDifferentThan(rows, id, filterValue) {
+  function filterDifferentThan(rows, id) {
     return rows.filter((row) => {
       const rowValue = row.values[id];
-      return rowValue !== '302400000066'; // example
+      return !hiddenRows.includes(rowValue);
     });
   }
 
   // trigger to custom filter
-  function DefaultColumnFilter({ column: { filterValue, setFilter } }) {
-    return setFilter(filterValue); // Set undefined to remove the filter entirely
+  function DefaultColumnFilter() {
+    return <> </>;
+  } // as colunas padrao nao aplicam filtro
+
+  function FilterForId({ column: { setFilter } }) {
+    useEffect(() => {
+      setFilter('');
+    }, []);
+    return <> </>;
   }
 
   const columns = React.useMemo(
@@ -83,6 +98,8 @@ export default function Index(props) {
         id: 'expander', // It needs an ID
         width: 30,
         disableResizing: true,
+        canFilter: false,
+        filterable: false,
         Cell: ({ row }) => (
           // Use Cell to render an expander for each row.
           // We can use the getToggleRowExpandedProps prop-getter
@@ -98,21 +115,23 @@ export default function Index(props) {
         width: 125,
         disableResizing: true,
         isVisible: window.innerWidth > 576,
-        Filter: DefaultColumnFilter,
         filter: filterDifferentThan,
+        Filter: FilterForId,
       },
-      { Header: 'Denominação', accessor: 'name' },
+      { Header: 'Denominação', accessor: 'name', disableFilters: true },
       {
         Header: 'Unidade',
         accessor: 'unit',
         width: 100,
         disableResizing: true,
+        disableFilters: true,
       },
       {
         Header: 'Saldo',
         accessor: 'total',
         width: 80,
         disableResizing: true,
+        disableFilters: true,
       },
       {
         // Make an expander cell
@@ -120,6 +139,7 @@ export default function Index(props) {
         id: 'quantity', // It needs an ID
         width: 120,
         disableResizing: true,
+        disableFilters: true,
         Cell: ({ row }) => (
           <Col className="d-flex">
             <Form.Control
@@ -140,15 +160,15 @@ export default function Index(props) {
         ),
       },
     ],
-    [materials]
+    [handlePushItem]
   );
 
-  const data = React.useMemo(() => materials, [materials]);
+  const data = React.useMemo(() => materialsBalance, [materialsBalance]);
 
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
-      // Filter: DefaultColumnFilter, //coloca filtro para todas as colunas
+      Filter: DefaultColumnFilter, // coloca filtro para todas as colunas
       minWidth: 30,
       width: 120,
       maxWidth: 800,
@@ -214,8 +234,7 @@ export default function Index(props) {
           Referências extraídas via SIPAC (grupos: 3024, 3026).
         </Card.Text>
       </Row>
-
-      <TableGfilterNestedrow
+      <TableGfilterNestedRowHiddenRows
         columns={columns}
         data={data}
         defaultColumn={defaultColumn}

@@ -26,7 +26,7 @@ import Loading from '../../../../components/Loading';
 
 import SearchModal from './components/SearchModal';
 
-export default function Index({ submitReq }) {
+export default function Index() {
   const [materialsBalance, setMaterialsBalance] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,10 +50,10 @@ export default function Index({ submitReq }) {
   }, []);
 
   const inputRef = useRef();
-  const [show, setShow] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = () => setShowModal(true);
 
   const schema = yup.object().shape({
     reqMaintenance: yup
@@ -106,7 +106,6 @@ export default function Index({ submitReq }) {
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
-              console.log(values);
               resetForm();
             }}
           >
@@ -297,10 +296,12 @@ export default function Index({ submitReq }) {
                     return (
                       <Row style={{ background: body2Color }}>
                         <SearchModal // modal p/ pesquisa de materiais
-                          handleClose={handleClose}
-                          show={show}
+                          handleClose={handleCloseModal}
+                          show={showModal}
                           push={push}
-                          items={values.items}
+                          hiddenItems={values.items.map(
+                            (item) => item.MaterialId
+                          )}
                           materialsBalance={materialsBalance}
                         />
                         <Row
@@ -309,7 +310,7 @@ export default function Index({ submitReq }) {
                         >
                           <Col xs="auto">
                             <Dropdown as={ButtonGroup}>
-                              <Button variant="light" onClick={handleShow}>
+                              <Button variant="light" onClick={handleShowModal}>
                                 Pesquisar
                               </Button>
 
