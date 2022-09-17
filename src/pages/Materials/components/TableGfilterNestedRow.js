@@ -123,19 +123,21 @@ export default function TableGfilterNestedrow({
                 {headerGroup.headers.map((column) => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                     {column.render('Header')}
-                    <span>
-                      {' '}
-                      <FaSort />
-                      {column.isSorted ? (
-                        column.isSortedDesc ? (
-                          <FaSortAlphaUp />
+                    {column.canSort ? (
+                      <span>
+                        {' '}
+                        <FaSort />
+                        {column.isSorted ? (
+                          column.isSortedDesc ? (
+                            <FaSortAlphaUp />
+                          ) : (
+                            <FaSortAlphaDown />
+                          )
                         ) : (
-                          <FaSortAlphaDown />
-                        )
-                      ) : (
-                        ''
-                      )}
-                    </span>
+                          ''
+                        )}
+                      </span>
+                    ) : null}
                   </th>
                 ))}
               </tr>
