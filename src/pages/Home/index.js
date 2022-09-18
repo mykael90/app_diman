@@ -69,7 +69,7 @@ export default function Home() {
               <Button
                 variant="secondary"
                 onClick={() => setOpen(!open)}
-                aria-controls="example-collapse-text"
+                aria-controls="collapse-text"
                 aria-expanded={open}
               >
                 {' '}
@@ -78,7 +78,7 @@ export default function Home() {
             ) : null}
 
             <Collapse in={open}>
-              <div id="example-collapse-text">
+              <div id="collapse-text">
                 <Card.Text
                   className="lead pt-2"
                   style={{ textAlign: 'justify' }}
@@ -161,7 +161,7 @@ export default function Home() {
               <Card as="Col" className="px-0 mx-1 my-2">
                 <Card.Img
                   variant="top"
-                  src="https://source.unsplash.com/80x80/?workers"
+                  src="https://source.unsplash.com/400x400/?workers"
                 />
                 <Card.Body>
                   <Card.Title>COLABORADORES</Card.Title>
@@ -173,7 +173,7 @@ export default function Home() {
               <Card as="Col" className="px-0 mx-1 my-2">
                 <Card.Img
                   variant="top"
-                  src="https://source.unsplash.com/80x80/?construction"
+                  src="https://source.unsplash.com/400x400/?construction"
                 />
                 <Card.Body>
                   <Card.Title>MATERIAIS</Card.Title>
@@ -185,7 +185,7 @@ export default function Home() {
               <Card as="Col" className="px-0 mx-1 my-2">
                 <Card.Img
                   variant="top"
-                  src="https://source.unsplash.com/80x80/?equipment"
+                  src="https://source.unsplash.com/400x400/?equipment"
                 />
                 <Card.Body>
                   <Card.Title>EQUIPAMENTOS</Card.Title>
@@ -197,7 +197,7 @@ export default function Home() {
               <Card as="Col" className="px-0 mx-1 my-2">
                 <Card.Img
                   variant="top"
-                  src="https://source.unsplash.com/80x80/?building"
+                  src="https://source.unsplash.com/400x400/?building"
                 />
                 <Card.Body>
                   <Card.Title>EDIFICAÇÕES</Card.Title>
@@ -209,7 +209,7 @@ export default function Home() {
               <Card as="Col" className="px-0 mx-1 my-2">
                 <Card.Img
                   variant="top"
-                  src="https://source.unsplash.com/80x80/?water"
+                  src="https://source.unsplash.com/400x400/?water"
                 />
                 <Card.Body>
                   <Card.Title>ABASTECIMENTO DE ÁGUA</Card.Title>
@@ -222,7 +222,7 @@ export default function Home() {
               <Card as="Col" className="px-0 mx-1 my-2">
                 <Card.Img
                   variant="top"
-                  src="https://source.unsplash.com/80x80/?pump"
+                  src="https://source.unsplash.com/400x400/?pump"
                 />
                 <Card.Body>
                   <Card.Title>SANEAMENTO</Card.Title>
@@ -235,7 +235,7 @@ export default function Home() {
               <Card as="Col" className="px-0 mx-1 my-2">
                 <Card.Img
                   variant="top"
-                  src="https://source.unsplash.com/80x80/?energy"
+                  src="https://source.unsplash.com/400x400/?energy"
                 />
                 <Card.Body>
                   <Card.Title>FORNECIMENTO ELÉTRICO</Card.Title>
@@ -248,7 +248,7 @@ export default function Home() {
               <Card as="Col" className="px-0 mx-1 my-2">
                 <Card.Img
                   variant="top"
-                  src="https://source.unsplash.com/80x80/?asphalt"
+                  src="https://source.unsplash.com/400x400/?asphalt"
                 />
                 <Card.Body>
                   <Card.Title>PAVIMENTAÇÃO</Card.Title>
