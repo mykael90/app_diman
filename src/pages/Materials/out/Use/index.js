@@ -33,10 +33,34 @@ import imoveis from '../../../../assets/JSON/imoveis.json';
 export default function Index() {
   const [materialsBalance, setMaterialsBalance] = useState([]);
   const [users, setUsers] = useState([]);
+  const [schema, setSchema] = useState(
+    yup.object().shape({
+      reqMaintenance: yup
+        .string()
+        .matches(
+          /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
+          'Formato de requisição não permitido'
+        ),
+      removedBy: yup.number().positive().integer().required('Requerido'),
+      property: yup.number().positive().integer().required('Requerido'),
+      obs: yup.string(),
+      // eslint-disable-next-line react/forbid-prop-types
+      items: yup
+        .array()
+        .of(
+          yup.object().shape({
+            quantity: yup.number().required('Requerido').positive(),
+          })
+        )
+        .required()
+        .min(1, 'A lista de materiais não pode ser vazia'),
+    })
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [openCollapse, setOpenCollapse] = useState(false);
   const inputRef = useRef();
+  const oldQuantity = useRef(0);
 
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
@@ -77,43 +101,70 @@ export default function Index() {
     getUsersData();
   }, []);
 
+  const handleQuantityChange = (e, balance, handleChange) => {
+    if (e.target.value > balance) {
+      toast.error('A saída não pode superar o saldo do material');
+      e.target.value = balance;
+      handleChange(e);
+      return;
+    }
+    if (e.target.value < 0) {
+      toast.error('A saída não pode ser negativa');
+      e.target.value = 0;
+      handleChange(e);
+      return;
+    }
+    handleChange(e);
+  };
+
   const formatReq = (req) => {
     const currentYear = new Date().getFullYear();
     return req.includes('/') ? req : `${req}/${currentYear}`;
   };
 
-  const schema = yup.object().shape({
-    reqMaintenance: yup
-      .string()
-      .matches(
-        /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
-        'Formato de requisição não permitido'
-      ),
-    removedBy: yup.number().positive().integer().required('Requerido'),
+  const schemaSingleOutput = yup.object().shape({
     authorizedBy: yup.number().positive().integer().required('Requerido'),
-    property: yup.number().positive().integer().required('Requerido'),
     building: yup.string().required('Requerido'),
-    obs: yup.string(),
-    // eslint-disable-next-line react/forbid-prop-types
-    items: yup
-      .array()
-      .of(
-        yup.object().shape({
-          MaterialId: yup.number().required('Requerido').positive().integer(),
-          name: yup.string().required('Requerido'),
-          unit: yup.string().required('Requerido'),
-          quantity: yup.number().required('Requerido').positive().integer(),
-        })
-      )
-      .required('A lista de materiais não pode ser vazia'),
   });
+
+  const initialSchema = () => {
+    setSchema(
+      yup.object().shape({
+        reqMaintenance: yup
+          .string()
+          .matches(
+            /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
+            'Formato de requisição não permitido'
+          ),
+        removedBy: yup.number().positive().integer().required('Requerido'),
+        property: yup.number().positive().integer().required('Requerido'),
+        obs: yup.string(),
+        // eslint-disable-next-line react/forbid-prop-types
+        items: yup
+          .array()
+          .of(
+            yup.object().shape({
+              quantity: yup.number().required('Requerido').positive(),
+            })
+          )
+          .required()
+          .min(1, 'A lista de materiais não pode ser vazia'),
+      })
+    );
+  };
+
+  const apllySchema = (addSchema) => {
+    const newSchema = schema.concat(addSchema);
+    setSchema(newSchema);
+  };
 
   const initialValues = {
     reqMaintenance: '',
-    removedBy: '',
     authorizedBy: '',
+    removedBy: '',
     property: '',
     building: '',
+    reqMaterial: '',
     obs: '',
     items: [],
   };
@@ -136,20 +187,31 @@ export default function Index() {
             }}
           >
             {({
+              submitForm,
               resetForm,
               handleSubmit,
               handleChange,
               handleBlur,
               values,
               touched,
-              isValid,
               errors,
               setFieldValue,
             }) => (
               <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Row className="d-flex justify-content-between pb-3">
-                  <Col xs="3" className="d-flex justify-content-start">
-                    <Form.Group as={Col} xs={6} controlId="reqMaintenance">
+                  <Col
+                    xs="12"
+                    sm="10"
+                    md="6"
+                    className="d-flex justify-content-start"
+                  >
+                    <Form.Group
+                      as={Col}
+                      xs={6}
+                      sm={5}
+                      md={4}
+                      controlId="reqMaintenance"
+                    >
                       <Form.Label>REQ. MANUTENÇÃO</Form.Label>
                       <Form.Control
                         type="tel"
@@ -160,7 +222,7 @@ export default function Index() {
                         }
                         autoFocus
                         ref={inputRef}
-                        placeholder="Código/ano"
+                        placeholder="Insira o número"
                         onBlur={handleBlur}
                         readOnly={!!openCollapse}
                       />
@@ -201,8 +263,12 @@ export default function Index() {
                         <Button
                           variant="secondary"
                           onClick={() => {
-                            !errors.reqMaintenance && // verficcar se n tem erro
+                            !values.reqMaintenance &&
+                              !errors.reqMaintenance && // verficcar se é vazio e n tem erro
                               setOpenCollapse(!openCollapse);
+                            !values.reqMaintenance &&
+                              !errors.reqMaintenance && // verficcar se é vazio e n tem erro
+                              apllySchema(schemaSingleOutput);
                           }}
                           aria-controls="collapse-form"
                           aria-expanded={openCollapse}
@@ -213,7 +279,7 @@ export default function Index() {
                     ) : null}
                   </Col>
 
-                  <Col xs="4" className="d-flex me-4">
+                  <Col xs="12" md="4" className="d-flex me-4">
                     {!values.reqMaintenance && openCollapse ? (
                       <Form.Group as={Col} xs={12} controlId="authorizedBy">
                         <Form.Label>AUTORIZADO POR:</Form.Label>
@@ -294,10 +360,9 @@ export default function Index() {
                             onChange={handleChange}
                             isInvalid={touched.property && !!errors.property}
                             isValid={touched.property && !errors.property}
-                            placeholder="Selecione o profissional"
                             onBlur={handleBlur}
                           >
-                            <option>Selecione o profissional</option>
+                            <option>Selecione o complexo de destino</option>
                             {imoveis.map((imovel) => (
                               <option key={imovel.id} value={imovel.id}>
                                 {imovel.nome_imovel}
@@ -313,78 +378,40 @@ export default function Index() {
                           </Form.Control.Feedback>
                         </Form.Group>
                       </Row>
-                      <Row className="pb-3">
-                        <Form.Group
-                          as={Col}
-                          xs={12}
-                          md={8}
-                          controlId="building"
-                        >
-                          <Form.Label>PRÉDIO:</Form.Label>
-                          <Form.Control
-                            type="text"
-                            list="buildingOptions"
-                            value={values.building}
-                            onChange={handleChange}
-                            isInvalid={touched.building && !!errors.building}
-                            isValid={touched.building && !errors.building}
-                            placeholder="Selecione o local"
-                            onBlur={handleBlur}
-                          />
-                          <datalist id="buildingOptions">
-                            <option key={1} value="Chrome" />
-                            <option key={2} value="Firefox" />
-                            <option key={3} value="Internet Explorer" />
-                            <option key={4} value="Opera" />
-                            <option key={5} value="Safari" />
-                            <option key={6} value="Microsoft Edge" />
-                          </datalist>
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.building}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group
-                          as={Col}
-                          xs={12}
-                          md={4}
-                          controlId="reqMaintenance"
-                        >
-                          <Form.Label>RMs VINCULADAS</Form.Label>
 
-                          <Form.Select
-                            type="text"
-                            value={values.authorizedBy}
-                            onChange={handleChange}
-                            isInvalid={
-                              touched.authorizedBy && !!errors.authorizedBy
-                            }
-                            isValid={
-                              touched.authorizedBy && !errors.authorizedBy
-                            }
-                            placeholder="Selecione o usuário"
-                            onBlur={handleBlur}
-                          >
-                            <option>Selecione o usuário</option>
-                            {users.map((user) => (
-                              <option key={user.id} value={user.id}>
-                                {user.name}
-                              </option>
-                            ))}
-                          </Form.Select>
+                      {!values.reqMaintenance && openCollapse ? (
+                        <Row className="pb-3">
+                          <Form.Group as={Col} xs={12} controlId="building">
+                            <Form.Label>PRÉDIO:</Form.Label>
+                            <Form.Control
+                              type="text"
+                              list="buildingOptions"
+                              value={values.building}
+                              onChange={handleChange}
+                              isInvalid={touched.building && !!errors.building}
+                              isValid={touched.building && !errors.building}
+                              placeholder="Selecione o local"
+                              onBlur={handleBlur}
+                            />
+                            <datalist id="buildingOptions">
+                              <option key={1} value="Chrome" />
+                              <option key={2} value="Firefox" />
+                              <option key={3} value="Internet Explorer" />
+                              <option key={4} value="Opera" />
+                              <option key={5} value="Safari" />
+                              <option key={6} value="Microsoft Edge" />
+                            </datalist>
+                            <Form.Control.Feedback
+                              tooltip
+                              type="invalid"
+                              style={{ position: 'static' }}
+                            >
+                              {errors.building}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </Row>
+                      ) : null}
 
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.reqMaintenance}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </Row>
                       <Row className="pb-3">
                         <Form.Group xs={12} controlId="obs">
                           <Form.Label>OBSERVAÇÕES GERAIS:</Form.Label>
@@ -484,6 +511,42 @@ export default function Index() {
                                   </Dropdown.Menu>
                                 </Dropdown>
                               </Col>
+                              <Form.Group
+                                as={Col}
+                                xs={12}
+                                md={4}
+                                controlId="reqMaterial"
+                              >
+                                <Form.Label>RMs VINCULADAS</Form.Label>
+
+                                <Form.Select
+                                  type="text"
+                                  value={values.reqMaterial}
+                                  onChange={handleChange}
+                                  isInvalid={
+                                    touched.reqMaterial && !!errors.reqMaterial
+                                  }
+                                  isValid={
+                                    touched.reqMaterial && !errors.reqMaterial
+                                  }
+                                  onBlur={handleBlur}
+                                >
+                                  <option>Selecione a RM</option>
+                                  {users.map((user) => (
+                                    <option key={user.id} value={user.id}>
+                                      {user.name}
+                                    </option>
+                                  ))}
+                                </Form.Select>
+
+                                <Form.Control.Feedback
+                                  tooltip
+                                  type="invalid"
+                                  style={{ position: 'static' }}
+                                >
+                                  {errors.reqMaterial}
+                                </Form.Control.Feedback>
+                              </Form.Group>
                             </Row>
                             <Row className="p-0 m-0 pt-2">
                               <Col
@@ -539,14 +602,6 @@ export default function Index() {
                                       readOnly
                                       value={item.MaterialId}
                                       onChange={handleChange}
-                                      // isInvalid={
-                                      //   touched.items &&
-                                      //   !!errors.items[index].MaterialId
-                                      // }
-                                      // isValid={
-                                      //   touched.items &&
-                                      //   !errors.items[index].MaterialId
-                                      // }
                                       placeholder="Selecione o ID material"
                                       onBlur={handleBlur}
                                       size="sm"
@@ -561,16 +616,9 @@ export default function Index() {
                                     <Form.Control
                                       type="text"
                                       plaintext
-                                      // readOnly
+                                      readOnly
                                       value={item.name}
                                       onChange={handleChange}
-                                      // isInvalid={
-                                      //   touched.items &&
-                                      //   !!errors.items[index].name
-                                      // }
-                                      // isValid={
-                                      //   touched.items && !errors.items[index].name
-                                      // }
                                       onBlur={handleBlur}
                                       placeholder="Selecione o ID material"
                                       size="sm"
@@ -588,18 +636,30 @@ export default function Index() {
                                     <Form.Control
                                       type="text"
                                       plaintext
-                                      // readOnly
+                                      readOnly
                                       value={item.unit}
                                       onChange={handleChange}
-                                      // isInvalid={
-                                      //   touched.items &&
-                                      //   !!errors.items[index].name
-                                      // }
-                                      // isValid={
-                                      //   touched.items && !errors.items[index].name
-                                      // }
                                       onBlur={handleBlur}
                                       placeholder="UND"
+                                      size="sm"
+                                      className="p-0 m-0 ps-2"
+                                    />
+                                  </Form.Group>
+                                  <Form.Group
+                                    as={Col}
+                                    xs={4}
+                                    sm={4}
+                                    md={1}
+                                    controlId={`items[${index}].balance`}
+                                    className="d-none"
+                                  >
+                                    <Form.Control
+                                      type="number"
+                                      plaintext
+                                      value={item.balance}
+                                      onChange={handleChange}
+                                      onBlur={handleBlur}
+                                      placeholder="SALDO"
                                       size="sm"
                                       className="p-0 m-0 ps-2"
                                     />
@@ -615,16 +675,14 @@ export default function Index() {
                                     <Form.Control
                                       type="number"
                                       plaintext
-                                      // readOnly
                                       value={item.quantity}
-                                      onChange={handleChange}
-                                      // isInvalid={
-                                      //   touched.items &&
-                                      //   !!errors.items[index].quantity
-                                      // }
-                                      // isValid={
-                                      //   touched.items && !errors.items[index].quantity
-                                      // }
+                                      onChange={(e) =>
+                                        handleQuantityChange(
+                                          e,
+                                          item.balance,
+                                          handleChange
+                                        )
+                                      }
                                       onBlur={handleBlur}
                                       placeholder="QTD"
                                       size="sm"
@@ -647,7 +705,19 @@ export default function Index() {
                         );
                       }}
                     </FieldArray>
-                    <hr />
+                    <Row className="pt-4">
+                      {typeof errors.items === 'string' ? (
+                        <span>
+                          {errors.items} <hr />
+                        </span>
+                      ) : errors.items ? (
+                        <span>
+                          A quantidade de nenhum item pode ser igual ou menor a
+                          zero. <hr />
+                        </span>
+                      ) : null}
+                    </Row>
+
                     <Row className="justify-content-center pt-2 pb-4">
                       <Col xs="auto" className="text-center">
                         <Button
@@ -655,6 +725,7 @@ export default function Index() {
                           variant="warning"
                           onClick={() => {
                             resetForm();
+                            initialSchema();
                             setOpenCollapse(false);
                           }}
                         >
@@ -665,9 +736,7 @@ export default function Index() {
                         <Button
                           variant="success"
                           onClick={() => {
-                            toast.success(
-                              'Saída de material realizada com sucesso'
-                            );
+                            submitForm();
                           }}
                         >
                           Confirmar saída

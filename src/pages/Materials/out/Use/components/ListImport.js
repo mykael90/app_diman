@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus } from 'react-icons/fa';
 
@@ -14,6 +14,7 @@ export default function Index(props) {
   const { push, hiddenItems, materialsBalance } = props;
 
   const [hiddenRows, setHiddenRows] = useState(hiddenItems);
+  const oldQuantity = useRef(0);
 
   const handleQuantityChange = (e, row) => {
     const errors = [];
@@ -23,11 +24,11 @@ export default function Index(props) {
 
     if (errors.length > 0) {
       errors.map((error) => toast.error(error));
-      e.target.value = 0;
+      e.target.value = oldQuantity.current;
       return;
     }
-
-    row.values.quantity = e.target.value;
+    oldQuantity.current = e.target.value;
+    row.values.quantity = oldQuantity.current;
   };
 
   const handlePushItem = React.useMemo(
@@ -61,6 +62,7 @@ export default function Index(props) {
         MaterialId: row.values.material_id,
         name: row.values.name,
         unit: row.values.unit,
+        balance: row.values.total,
         quantity: row.values.quantity ?? 0,
       });
 
