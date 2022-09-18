@@ -27,8 +27,12 @@ import Loading from '../../../../components/Loading';
 
 import SearchModal from './components/SearchModal';
 
+import workers from '../../../../assets/JSON/workers_example.json';
+import imoveis from '../../../../assets/JSON/imoveis.json';
+
 export default function Index() {
   const [materialsBalance, setMaterialsBalance] = useState([]);
+  const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [openCollapse, setOpenCollapse] = useState(false);
@@ -38,7 +42,7 @@ export default function Index() {
   const handleShowModal = () => setShowModal(true);
 
   useEffect(() => {
-    async function getData() {
+    async function getMaterialsData() {
       try {
         setIsLoading(true);
         const response = await axios.get('/materials/in/items');
@@ -53,9 +57,30 @@ export default function Index() {
         setIsLoading(false);
       }
     }
+    async function getUsersData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/users/');
+        setUsers(response.data);
+        setIsLoading(false);
+        inputRef.current.focus();
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
 
-    getData();
+    getMaterialsData();
+    getUsersData();
   }, []);
+
+  const formatReq = (req) => {
+    const currentYear = new Date().getFullYear();
+    return req.includes('/') ? req : `${req}/${currentYear}`;
+  };
 
   const schema = yup.object().shape({
     reqMaintenance: yup
@@ -65,6 +90,7 @@ export default function Index() {
         'Formato de requisição não permitido'
       ),
     removedBy: yup.number().positive().integer().required('Requerido'),
+    authorizedBy: yup.number().positive().integer().required('Requerido'),
     property: yup.number().positive().integer().required('Requerido'),
     building: yup.string().required('Requerido'),
     obs: yup.string(),
@@ -85,6 +111,7 @@ export default function Index() {
   const initialValues = {
     reqMaintenance: '',
     removedBy: '',
+    authorizedBy: '',
     property: '',
     building: '',
     obs: '',
@@ -120,205 +147,268 @@ export default function Index() {
               setFieldValue,
             }) => (
               <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
-                <Row>
-                  <Form.Group as={Col} controlId="reqMaintenance">
-                    <Row className="d-flex py-2">
-                      <Col xs={8} md={6} lg={4} xl={4}>
-                        <Form.Label>Nº REQ. DE MANUTENÇÃO</Form.Label>
-                        <Row>
-                          <Col>
-                            <Form.Control
-                              type="tel"
-                              value={values.reqMaintenance}
-                              onChange={handleChange}
-                              isInvalid={
-                                touched.reqMaintenance &&
-                                !!errors.reqMaintenance
-                              }
-                              autoFocus
-                              ref={inputRef}
-                              placeholder="Código/ano"
-                              onBlur={handleBlur}
-                              readOnly={!!openCollapse}
-                            />
-                          </Col>
-                          {!openCollapse ? (
-                            <Col>
-                              <Button
-                                type="submit"
-                                variant="success"
-                                onClick={() => {
-                                  !!values.reqMaintenance && // verificar se ja tem algum valor
-                                    !errors.reqMaintenance && // verficcar se n tem erro
-                                    setOpenCollapse(!openCollapse); // abrir o restante do form
-                                  const currentYear = new Date().getFullYear(); // formatar o numero da req.
-                                  const formatReq =
-                                    values.reqMaintenance.includes('/')
-                                      ? values.reqMaintenance
-                                      : `${values.reqMaintenance}/${currentYear}`;
-                                  setFieldValue('reqMaintenance', formatReq);
-                                }}
-                                aria-controls="collapse-form"
-                                aria-expanded={openCollapse}
-                              >
-                                <FaPlus />
-                              </Button>
-                            </Col>
-                          ) : null}
-                        </Row>
-
-                        <Form.Control.Feedback
-                          tooltip
-                          type="invalid"
-                          style={{ position: 'static' }}
-                        >
-                          {errors.reqMaintenance}
-                        </Form.Control.Feedback>
-                      </Col>
-                    </Row>
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    controlId="property"
-                    className="pt-2"
-                  >
-                    <Form.Label>CAMPUS:</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.property}
-                      onChange={handleChange}
-                      isInvalid={touched.property && !!errors.property}
-                      isValid={touched.property && !errors.property}
-                      placeholder="Selecione o local"
-                      onBlur={handleBlur}
-                    />
-                    <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.property}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Row>
-                <Collapse in={openCollapse}>
-                  <div id="collapse-form">
-                    <Row>
-                      <Form.Group
-                        as={Col}
-                        xs={12}
-                        md={4}
-                        controlId="removedBy"
-                        className="pt-2"
+                <Row className="d-flex justify-content-between pb-3">
+                  <Col xs="3" className="d-flex justify-content-start">
+                    <Form.Group as={Col} xs={6} controlId="reqMaintenance">
+                      <Form.Label>REQ. MANUTENÇÃO</Form.Label>
+                      <Form.Control
+                        type="tel"
+                        value={values.reqMaintenance}
+                        onChange={handleChange}
+                        isInvalid={
+                          touched.reqMaintenance && !!errors.reqMaintenance
+                        }
+                        autoFocus
+                        ref={inputRef}
+                        placeholder="Código/ano"
+                        onBlur={handleBlur}
+                        readOnly={!!openCollapse}
+                      />
+                      <Form.Control.Feedback
+                        tooltip
+                        type="invalid"
+                        style={{ position: 'static' }}
                       >
-                        <Form.Label>RETIRADO POR:</Form.Label>
+                        {errors.reqMaintenance}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    {!openCollapse ? (
+                      <Col xs="auto" className="ps-2 align-self-end">
+                        <Button
+                          type="submit"
+                          variant="success"
+                          onClick={() => {
+                            !!values.reqMaintenance && // verificar se ja tem algum valor
+                              !errors.reqMaintenance && // verficcar se n tem erro
+                              setOpenCollapse(!openCollapse);
+                            !!values.reqMaintenance && // verificar se ja tem algum valor
+                              !errors.reqMaintenance && // verficcar se n tem erro
+                              setFieldValue(
+                                'reqMaintenance',
+                                formatReq(values.reqMaintenance) // formatar o numero da requisicao
+                              );
+                          }}
+                          aria-controls="collapse-form"
+                          aria-expanded={openCollapse}
+                        >
+                          <FaPlus />
+                        </Button>
+                      </Col>
+                    ) : null}
+
+                    {!openCollapse ? (
+                      <Col xs="auto" className="ps-2 align-self-end">
+                        <Button
+                          variant="secondary"
+                          onClick={() => {
+                            !errors.reqMaintenance && // verficcar se n tem erro
+                              setOpenCollapse(!openCollapse);
+                          }}
+                          aria-controls="collapse-form"
+                          aria-expanded={openCollapse}
+                        >
+                          Saída Avulsa
+                        </Button>
+                      </Col>
+                    ) : null}
+                  </Col>
+
+                  <Col xs="4" className="d-flex me-4">
+                    {!values.reqMaintenance && openCollapse ? (
+                      <Form.Group as={Col} xs={12} controlId="authorizedBy">
+                        <Form.Label>AUTORIZADO POR:</Form.Label>
                         <Form.Select
                           type="text"
-                          value={values.removedBy}
+                          value={values.authorizedBy}
                           onChange={handleChange}
-                          isInvalid={touched.removedBy && !!errors.removedBy}
-                          isValid={touched.removedBy && !errors.removedBy}
-                          placeholder="Selecione o profissional"
+                          isInvalid={
+                            touched.authorizedBy && !!errors.authorizedBy
+                          }
+                          isValid={touched.authorizedBy && !errors.authorizedBy}
+                          placeholder="Selecione o usuário"
                           onBlur={handleBlur}
                         >
-                          <option>Selecione o profissional</option>
-                          <option value="1">JOSE FERREIRA</option>
-                          <option value="2">MARCONDES</option>
-                          <option value="3">DANIEL</option>
+                          <option>Selecione o usuário</option>
+                          {users.map((user) => (
+                            <option key={user.id} value={user.id}>
+                              {user.name}
+                            </option>
+                          ))}
                         </Form.Select>
                         <Form.Control.Feedback
                           tooltip
                           type="invalid"
                           style={{ position: 'static' }}
                         >
-                          {errors.removedBy}
+                          {errors.authorizedBy}
                         </Form.Control.Feedback>
                       </Form.Group>
+                    ) : null}
+                  </Col>
+                </Row>
+                <Collapse in={openCollapse}>
+                  <div id="collapse-form">
+                    <Row className="pb-3">
+                      <Row className="pb-3">
+                        <Form.Group
+                          as={Col}
+                          xs={12}
+                          md={4}
+                          controlId="removedBy"
+                        >
+                          <Form.Label>RETIRADO POR:</Form.Label>
+                          <Form.Select
+                            type="text"
+                            value={values.removedBy}
+                            onChange={handleChange}
+                            isInvalid={touched.removedBy && !!errors.removedBy}
+                            isValid={touched.removedBy && !errors.removedBy}
+                            placeholder="Selecione o profissional"
+                            onBlur={handleBlur}
+                          >
+                            <option>Selecione o profissional</option>
+                            {workers.map((worker) => (
+                              <option key={worker.id} value={worker.id}>
+                                {worker.name}
+                              </option>
+                            ))}
+                          </Form.Select>
+                          <Form.Control.Feedback
+                            tooltip
+                            type="invalid"
+                            style={{ position: 'static' }}
+                          >
+                            {errors.removedBy}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group
+                          as={Col}
+                          xs={12}
+                          md={8}
+                          controlId="property"
+                        >
+                          <Form.Label>COMPLEXO DE DESTINO:</Form.Label>
+                          <Form.Select
+                            type="text"
+                            value={values.property}
+                            onChange={handleChange}
+                            isInvalid={touched.property && !!errors.property}
+                            isValid={touched.property && !errors.property}
+                            placeholder="Selecione o profissional"
+                            onBlur={handleBlur}
+                          >
+                            <option>Selecione o profissional</option>
+                            {imoveis.map((imovel) => (
+                              <option key={imovel.id} value={imovel.id}>
+                                {imovel.nome_imovel}
+                              </option>
+                            ))}
+                          </Form.Select>
+                          <Form.Control.Feedback
+                            tooltip
+                            type="invalid"
+                            style={{ position: 'static' }}
+                          >
+                            {errors.property}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                      </Row>
+                      <Row className="pb-3">
+                        <Form.Group
+                          as={Col}
+                          xs={12}
+                          md={8}
+                          controlId="building"
+                        >
+                          <Form.Label>PRÉDIO:</Form.Label>
+                          <Form.Control
+                            type="text"
+                            list="buildingOptions"
+                            value={values.building}
+                            onChange={handleChange}
+                            isInvalid={touched.building && !!errors.building}
+                            isValid={touched.building && !errors.building}
+                            placeholder="Selecione o local"
+                            onBlur={handleBlur}
+                          />
+                          <datalist id="buildingOptions">
+                            <option key={1} value="Chrome" />
+                            <option key={2} value="Firefox" />
+                            <option key={3} value="Internet Explorer" />
+                            <option key={4} value="Opera" />
+                            <option key={5} value="Safari" />
+                            <option key={6} value="Microsoft Edge" />
+                          </datalist>
+                          <Form.Control.Feedback
+                            tooltip
+                            type="invalid"
+                            style={{ position: 'static' }}
+                          >
+                            {errors.building}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group
+                          as={Col}
+                          xs={12}
+                          md={4}
+                          controlId="reqMaintenance"
+                        >
+                          <Form.Label>RMs VINCULADAS</Form.Label>
 
-                      <Form.Group
-                        as={Col}
-                        xs={12}
-                        md={4}
-                        controlId="property"
-                        className="pt-2"
-                      >
-                        <Form.Label>CAMPUS:</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={values.property}
-                          onChange={handleChange}
-                          isInvalid={touched.property && !!errors.property}
-                          isValid={touched.property && !errors.property}
-                          placeholder="Selecione o local"
-                          onBlur={handleBlur}
-                        />
-                        <Form.Control.Feedback
-                          tooltip
-                          type="invalid"
-                          style={{ position: 'static' }}
-                        >
-                          {errors.property}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                      <Form.Group
-                        as={Col}
-                        xs={12}
-                        md={8}
-                        controlId="building"
-                        className="pt-2"
-                      >
-                        <Form.Label>PRÉDIO:</Form.Label>
-                        <Form.Control
-                          type="text"
-                          list="buildingOptions"
-                          value={values.building}
-                          onChange={handleChange}
-                          isInvalid={touched.building && !!errors.building}
-                          isValid={touched.building && !errors.building}
-                          placeholder="Selecione o local"
-                          onBlur={handleBlur}
-                        />
-                        <datalist id="buildingOptions">
-                          <option key={1} value="Chrome" />
-                          <option key={2} value="Firefox" />
-                          <option key={3} value="Internet Explorer" />
-                          <option key={4} value="Opera" />
-                          <option key={5} value="Safari" />
-                          <option key={6} value="Microsoft Edge" />
-                        </datalist>
-                        <Form.Control.Feedback
-                          tooltip
-                          type="invalid"
-                          style={{ position: 'static' }}
-                        >
-                          {errors.building}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                      <Form.Group xs={12} controlId="obs" className="pt-2">
-                        <Form.Label>OBSERVAÇÕES GERAIS:</Form.Label>
-                        <Form.Control
-                          as="textarea"
-                          rows={2}
-                          type="text"
-                          value={values.obs}
-                          onChange={handleChange}
-                          isInvalid={touched.obs && !!errors.obs}
-                          isValid={touched.obs && !errors.obs}
-                          placeholder="Observações gerais"
-                          onBlur={handleBlur}
-                        />
-                        <Form.Control.Feedback
-                          tooltip
-                          type="invalid"
-                          style={{ position: 'static' }}
-                        >
-                          {errors.obs}
-                        </Form.Control.Feedback>
-                      </Form.Group>
+                          <Form.Select
+                            type="text"
+                            value={values.authorizedBy}
+                            onChange={handleChange}
+                            isInvalid={
+                              touched.authorizedBy && !!errors.authorizedBy
+                            }
+                            isValid={
+                              touched.authorizedBy && !errors.authorizedBy
+                            }
+                            placeholder="Selecione o usuário"
+                            onBlur={handleBlur}
+                          >
+                            <option>Selecione o usuário</option>
+                            {users.map((user) => (
+                              <option key={user.id} value={user.id}>
+                                {user.name}
+                              </option>
+                            ))}
+                          </Form.Select>
+
+                          <Form.Control.Feedback
+                            tooltip
+                            type="invalid"
+                            style={{ position: 'static' }}
+                          >
+                            {errors.reqMaintenance}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                      </Row>
+                      <Row className="pb-3">
+                        <Form.Group xs={12} controlId="obs">
+                          <Form.Label>OBSERVAÇÕES GERAIS:</Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={2}
+                            type="text"
+                            value={values.obs}
+                            onChange={handleChange}
+                            isInvalid={touched.obs && !!errors.obs}
+                            isValid={touched.obs && !errors.obs}
+                            placeholder="Observações gerais"
+                            onBlur={handleBlur}
+                          />
+                          <Form.Control.Feedback
+                            tooltip
+                            type="invalid"
+                            style={{ position: 'static' }}
+                          >
+                            {errors.obs}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                      </Row>
                     </Row>
-                    <hr />
                     <Row
                       className="d-flex text-center"
                       style={{ background: primaryDarkColor, color: 'white' }}
