@@ -9,6 +9,7 @@ import Sipac from './in/Sipac';
 import InDonation from './in/Donation';
 import Returned from './in/Returned';
 import First from './in/First';
+import Supplier from './in/Supplier';
 
 import Out from './out';
 import Use from './out/Use';
@@ -56,6 +57,7 @@ export default function MaterialsRoutes() {
           <Route path="donation" element={<InDonation />} />{' '}
           <Route path="returned" element={<Returned />} />{' '}
           <Route path="first" element={<First />} />{' '}
+          <Route path="supplier" element={<Supplier />} />{' '}
         </Route>
 
         <Route path="out" element={<Out />}>
