@@ -196,13 +196,13 @@ export default function Index() {
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
+              console.log(values);
               resetForm();
             }}
           >
             {({
               submitForm,
               resetForm,
-              handleSubmit,
               handleChange,
               handleBlur,
               values,
@@ -210,7 +210,8 @@ export default function Index() {
               errors,
               setFieldValue,
             }) => (
-              <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
+              <Form noValidate autoComplete="off">
+                {JSON.stringify(errors)}
                 <Row className="d-flex justify-content-between pb-3">
                   <Col
                     xs="12"
@@ -752,12 +753,7 @@ export default function Index() {
                         </Button>
                       </Col>
                       <Col xs="auto" className="text-center">
-                        <Button
-                          variant="success"
-                          onClick={() => {
-                            submitForm();
-                          }}
-                        >
+                        <Button variant="success" onClick={submitForm}>
                           Confirmar saída
                         </Button>
                       </Col>
