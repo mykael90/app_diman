@@ -55,6 +55,12 @@ export default function Index() {
         ),
       },
       {
+        Header: 'Req. Man.',
+        accessor: 'reqMaintenance',
+        width: 120,
+        disableResizing: true,
+      },
+      {
         Header: 'Nº RM',
         accessor: 'req',
         width: 120,

@@ -33,6 +33,7 @@ import imoveis from '../../../../assets/JSON/imoveis.json';
 export default function Index() {
   const [materialsBalance, setMaterialsBalance] = useState([]);
   const [users, setUsers] = useState([]);
+  const [reqRMs, setReqRMs] = useState([]);
   const [schema, setSchema] = useState(
     yup.object().shape({
       reqMaintenance: yup
@@ -60,7 +61,6 @@ export default function Index() {
   const [showModal, setShowModal] = useState(false);
   const [openCollapse, setOpenCollapse] = useState(false);
   const inputRef = useRef();
-  const oldQuantity = useRef(0);
 
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
@@ -72,7 +72,6 @@ export default function Index() {
         const response = await axios.get('/materials/in/items');
         setMaterialsBalance(response.data);
         setIsLoading(false);
-        inputRef.current.focus();
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
         err.response?.data?.errors
@@ -87,7 +86,6 @@ export default function Index() {
         const response = await axios.get('/users/');
         setUsers(response.data);
         setIsLoading(false);
-        inputRef.current.focus();
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
         err.response?.data?.errors
@@ -100,6 +98,21 @@ export default function Index() {
     getMaterialsData();
     getUsersData();
   }, []);
+
+  async function getReqMaterialsData(reqMaintenance) {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`/materials/in/${reqMaintenance}`);
+      setReqRMs(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
 
   const handleQuantityChange = (e, balance, handleChange) => {
     if (e.target.value > balance) {
@@ -209,7 +222,7 @@ export default function Index() {
                       as={Col}
                       xs={6}
                       sm={5}
-                      md={4}
+                      md={3}
                       controlId="reqMaintenance"
                     >
                       <Form.Label>REQ. MANUTENÇÃO</Form.Label>
@@ -234,21 +247,26 @@ export default function Index() {
                         {errors.reqMaintenance}
                       </Form.Control.Feedback>
                     </Form.Group>
+
                     {!openCollapse ? (
                       <Col xs="auto" className="ps-2 align-self-end">
                         <Button
                           type="submit"
                           variant="success"
                           onClick={() => {
-                            !!values.reqMaintenance && // verificar se ja tem algum valor
-                              !errors.reqMaintenance && // verficcar se n tem erro
+                            if (
+                              !!values.reqMaintenance &&
+                              !errors.reqMaintenance
+                            ) {
                               setOpenCollapse(!openCollapse);
-                            !!values.reqMaintenance && // verificar se ja tem algum valor
-                              !errors.reqMaintenance && // verficcar se n tem erro
                               setFieldValue(
                                 'reqMaintenance',
                                 formatReq(values.reqMaintenance) // formatar o numero da requisicao
                               );
+                              getReqMaterialsData(
+                                formatReq(values.reqMaintenance)
+                              );
+                            }
                           }}
                           aria-controls="collapse-form"
                           aria-expanded={openCollapse}
@@ -276,6 +294,43 @@ export default function Index() {
                           Saída Avulsa
                         </Button>
                       </Col>
+                    ) : null}
+                    {!!values.reqMaintenance && openCollapse ? (
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        md={4}
+                        controlId="reqMaterial"
+                        className="ps-4"
+                      >
+                        <Form.Label>RMs VINCULADAS</Form.Label>
+
+                        <Form.Select
+                          type="text"
+                          value={values.reqMaterial}
+                          onChange={handleChange}
+                          isInvalid={
+                            touched.reqMaterial && !!errors.reqMaterial
+                          }
+                          isValid={touched.reqMaterial && !errors.reqMaterial}
+                          onBlur={handleBlur}
+                        >
+                          <option>Selecione a RM</option>
+                          {reqRMs.map((reqRM) => (
+                            <option key={reqRM.id} value={reqRM.id}>
+                              {reqRM.req}
+                            </option>
+                          ))}
+                        </Form.Select>
+
+                        <Form.Control.Feedback
+                          tooltip
+                          type="invalid"
+                          style={{ position: 'static' }}
+                        >
+                          {errors.reqMaterial}
+                        </Form.Control.Feedback>
+                      </Form.Group>
                     ) : null}
                   </Col>
 
@@ -511,42 +566,6 @@ export default function Index() {
                                   </Dropdown.Menu>
                                 </Dropdown>
                               </Col>
-                              <Form.Group
-                                as={Col}
-                                xs={12}
-                                md={4}
-                                controlId="reqMaterial"
-                              >
-                                <Form.Label>RMs VINCULADAS</Form.Label>
-
-                                <Form.Select
-                                  type="text"
-                                  value={values.reqMaterial}
-                                  onChange={handleChange}
-                                  isInvalid={
-                                    touched.reqMaterial && !!errors.reqMaterial
-                                  }
-                                  isValid={
-                                    touched.reqMaterial && !errors.reqMaterial
-                                  }
-                                  onBlur={handleBlur}
-                                >
-                                  <option>Selecione a RM</option>
-                                  {users.map((user) => (
-                                    <option key={user.id} value={user.id}>
-                                      {user.name}
-                                    </option>
-                                  ))}
-                                </Form.Select>
-
-                                <Form.Control.Feedback
-                                  tooltip
-                                  type="invalid"
-                                  style={{ position: 'static' }}
-                                >
-                                  {errors.reqMaterial}
-                                </Form.Control.Feedback>
-                              </Form.Group>
                             </Row>
                             <Row className="p-0 m-0 pt-2">
                               <Col
