@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
+import Select from 'react-select';
 import axios from '../../../../services/axios';
 import {
   primaryDarkColor,
@@ -29,6 +30,11 @@ import SearchModal from './components/SearchModal';
 
 import workers from '../../../../assets/JSON/workers_example.json';
 import imoveis from '../../../../assets/JSON/imoveis.json';
+
+const workersOptions = workers.map((worker) => ({
+  value: worker.id,
+  label: worker.name,
+}));
 
 export default function Index() {
   const [materialsBalance, setMaterialsBalance] = useState([]);
@@ -209,9 +215,12 @@ export default function Index() {
               touched,
               errors,
               setFieldValue,
+              setFieldTouched,
             }) => (
               <Form noValidate autoComplete="off">
                 {JSON.stringify(errors)}
+                <br />
+                {JSON.stringify(touched)}
                 <Row className="d-flex justify-content-between pb-3">
                   <Col
                     xs="12"
@@ -376,10 +385,26 @@ export default function Index() {
                           as={Col}
                           xs={12}
                           md={4}
-                          controlId="removedBy"
+                          // controlId="removedBy"
                         >
                           <Form.Label>RETIRADO POR:</Form.Label>
-                          <Form.Select
+                          <Select
+                            id="removedBy"
+                            // name="removedBy"
+                            as={Form.Select}
+                            options={workersOptions}
+                            value={values.removedBy}
+                            onChange={(selected) => {
+                              setFieldValue('removedBy', selected);
+                              setFieldTouched('removedBy');
+                              console.log(selected);
+                            }}
+                            isInvalid={touched.removedBy && !!errors.removedBy}
+                            isValid={touched.removedBy && !errors.removedBy}
+                            placeholder="Selecione o profissional"
+                            // onBlur={handleBlur}
+                          />
+                          {/* <Form.Select
                             type="text"
                             value={values.removedBy}
                             onChange={handleChange}
@@ -394,7 +419,7 @@ export default function Index() {
                                 {worker.name}
                               </option>
                             ))}
-                          </Form.Select>
+                          </Form.Select> */}
                           <Form.Control.Feedback
                             tooltip
                             type="invalid"
