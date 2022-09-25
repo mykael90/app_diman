@@ -37,7 +37,7 @@ const workersOptions = workers.map((worker) => ({
 }));
 
 export default function Index() {
-  const [materialsBalance, setMaterialsBalance] = useState([]);
+  const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
   const [reqRMs, setReqRMs] = useState([]);
   const [schema, setSchema] = useState(
@@ -75,8 +75,8 @@ export default function Index() {
     async function getMaterialsData() {
       try {
         setIsLoading(true);
-        const response = await axios.get('/materials/in/items');
-        setMaterialsBalance(response.data);
+        const response = await axios.get('/materials/inventory/');
+        setinventoryData(response.data);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -533,9 +533,9 @@ export default function Index() {
                               show={showModal}
                               push={push}
                               hiddenItems={values.items.map(
-                                (item) => item.MaterialId
+                                (item) => item.materialId
                               )}
-                              materialsBalance={materialsBalance}
+                              inventoryData={inventoryData}
                             />
                             <Row
                               className="p-0 m-0 py-2"
@@ -629,7 +629,7 @@ export default function Index() {
                             {values.items.length > 0 &&
                               values.items.map((item, index) => (
                                 <Row
-                                  key={item.MaterialId}
+                                  key={item.materialId}
                                   className="d-flex p-0 m-0"
                                 >
                                   <Form.Group
@@ -638,14 +638,14 @@ export default function Index() {
                                     sm={4}
                                     md={3}
                                     lg={2}
-                                    controlId={`items[${index}].MaterialId`}
+                                    controlId={`items[${index}].materialId`}
                                     className="border m-0 p-0"
                                   >
                                     <Form.Control
                                       type="text"
                                       plaintext
                                       readOnly
-                                      value={item.MaterialId}
+                                      value={item.materialId}
                                       onChange={handleChange}
                                       placeholder="Selecione o ID material"
                                       onBlur={handleBlur}

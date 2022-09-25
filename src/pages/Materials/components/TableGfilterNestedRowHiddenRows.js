@@ -11,7 +11,7 @@ import {
   useResizeColumns,
   useExpanded,
 } from 'react-table';
-import { Form, Table, Row, Col } from 'react-bootstrap';
+import { Form, Table, Row, Col, Button } from 'react-bootstrap';
 import {
   FaFilter,
   FaSortAlphaDown,
@@ -123,21 +123,41 @@ export default function TableGfilterNestedRowHiddenRows({
                 {headerGroup.headers.map((column) => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                     {column.render('Header')}
-                    <div>
+                    <div className="text-center">
                       {column.canFilter ? column.render('Filter') : null}
                     </div>
                     {column.canSort ? (
                       <span>
                         {' '}
-                        <FaSort />
                         {column.isSorted ? (
                           column.isSortedDesc ? (
-                            <FaSortAlphaUp />
+                            <Button
+                              title="Ordenado decrescente"
+                              size="sm"
+                              variant="outline-primary"
+                              className="border-0"
+                            >
+                              <FaSortAlphaUp />
+                            </Button>
                           ) : (
-                            <FaSortAlphaDown />
+                            <Button
+                              title="Ordenado crescente"
+                              size="sm"
+                              variant="outline-primary"
+                              className="border-0"
+                            >
+                              <FaSortAlphaDown />
+                            </Button>
                           )
                         ) : (
-                          ''
+                          <Button
+                            title="Clique para ordenar"
+                            size="sm"
+                            variant="outline-primary"
+                            className="border-0"
+                          >
+                            <FaSort />
+                          </Button>
                         )}
                       </span>
                     ) : null}
