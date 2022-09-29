@@ -359,6 +359,7 @@ export default function Index() {
       },
     ],
     filters: [{ id: 'totalInventory', value: 1 }],
+    pageSize: 20,
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),

@@ -206,54 +206,52 @@ export default function TableGfilterNestedrow({
         </Table>
       </Row>
 
-      <Row className="d-flex align-items-center justify-content-md-center py-2">
-        <Col
-          xs="12"
-          sm="auto"
-          className="d-flex py-1 justify-content-md-center"
-        >
-          <Button
-            as={Col}
-            xs="auto"
-            variant="dark"
-            onClick={() => gotoPage(0)}
-            disabled={!canPreviousPage}
-            className="me-1"
-          >
-            {'<<'}
-          </Button>{' '}
-          <Button
-            as={Col}
-            xs="auto"
-            variant="dark"
-            onClick={() => previousPage()}
-            disabled={!canPreviousPage}
-            className="me-1"
-          >
-            {'<'}
-          </Button>{' '}
-          <Button
-            as={Col}
-            xs="auto"
-            variant="dark"
-            onClick={() => nextPage()}
-            disabled={!canNextPage}
-            className="me-1"
-          >
-            {'>'}
-          </Button>{' '}
-          <Button
-            as={Col}
-            xs="auto"
-            variant="dark"
-            onClick={() => gotoPage(pageCount - 1)}
-            disabled={!canNextPage}
-            className="me-1"
-          >
-            {'>>'}
-          </Button>{' '}
+      <Row className="d-flex align-items-center py-2">
+        <Col xs="12" sm="auto" className="d-flex py-1">
+          <div>
+            <Button
+              as={Col}
+              xs="auto"
+              variant="dark"
+              onClick={() => gotoPage(0)}
+              disabled={!canPreviousPage}
+              className="me-1"
+            >
+              {'<<'}
+            </Button>{' '}
+            <Button
+              as={Col}
+              xs="auto"
+              variant="dark"
+              onClick={() => previousPage()}
+              disabled={!canPreviousPage}
+              className="me-1"
+            >
+              {'<'}
+            </Button>{' '}
+            <Button
+              as={Col}
+              xs="auto"
+              variant="dark"
+              onClick={() => nextPage()}
+              disabled={!canNextPage}
+              className="me-1"
+            >
+              {'>'}
+            </Button>{' '}
+            <Button
+              as={Col}
+              xs="auto"
+              variant="dark"
+              onClick={() => gotoPage(pageCount - 1)}
+              disabled={!canNextPage}
+              className="me-1"
+            >
+              {'>>'}
+            </Button>{' '}
+          </div>
         </Col>
-        <Col xs="auto" className="d-flex py-1">
+        <Col xs="12" sm="auto" className="d-flex py-1">
           <span>
             Página{' '}
             <strong>
@@ -261,11 +259,10 @@ export default function TableGfilterNestedrow({
             </strong>
           </span>
         </Col>
-        <Col xs="12" sm="auto" className="d-flex align-items-center py-1">
-          <Col xs="auto" className="d-flex pe-1">
-            <span>Ir para página: </span>
-          </Col>
-          <Form.Group as={Col} xs="auto" className="d-flex">
+        <Col xs="auto" className="d-none d-sm-flex align-items-center py-1">
+          <span>Ir para página: </span>
+
+          <Form.Group as={Col} className="d-flex">
             <Form.Control
               size="sm"
               type="number"
