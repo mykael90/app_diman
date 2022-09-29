@@ -592,39 +592,6 @@ export default function Index() {
                                 </Dropdown>
                               </Col>
                             </Row>
-                            {/* <Row className="p-0 m-0 pt-2">
-                              <Col
-                                xs={4}
-                                sm={4}
-                                md={3}
-                                lg={2}
-                                className="border my-0 mx-0"
-                              >
-                                CODIGO
-                              </Col>
-                              <Col className="border my-0 mx-0">
-                                DENOMINAÇÃO
-                              </Col>
-                              <Col
-                                xs={4}
-                                sm={4}
-                                md={1}
-                                className="border my-0 mx-0"
-                              >
-                                UND
-                              </Col>
-                              <Col
-                                xs={4}
-                                sm={4}
-                                md={1}
-                                className="border my-0 mx-0"
-                              >
-                                QTD
-                              </Col>
-                              <Col xs="auto" className="border my-0 mx-0">
-                                R
-                              </Col>
-                            </Row> */}
                             {values.items.length > 0 &&
                               values.items.map((item, index) => (
                                 <>
