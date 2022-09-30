@@ -32,6 +32,11 @@ import SearchModal from './components/SearchModal';
 import workers from '../../../../assets/JSON/workers_example.json';
 import imoveis from '../../../../assets/JSON/imoveis.json';
 
+const propertyOptions = imoveis.map((property) => ({
+  value: property.id,
+  label: property.nome_imovel,
+}));
+
 const workersOptions = workers.map((worker) => ({
   value: worker.id,
   label: worker.name,
@@ -50,13 +55,7 @@ export default function Index() {
           /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
           'Formato de requisição não permitido'
         ),
-      workerId: yup
-        .object()
-        .shape({
-          value: yup.number().positive().integer(),
-        })
-        .required('Requerido'),
-      campusId: yup.number().positive().integer().required('Requerido'),
+      workerId: yup.object().required('Requerido'),
       obs: yup.string(),
       // eslint-disable-next-line react/forbid-prop-types
       items: yup
@@ -81,7 +80,7 @@ export default function Index() {
   const handleStore = async (values, resetForm) => {
     const formattedValues = Object.fromEntries(
       Object.entries(values).filter(([_, v]) => v != null)
-    ); // LIMPANDO CHAVES NILL E UNDEFINED
+    ); // LIMPANDO CHAVES NULL E UNDEFINED
 
     Object.keys(formattedValues).forEach((key) => {
       if (formattedValues[key] === '') {
@@ -91,9 +90,14 @@ export default function Index() {
 
     formattedValues.userId = userId;
     formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
-    formattedValues.workerId = formattedValues.workerId.value;
-    formattedValues.workerId = formattedValues.workerId.value;
-    console.log(formattedValues);
+    formattedValues.workerId = formattedValues.workerId?.value;
+    formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
+    formattedValues.propertyId = formattedValues.propertyId?.value;
+    formattedValues.buildingId = formattedValues.buildingId?.value;
+
+    formattedValues.items.forEach((item) => {
+      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+    });
 
     try {
       setIsLoading(true);
@@ -102,6 +106,7 @@ export default function Index() {
       await axios.post(`/materials/out/`, formattedValues);
 
       setIsLoading(false);
+      setOpenCollapse(false);
       resetForm();
 
       toast.success(`Saída de material realizada com sucesso`);
@@ -186,8 +191,8 @@ export default function Index() {
   };
 
   const schemaSingleOutput = yup.object().shape({
-    authorizedBy: yup.number().positive().integer().required('Requerido'),
-    buildingId: yup.string().required('Requerido'),
+    authorizedBy: yup.object().required('Requerido'),
+    propertyId: yup.object().required('Requerido'),
   });
 
   const initialSchema = () => {
@@ -199,13 +204,7 @@ export default function Index() {
             /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
             'Formato de requisição não permitido'
           ),
-        workerId: yup
-          .object()
-          .shape({
-            value: yup.number().positive().integer(),
-          })
-          .required('Requerido'),
-        campusId: yup.number().positive().integer().required('Requerido'),
+        workerId: yup.object().required('Requerido'),
         obs: yup.string(),
         // eslint-disable-next-line react/forbid-prop-types
         items: yup
@@ -229,8 +228,8 @@ export default function Index() {
   const initialValues = {
     reqMaintenance: '',
     authorizedBy: '',
-    workerId: {},
-    campusId: '',
+    workerId: '',
+    place: '',
     buildingId: '',
     reqMaterial: '',
     obs: '',
@@ -266,9 +265,9 @@ export default function Index() {
               setFieldTouched,
             }) => (
               <Form noValidate autoComplete="off">
-                {JSON.stringify(values)}
-                <br />
                 {JSON.stringify(errors)}
+                <br />
+                {JSON.stringify(!values.workerId)}
                 <Row className="d-flex justify-content-between pb-3">
                   <Col
                     xs="12"
@@ -370,7 +369,7 @@ export default function Index() {
                           isInvalid={
                             touched.reqMaterial && !!errors.reqMaterial
                           }
-                          isValid={touched.reqMaterial && !errors.reqMaterial}
+                          // isValid={touched.reqMaterial && !errors.reqMaterial}
                           onBlur={handleBlur}
                         >
                           <option>Selecione a RM</option>
@@ -396,24 +395,24 @@ export default function Index() {
                     {!values.reqMaintenance && openCollapse ? (
                       <Form.Group as={Col} xs={12} controlId="authorizedBy">
                         <Form.Label>AUTORIZADO POR:</Form.Label>
-                        <Form.Select
-                          type="text"
+                        <Select
+                          id="authorizedBy"
+                          options={users.map((user) => ({
+                            value: user.id,
+                            label: user.name,
+                          }))}
                           value={values.authorizedBy}
-                          onChange={handleChange}
+                          onChange={(selected) => {
+                            setFieldValue('authorizedBy', selected);
+                            setFieldTouched('authorizedBy');
+                          }}
                           isInvalid={
                             touched.authorizedBy && !!errors.authorizedBy
                           }
                           isValid={touched.authorizedBy && !errors.authorizedBy}
-                          placeholder="Selecione o usuário"
+                          placeholder="Selecione o responsável"
                           onBlur={handleBlur}
-                        >
-                          <option>Selecione o usuário</option>
-                          {users.map((user) => (
-                            <option key={user.id} value={user.id}>
-                              {user.name}
-                            </option>
-                          ))}
-                        </Form.Select>
+                        />
                         <Form.Control.Feedback
                           tooltip
                           type="invalid"
@@ -438,7 +437,8 @@ export default function Index() {
                           <Form.Label>RETIRADO POR:</Form.Label>
                           <Select
                             id="workerId"
-                            // name="workerId"
+                            inputId="workerId"
+                            name="workerId"
                             as={Form.Select}
                             options={workersOptions}
                             value={values.workerId}
@@ -449,24 +449,8 @@ export default function Index() {
                             isInvalid={touched.workerId && !!errors.workerId}
                             isValid={touched.workerId && !errors.workerId}
                             placeholder="Selecione o profissional"
-                            // onBlur={handleBlur}
-                          />
-                          {/* <Form.Select
-                            type="text"
-                            value={values.workerId}
-                            onChange={handleChange}
-                            isInvalid={touched.workerId && !!errors.workerId}
-                            isValid={touched.workerId && !errors.workerId}
-                            placeholder="Selecione o profissional"
                             onBlur={handleBlur}
-                          >
-                            <option>Selecione o profissional</option>
-                            {workers.map((worker) => (
-                              <option key={worker.id} value={worker.id}>
-                                {worker.name}
-                              </option>
-                            ))}
-                          </Form.Select> */}
+                          />
                           <Form.Control.Feedback
                             tooltip
                             type="invalid"
@@ -475,62 +459,73 @@ export default function Index() {
                             {errors.workerId}
                           </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group
-                          as={Col}
-                          xs={12}
-                          md={8}
-                          controlId="campusId"
-                        >
-                          <Form.Label>CAMPUS:</Form.Label>
-                          <Form.Select
+                        <Form.Group as={Col} xs={12} md={8} controlId="place">
+                          <Form.Label>LOCAL DE USO:</Form.Label>
+                          <Form.Control
                             type="text"
-                            value={values.campusId}
+                            value={values.place}
                             onChange={handleChange}
-                            isInvalid={touched.campusId && !!errors.campusId}
-                            isValid={touched.campusId && !errors.campusId}
+                            isInvalid={touched.place && !!errors.place}
+                            // isValid={touched.place && !errors.place}
                             onBlur={handleBlur}
-                          >
-                            <option>Selecione o complexo de destino</option>
-                            {imoveis.map((imovel) => (
-                              <option key={imovel.id} value={imovel.id}>
-                                {imovel.nome_imovel}
-                              </option>
-                            ))}
-                          </Form.Select>
+                            placeholder="Informações sobre a localização do serviço"
+                          />
                           <Form.Control.Feedback
                             tooltip
                             type="invalid"
                             style={{ position: 'static' }}
                           >
-                            {errors.campusId}
+                            {errors.place}
                           </Form.Control.Feedback>
                         </Form.Group>
                       </Row>
 
                       {!values.reqMaintenance && openCollapse ? (
                         <Row className="pb-3">
+                          <Form.Group as={Col} xs={12} controlId="propertyId">
+                            <Form.Label>PROPRIEDADE:</Form.Label>
+                            <Select
+                              id="propertyId"
+                              options={propertyOptions}
+                              value={values.propertyId}
+                              onChange={(selected) => {
+                                setFieldValue('propertyId', selected);
+                                setFieldTouched('propertyId');
+                              }}
+                              isInvalid={
+                                touched.propertyId && !!errors.propertyId
+                              }
+                              isValid={touched.propertyId && !errors.propertyId}
+                              placeholder="Selecione a propriedade"
+                            />
+                            <Form.Control.Feedback
+                              tooltip
+                              type="invalid"
+                              style={{ position: 'static' }}
+                            >
+                              {errors.buildingId}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </Row>
+                      ) : null}
+                      {!values.reqMaintenance && openCollapse ? (
+                        <Row className="pb-3">
                           <Form.Group as={Col} xs={12} controlId="buildingId">
                             <Form.Label>PRÉDIO:</Form.Label>
-                            <Form.Control
-                              type="text"
-                              list="buildingIdOptions"
+                            <Select
+                              id="buildingId"
+                              options={workersOptions}
                               value={values.buildingId}
-                              onChange={handleChange}
+                              onChange={(selected) => {
+                                setFieldValue('buildingId', selected);
+                                setFieldTouched('buildingId');
+                              }}
                               isInvalid={
                                 touched.buildingId && !!errors.buildingId
                               }
                               isValid={touched.buildingId && !errors.buildingId}
-                              placeholder="Selecione o local"
-                              onBlur={handleBlur}
+                              placeholder="Selecione o prédio"
                             />
-                            <datalist id="buildingIdOptions">
-                              <option key={1} value="Chrome" />
-                              <option key={2} value="Firefox" />
-                              <option key={3} value="Internet Explorer" />
-                              <option key={4} value="Opera" />
-                              <option key={5} value="Safari" />
-                              <option key={6} value="Microsoft Edge" />
-                            </datalist>
                             <Form.Control.Feedback
                               tooltip
                               type="invalid"
@@ -552,7 +547,7 @@ export default function Index() {
                             value={values.obs}
                             onChange={handleChange}
                             isInvalid={touched.obs && !!errors.obs}
-                            isValid={touched.obs && !errors.obs}
+                            // isValid={touched.obs && !errors.obs}
                             placeholder="Observações gerais"
                             onBlur={handleBlur}
                           />
@@ -612,31 +607,6 @@ export default function Index() {
                                     </Dropdown.Item>
                                     <Dropdown.Item href="#/action-3">
                                       Importar de outras saídas
-                                    </Dropdown.Item>
-                                  </Dropdown.Menu>
-                                </Dropdown>
-                              </Col>
-                              <Col xs="auto">
-                                <Dropdown>
-                                  <Dropdown.Toggle
-                                    variant="light"
-                                    id="dropdown-basic"
-                                  >
-                                    Importar RM Associada{' '}
-                                    <Badge bg="primary">3</Badge>
-                                    <span className="visually-hidden">
-                                      unread messages
-                                    </span>
-                                  </Dropdown.Toggle>
-                                  <Dropdown.Menu>
-                                    <Dropdown.Item href="#/action-1">
-                                      RM 1564
-                                    </Dropdown.Item>
-                                    <Dropdown.Item href="#/action-2">
-                                      RM 4875
-                                    </Dropdown.Item>
-                                    <Dropdown.Item href="#/action-3">
-                                      RM 1567
                                     </Dropdown.Item>
                                   </Dropdown.Menu>
                                 </Dropdown>
