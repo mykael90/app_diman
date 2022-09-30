@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
 import React, { useState, useRef, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 import {
   Button,
@@ -37,6 +38,7 @@ const workersOptions = workers.map((worker) => ({
 }));
 
 export default function Index() {
+  const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
   const [reqRMs, setReqRMs] = useState([]);
@@ -48,8 +50,13 @@ export default function Index() {
           /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
           'Formato de requisição não permitido'
         ),
-      removedBy: yup.number().positive().integer().required('Requerido'),
-      property: yup.number().positive().integer().required('Requerido'),
+      workerId: yup
+        .object()
+        .shape({
+          value: yup.number().positive().integer(),
+        })
+        .required('Requerido'),
+      campusId: yup.number().positive().integer().required('Requerido'),
       obs: yup.string(),
       // eslint-disable-next-line react/forbid-prop-types
       items: yup
@@ -70,6 +77,43 @@ export default function Index() {
 
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
+
+  const handleStore = async (values, resetForm) => {
+    const formattedValues = Object.fromEntries(
+      Object.entries(values).filter(([_, v]) => v != null)
+    ); // LIMPANDO CHAVES NILL E UNDEFINED
+
+    Object.keys(formattedValues).forEach((key) => {
+      if (formattedValues[key] === '') {
+        delete formattedValues[key];
+      }
+    }); // LIMPANDO CHAVES `EMPTY STRINGS`
+
+    formattedValues.userId = userId;
+    formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
+    formattedValues.workerId = formattedValues.workerId.value;
+    formattedValues.workerId = formattedValues.workerId.value;
+    console.log(formattedValues);
+
+    try {
+      setIsLoading(true);
+
+      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
+      await axios.post(`/materials/out/`, formattedValues);
+
+      setIsLoading(false);
+      resetForm();
+
+      toast.success(`Saída de material realizada com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     async function getMaterialsData() {
@@ -143,7 +187,7 @@ export default function Index() {
 
   const schemaSingleOutput = yup.object().shape({
     authorizedBy: yup.number().positive().integer().required('Requerido'),
-    building: yup.string().required('Requerido'),
+    buildingId: yup.string().required('Requerido'),
   });
 
   const initialSchema = () => {
@@ -155,8 +199,13 @@ export default function Index() {
             /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
             'Formato de requisição não permitido'
           ),
-        removedBy: yup.number().positive().integer().required('Requerido'),
-        property: yup.number().positive().integer().required('Requerido'),
+        workerId: yup
+          .object()
+          .shape({
+            value: yup.number().positive().integer(),
+          })
+          .required('Requerido'),
+        campusId: yup.number().positive().integer().required('Requerido'),
         obs: yup.string(),
         // eslint-disable-next-line react/forbid-prop-types
         items: yup
@@ -180,9 +229,9 @@ export default function Index() {
   const initialValues = {
     reqMaintenance: '',
     authorizedBy: '',
-    removedBy: '',
-    property: '',
-    building: '',
+    workerId: {},
+    campusId: '',
+    buildingId: '',
     reqMaterial: '',
     obs: '',
     items: [],
@@ -202,8 +251,7 @@ export default function Index() {
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
-              console.log(values);
-              resetForm();
+              handleStore(values, resetForm);
             }}
           >
             {({
@@ -218,9 +266,9 @@ export default function Index() {
               setFieldTouched,
             }) => (
               <Form noValidate autoComplete="off">
-                {JSON.stringify(errors)}
+                {JSON.stringify(values)}
                 <br />
-                {JSON.stringify(touched)}
+                {JSON.stringify(errors)}
                 <Row className="d-flex justify-content-between pb-3">
                   <Col
                     xs="12"
@@ -385,30 +433,30 @@ export default function Index() {
                           as={Col}
                           xs={12}
                           md={4}
-                          // controlId="removedBy"
+                          // controlId="workerId"
                         >
                           <Form.Label>RETIRADO POR:</Form.Label>
                           <Select
-                            id="removedBy"
-                            // name="removedBy"
+                            id="workerId"
+                            // name="workerId"
                             as={Form.Select}
                             options={workersOptions}
-                            value={values.removedBy}
+                            value={values.workerId}
                             onChange={(selected) => {
-                              setFieldValue('removedBy', selected);
-                              setFieldTouched('removedBy');
+                              setFieldValue('workerId', selected);
+                              setFieldTouched('workerId');
                             }}
-                            isInvalid={touched.removedBy && !!errors.removedBy}
-                            isValid={touched.removedBy && !errors.removedBy}
+                            isInvalid={touched.workerId && !!errors.workerId}
+                            isValid={touched.workerId && !errors.workerId}
                             placeholder="Selecione o profissional"
                             // onBlur={handleBlur}
                           />
                           {/* <Form.Select
                             type="text"
-                            value={values.removedBy}
+                            value={values.workerId}
                             onChange={handleChange}
-                            isInvalid={touched.removedBy && !!errors.removedBy}
-                            isValid={touched.removedBy && !errors.removedBy}
+                            isInvalid={touched.workerId && !!errors.workerId}
+                            isValid={touched.workerId && !errors.workerId}
                             placeholder="Selecione o profissional"
                             onBlur={handleBlur}
                           >
@@ -424,22 +472,22 @@ export default function Index() {
                             type="invalid"
                             style={{ position: 'static' }}
                           >
-                            {errors.removedBy}
+                            {errors.workerId}
                           </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group
                           as={Col}
                           xs={12}
                           md={8}
-                          controlId="property"
+                          controlId="campusId"
                         >
-                          <Form.Label>COMPLEXO DE DESTINO:</Form.Label>
+                          <Form.Label>CAMPUS:</Form.Label>
                           <Form.Select
                             type="text"
-                            value={values.property}
+                            value={values.campusId}
                             onChange={handleChange}
-                            isInvalid={touched.property && !!errors.property}
-                            isValid={touched.property && !errors.property}
+                            isInvalid={touched.campusId && !!errors.campusId}
+                            isValid={touched.campusId && !errors.campusId}
                             onBlur={handleBlur}
                           >
                             <option>Selecione o complexo de destino</option>
@@ -454,26 +502,28 @@ export default function Index() {
                             type="invalid"
                             style={{ position: 'static' }}
                           >
-                            {errors.property}
+                            {errors.campusId}
                           </Form.Control.Feedback>
                         </Form.Group>
                       </Row>
 
                       {!values.reqMaintenance && openCollapse ? (
                         <Row className="pb-3">
-                          <Form.Group as={Col} xs={12} controlId="building">
+                          <Form.Group as={Col} xs={12} controlId="buildingId">
                             <Form.Label>PRÉDIO:</Form.Label>
                             <Form.Control
                               type="text"
-                              list="buildingOptions"
-                              value={values.building}
+                              list="buildingIdOptions"
+                              value={values.buildingId}
                               onChange={handleChange}
-                              isInvalid={touched.building && !!errors.building}
-                              isValid={touched.building && !errors.building}
+                              isInvalid={
+                                touched.buildingId && !!errors.buildingId
+                              }
+                              isValid={touched.buildingId && !errors.buildingId}
                               placeholder="Selecione o local"
                               onBlur={handleBlur}
                             />
-                            <datalist id="buildingOptions">
+                            <datalist id="buildingIdOptions">
                               <option key={1} value="Chrome" />
                               <option key={2} value="Firefox" />
                               <option key={3} value="Internet Explorer" />
@@ -486,7 +536,7 @@ export default function Index() {
                               type="invalid"
                               style={{ position: 'static' }}
                             >
-                              {errors.building}
+                              {errors.buildingId}
                             </Form.Control.Feedback>
                           </Form.Group>
                         </Row>
