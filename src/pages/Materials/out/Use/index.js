@@ -30,12 +30,6 @@ import Loading from '../../../../components/Loading';
 import SearchModal from './components/SearchModal';
 
 import workers from '../../../../assets/JSON/workers_example.json';
-import imoveis from '../../../../assets/JSON/imoveis.json';
-
-const propertyOptions = imoveis.map((property) => ({
-  value: property.id,
-  label: property.nome_imovel,
-}));
 
 const workersOptions = workers.map((worker) => ({
   value: worker.id,
@@ -46,6 +40,7 @@ export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
+  const [properties, setProperties] = useState([]);
   const [reqRMs, setReqRMs] = useState([]);
   const [schema, setSchema] = useState(
     yup.object().shape({
@@ -149,9 +144,24 @@ export default function Index() {
         setIsLoading(false);
       }
     }
+    async function getPropertiesData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/properties/');
+        setProperties(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
 
     getMaterialsData();
     getUsersData();
+    getPropertiesData();
   }, []);
 
   async function getReqMaterialsData(reqMaintenance) {
@@ -486,11 +496,16 @@ export default function Index() {
                             <Form.Label>PROPRIEDADE:</Form.Label>
                             <Select
                               id="propertyId"
-                              options={propertyOptions}
+                              options={properties.map((property) => ({
+                                value: property.id,
+                                label: property.nomeImovel,
+                              }))}
                               value={values.propertyId}
                               onChange={(selected) => {
                                 setFieldValue('propertyId', selected);
                                 setFieldTouched('propertyId');
+                                setFieldValue('buildingId', '');
+                                setFieldTouched('buildingId', false);
                               }}
                               isInvalid={
                                 touched.propertyId && !!errors.propertyId
@@ -514,7 +529,16 @@ export default function Index() {
                             <Form.Label>PRÉDIO:</Form.Label>
                             <Select
                               id="buildingId"
-                              options={workersOptions}
+                              options={properties
+                                .filter((property) =>
+                                  values.propertyId
+                                    ? property.id === values.propertyId.value
+                                    : false
+                                )[0]
+                                ?.buildingsSipac.map((building) => ({
+                                  value: building.id,
+                                  label: building.name,
+                                }))}
                               value={values.buildingId}
                               onChange={(selected) => {
                                 setFieldValue('buildingId', selected);
