@@ -217,6 +217,18 @@ export default function Index() {
             disableResizing: true,
             disableFilters: true,
           },
+          {
+            Header: () => (
+              // FORMAT HEADER
+              <div className="text-center">Preço</div>
+            ),
+            accessor: 'value',
+            width: 100,
+            disableSortBy: true,
+            disableResizing: true,
+            disableFilters: true,
+            Cell: ({ value }) => <div className="text-end"> {value}</div>,
+          },
         ],
       },
       {
@@ -267,6 +279,41 @@ export default function Index() {
               <div className="p-auto text-center">Restrito</div>
             ),
             accessor: 'restrictInventory',
+            width: 100,
+            disableResizing: true,
+            disableFilters: true,
+            disableSortBy: true,
+            isVisible: window.innerWidth > 576,
+            Cell: ({ value, row }) => (
+              <div className="p-auto text-end">
+                {value}{' '}
+                <OverlayTrigger
+                  placement="right"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={(props) =>
+                    renderTooltip(props, 'Consultar histórico de transações')
+                  }
+                >
+                  <Button
+                    size="sm"
+                    variant="outline-danger"
+                    className="border-0"
+                    onClick={() => {
+                      handleShowModal(row.original.materialId);
+                    }}
+                  >
+                    <FaChartLine />
+                  </Button>
+                </OverlayTrigger>
+              </div>
+            ),
+          },
+          {
+            Header: () => (
+              // FORMAT HEADER
+              <div className="p-auto text-center">Reservado</div>
+            ),
+            accessor: 'reserveInventory',
             width: 100,
             disableResizing: true,
             disableFilters: true,

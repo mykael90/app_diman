@@ -72,7 +72,6 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
-        Cell: (props) => <span>R$ {props.value}</span>,
       },
       {
         Header: 'Autorizado por:',
@@ -233,7 +232,6 @@ export default function Index() {
             width: 100,
             disableResizing: true,
             // eslint-disable-next-line react/destructuring-assignment
-            Cell: (props) => <span>R$ {props.value}</span>,
           },
         ]}
         data={row.original.MaterialOutItems}

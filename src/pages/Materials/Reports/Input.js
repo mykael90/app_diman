@@ -77,8 +77,6 @@ export default function Index() {
         accessor: 'value',
         width: 120,
         disableResizing: true,
-        // eslint-disable-next-line react/destructuring-assignment
-        Cell: (props) => <span>R$ {props.value}</span>,
       },
       {
         Header: 'Pedido em:',
@@ -245,7 +243,6 @@ export default function Index() {
             width: 100,
             disableResizing: true,
             // eslint-disable-next-line react/destructuring-assignment
-            Cell: (props) => <span>R$ {props.value}</span>,
           },
         ]}
         data={row.original.MaterialInItems}

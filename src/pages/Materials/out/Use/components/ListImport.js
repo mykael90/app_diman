@@ -162,6 +162,14 @@ export default function Index(props) {
         disableFilters: true,
       },
       {
+        Header: 'Preço',
+        accessor: 'value',
+        width: 100,
+        disableResizing: true,
+        disableFilters: true,
+        Cell: ({ value }) => <div className="text-end"> {value}</div>,
+      },
+      {
         Header: () => (
           // FORMAT HEADER
           <div className="p-auto text-center">S Comum</div>
