@@ -46,10 +46,7 @@ export default function Index() {
     yup.object().shape({
       reqMaintenance: yup
         .string()
-        .matches(
-          /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
-          'Formato de requisição não permitido'
-        ),
+        .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
       workerId: yup.object().required('Requerido'),
       obs: yup.string(),
       // eslint-disable-next-line react/forbid-prop-types
@@ -210,10 +207,7 @@ export default function Index() {
       yup.object().shape({
         reqMaintenance: yup
           .string()
-          .matches(
-            /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
-            'Formato de requisição não permitido'
-          ),
+          .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
         workerId: yup.object().required('Requerido'),
         obs: yup.string(),
         // eslint-disable-next-line react/forbid-prop-types
@@ -277,46 +271,39 @@ export default function Index() {
               <Form noValidate autoComplete="off">
                 {JSON.stringify(errors)}
                 <br />
-                {JSON.stringify(!values.workerId)}
-                <Row className="d-flex justify-content-between pb-3">
+                {JSON.stringify(touched)}
+                <Row className="d-flex pb-3">
                   <Col
                     xs="12"
                     sm="10"
                     md="6"
-                    className="d-flex justify-content-start"
+                    className="d-flex justify-content-start align-items-start"
                   >
                     <Form.Group
                       as={Col}
-                      xs={6}
+                      xs={5}
                       sm={5}
                       md={3}
                       controlId="reqMaintenance"
                     >
-                      <Form.Label>REQ. MANUTENÇÃO</Form.Label>
+                      <Form.Label>MANUTENÇÃO</Form.Label>
                       <Form.Control
                         type="tel"
                         value={values.reqMaintenance}
                         onChange={handleChange}
-                        isInvalid={
-                          touched.reqMaintenance && !!errors.reqMaintenance
-                        }
                         autoFocus
                         ref={inputRef}
-                        placeholder="Insira o número"
+                        placeholder="Nº Requisição"
                         onBlur={handleBlur}
                         readOnly={!!openCollapse}
                       />
-                      <Form.Control.Feedback
-                        tooltip
-                        type="invalid"
-                        style={{ position: 'static' }}
-                      >
-                        {errors.reqMaintenance}
-                      </Form.Control.Feedback>
+                      {touched.reqMaintenance && !!errors.reqMaintenance ? (
+                        <Badge bg="danger">{errors.reqMaintenance}</Badge>
+                      ) : null}
                     </Form.Group>
 
                     {!openCollapse ? (
-                      <Col xs="auto" className="ps-2 align-self-end">
+                      <Col xs="auto" className="ps-2 pt-4">
                         <Button
                           type="submit"
                           variant="success"
@@ -337,6 +324,7 @@ export default function Index() {
                           }}
                           aria-controls="collapse-form"
                           aria-expanded={openCollapse}
+                          className="mt-2"
                         >
                           <FaPlus />
                         </Button>
@@ -344,7 +332,7 @@ export default function Index() {
                     ) : null}
 
                     {!openCollapse ? (
-                      <Col xs="auto" className="ps-2 align-self-end">
+                      <Col xs="auto" className="ps-2 pt-4">
                         <Button
                           variant="secondary"
                           onClick={() => {
@@ -357,29 +345,24 @@ export default function Index() {
                           }}
                           aria-controls="collapse-form"
                           aria-expanded={openCollapse}
+                          className="mt-2"
                         >
                           Saída Avulsa
                         </Button>
                       </Col>
                     ) : null}
-                    {!!values.reqMaintenance && openCollapse ? (
-                      <Form.Group
-                        as={Col}
-                        xs={12}
-                        md={4}
-                        controlId="reqMaterial"
-                        className="ps-4"
-                      >
-                        <Form.Label>RMs VINCULADAS</Form.Label>
+                  </Col>
 
+                  <Col>
+                    {' '}
+                    {!!values.reqMaintenance && openCollapse ? (
+                      <Form.Group xs={12} md={4} controlId="reqMaterial">
+                        <Form.Label>RMs VINCULADAS</Form.Label>
                         <Form.Select
                           type="text"
                           value={values.reqMaterial}
                           onChange={handleChange}
-                          isInvalid={
-                            touched.reqMaterial && !!errors.reqMaterial
-                          }
-                          // isValid={touched.reqMaterial && !errors.reqMaterial}
+                          isInvalid={touched.reqMaterial && errors.reqMaterial}
                           onBlur={handleBlur}
                         >
                           <option>Selecione a RM</option>
@@ -389,24 +372,16 @@ export default function Index() {
                             </option>
                           ))}
                         </Form.Select>
-
-                        <Form.Control.Feedback
-                          tooltip
-                          type="invalid"
-                          style={{ position: 'static' }}
-                        >
-                          {errors.reqMaterial}
-                        </Form.Control.Feedback>
                       </Form.Group>
                     ) : null}
                   </Col>
 
-                  <Col xs="12" md="4" className="d-flex me-4">
-                    {!values.reqMaintenance && openCollapse ? (
-                      <Form.Group as={Col} xs={12} controlId="authorizedBy">
+                  <Col xs="12" md="4" className="d-flex">
+                    {openCollapse ? (
+                      <Form.Group>
                         <Form.Label>AUTORIZADO POR:</Form.Label>
                         <Select
-                          id="authorizedBy"
+                          inputId="authorizedBy"
                           options={users.map((user) => ({
                             value: user.id,
                             label: user.name,
@@ -416,24 +391,17 @@ export default function Index() {
                             setFieldValue('authorizedBy', selected);
                             setFieldTouched('authorizedBy');
                           }}
-                          isInvalid={
-                            touched.authorizedBy && !!errors.authorizedBy
-                          }
-                          isValid={touched.authorizedBy && !errors.authorizedBy}
                           placeholder="Selecione o responsável"
                           onBlur={handleBlur}
                         />
-                        <Form.Control.Feedback
-                          tooltip
-                          type="invalid"
-                          style={{ position: 'static' }}
-                        >
-                          {errors.authorizedBy}
-                        </Form.Control.Feedback>
+                        {touched.authorizedBy && !!errors.authorizedBy ? (
+                          <Badge bg="danger">{errors.authorizedBy}</Badge>
+                        ) : null}
                       </Form.Group>
                     ) : null}
                   </Col>
                 </Row>
+
                 <Collapse in={openCollapse}>
                   <div id="collapse-form">
                     <Row className="pb-3">
@@ -446,28 +414,21 @@ export default function Index() {
                         >
                           <Form.Label>RETIRADO POR:</Form.Label>
                           <Select
-                            id="workerId"
+                            // id="workerId"
                             inputId="workerId"
-                            name="workerId"
-                            as={Form.Select}
+                            // name="workerId"
                             options={workersOptions}
                             value={values.workerId}
                             onChange={(selected) => {
                               setFieldValue('workerId', selected);
                               setFieldTouched('workerId');
                             }}
-                            isInvalid={touched.workerId && !!errors.workerId}
-                            isValid={touched.workerId && !errors.workerId}
                             placeholder="Selecione o profissional"
                             onBlur={handleBlur}
                           />
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.workerId}
-                          </Form.Control.Feedback>
+                          {touched.workerId && !!errors.workerId ? (
+                            <Badge bg="danger">{errors.workerId}</Badge>
+                          ) : null}
                         </Form.Group>
                         <Form.Group as={Col} xs={12} md={8} controlId="place">
                           <Form.Label>LOCAL DE USO:</Form.Label>
