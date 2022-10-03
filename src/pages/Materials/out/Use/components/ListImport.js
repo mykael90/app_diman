@@ -20,7 +20,7 @@ export default function Index(props) {
 
   const handleQuantityChange = (e, row) => {
     const errors = [];
-    if (e.target.value > row.values.freeinventory)
+    if (e.target.value > row.values.freeInventory)
       errors.push('A saída não pode superar o saldo do material');
     if (e.target.value < 0) errors.push('A saída não pode ser negativa');
 
@@ -64,7 +64,8 @@ export default function Index(props) {
         materialId: row.values.materialId,
         name: row.values.name,
         unit: row.values.unit,
-        balance: row.values.freeinventory,
+        balance: row.values.freeInventory,
+        value: row.values.value,
         quantity: row.values.quantity ?? 0,
       });
 
