@@ -31,9 +31,31 @@ import SearchModal from './components/SearchModal';
 
 import workers from '../../../../assets/JSON/workers_example.json';
 
-const workersOptions = workers.map((worker) => ({
-  value: worker.id,
-  label: worker.name,
+const formatGroupLabel = (data) => (
+  <Col className="d-flex justify-content-between">
+    <span>{data.label}</span>
+    <Badge bg="secondary">{data.options.length}</Badge>
+  </Col>
+);
+
+const propertiesOp = [];
+
+const workersJobs = workers
+  .filter(
+    (value, index, arr) =>
+      arr.findIndex((item) => item.job === value.job) === index
+  )
+  .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
+
+const workerOp = [];
+
+workersJobs.forEach((value) => {
+  workerOp.push([value, workers.filter((item) => item.job === value)]);
+});
+
+const workersOptions = workerOp.map((value) => ({
+  label: value[0],
+  options: value[1].map((item) => ({ value: item.id, label: item.name })),
 }));
 
 export default function Index() {
@@ -156,6 +178,21 @@ export default function Index() {
       try {
         setIsLoading(true);
         const response = await axios.get('/properties/');
+        const propertiesCities = response.data
+          .filter(
+            (value, index, arr) =>
+              arr.findIndex((item) => item.municipio === value.municipio) ===
+              index
+          )
+          .map((value) => value.municipio); // RETORNA OS DIFERENTES TRABALHOS
+
+        propertiesCities.forEach((value) => {
+          propertiesOp.push([
+            value,
+            response.data.filter((item) => item.municipio === value),
+          ]);
+        });
+
         setProperties(response.data);
         setIsLoading(false);
       } catch (err) {
@@ -420,6 +457,7 @@ export default function Index() {
                           inputId="workerId"
                           // name="workerId"
                           options={workersOptions}
+                          formatGroupLabel={formatGroupLabel}
                           value={values.workerId}
                           onChange={(selected) => {
                             setFieldValue('workerId', selected);
@@ -469,10 +507,14 @@ export default function Index() {
                           <Form.Label>PROPRIEDADE:</Form.Label>
                           <Select
                             id="propertyId"
-                            options={properties.map((property) => ({
-                              value: property.id,
-                              label: property.nomeImovel,
+                            options={propertiesOp.map((value) => ({
+                              label: value[0],
+                              options: value[1].map((item) => ({
+                                value: item.id,
+                                label: item.nomeImovel,
+                              })),
                             }))}
+                            formatGroupLabel={formatGroupLabel}
                             value={values.propertyId}
                             onChange={(selected) => {
                               setFieldValue('propertyId', selected);
@@ -778,10 +820,8 @@ export default function Index() {
                     <Row className="pt-4">
                       <Col xs="auto">
                         {touched.items && typeof errors.items === 'string' ? (
-                          <Badge bg="danger">
-                            {errors.items} <hr />
-                          </Badge>
-                        ) : errors.items ? (
+                          <Badge bg="danger">{errors.items}</Badge>
+                        ) : touched.items && errors.items ? (
                           <Badge bg="danger">
                             A quantidade de item não pode ser 0.
                           </Badge>
@@ -789,8 +829,8 @@ export default function Index() {
                       </Col>
                     </Row>
 
-                    <Row className="justify-content-center">
-                      <Col xs="auto" className="text-center pt-2 pb-4">
+                    <Row>
+                      <Col xs="auto" className="text-center py-2">
                         <Button
                           variant="outline-info"
                           onClick={() => {
@@ -801,6 +841,9 @@ export default function Index() {
                           Pesquisar
                         </Button>
                       </Col>
+                    </Row>
+
+                    <Row className="justify-content-center">
                       <Col xs="auto" className="text-center pt-2 pb-4">
                         <Button
                           type="reset"
