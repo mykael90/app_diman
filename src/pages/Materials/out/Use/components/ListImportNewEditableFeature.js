@@ -63,8 +63,8 @@ function EditableCell({
 }
 
 export default function Index(props) {
-  const { push, items, materialsBalance } = props;
-  const [materials, setMaterials] = useState([...materialsBalance]);
+  const { push, items, inventoryData } = props;
+  const [materials, setMaterials] = useState([...inventoryData]);
   const [originalData] = useState(materials);
   const [skipPageReset, setSkipPageReset] = React.useState(false);
   // We need to keep the table from resetting the pageIndex when we

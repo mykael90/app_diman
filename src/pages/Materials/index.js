@@ -19,6 +19,10 @@ import Loss from './out/Loss';
 import Discard from './out/Discard';
 import Loan from './out/Loan';
 
+import Internal from './internal';
+import Restrict from './internal/Restrict';
+import Reserve from './internal/Reserve';
+
 import Reports from './Reports';
 import Input from './Reports/Input';
 import Output from './Reports/Output';
@@ -28,6 +32,10 @@ import Record from './Record';
 import List from './Record/List';
 import Add from './Record/Add';
 import Remove from './Record/Remove';
+
+import Definitions from './definitions';
+import Terminology from './definitions/Terminology';
+import ProccessFlow from './definitions/ProccessFlow';
 
 const ROLES = {
   adm: 100,
@@ -70,6 +78,11 @@ export default function MaterialsRoutes() {
         </Route>
       </Route>
 
+      <Route path="internal" element={<Internal />}>
+        <Route path="restrict" element={<Restrict />} />{' '}
+        <Route path="reserve" element={<Reserve />} />{' '}
+      </Route>
+
       <Route path="reports" element={<Reports />}>
         <Route path="inventory" element={<Inventory />} />{' '}
         <Route path="Input" element={<Input />} />{' '}
@@ -80,6 +93,11 @@ export default function MaterialsRoutes() {
         <Route path="list" element={<List />} />{' '}
         <Route path="add" element={<Add />} />{' '}
         <Route path="remove" element={<Remove />} />{' '}
+      </Route>
+
+      <Route path="definitions" element={<Definitions />}>
+        <Route path="terminology" element={<Terminology />} />{' '}
+        <Route path="proccessflow" element={<ProccessFlow />} />{' '}
       </Route>
     </Routes>
   );

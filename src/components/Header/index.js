@@ -79,6 +79,13 @@ export default function Header() {
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#4"
+                  onClick={() => navigate('/materials/internal/reserve')}
+                >
+                  Operações Internas
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#4"
                   onClick={() => navigate('/materials/reports/inventory')}
                 >
                   Relatórios
@@ -89,6 +96,13 @@ export default function Header() {
                   onClick={() => navigate('/materials/record/list')}
                 >
                   Cadastro
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#4"
+                  onClick={() => navigate('/materials/definitions/terminology')}
+                >
+                  Definições
                 </NavDropdown.Item>
               </NavDropdown>
 

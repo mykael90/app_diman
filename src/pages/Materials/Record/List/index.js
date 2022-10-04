@@ -92,6 +92,7 @@ export default function Index() {
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),
+    pageSize: 20,
   };
 
   const filterTypes = React.useMemo(
