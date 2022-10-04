@@ -3,22 +3,24 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaLock, FaLockOpen } from 'react-icons/fa';
 
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+
+import { primaryDarkColor } from '../../../../../config/colors';
 
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedRowHiddenRows from '../../../components/TableGfilterNestedRowHiddenRows';
 
 export default function Index(props) {
-  const { push, hiddenItems, materialsBalance } = props;
+  const { push, hiddenItems, inventoryData } = props;
 
   const [hiddenRows, setHiddenRows] = useState(hiddenItems);
   const oldQuantity = useRef(0);
 
   const handleQuantityChange = (e, row) => {
     const errors = [];
-    if (e.target.value > row.values.total)
+    if (e.target.value > row.values.freeInventory)
       errors.push('A saída não pode superar o saldo do material');
     if (e.target.value < 0) errors.push('A saída não pode ser negativa');
 
@@ -44,7 +46,7 @@ export default function Index(props) {
         let exists = false;
 
         hiddenRows.every((value) => {
-          if (value.MaterialId === row.values.material_id) {
+          if (value.materialId === row.values.materialId) {
             exists = true;
             return false;
           }
@@ -59,14 +61,15 @@ export default function Index(props) {
 
       // adicionar na lista de saída
       push({
-        MaterialId: row.values.material_id,
+        materialId: row.values.materialId,
         name: row.values.name,
         unit: row.values.unit,
-        balance: row.values.total,
+        balance: row.values.freeInventory,
+        value: row.values.value,
         quantity: row.values.quantity ?? 0,
       });
 
-      const newHiddenRows = [...hiddenRows, row.values.material_id];
+      const newHiddenRows = [...hiddenRows, row.values.materialId];
       setHiddenRows(newHiddenRows);
     },
     [hiddenRows, push]
@@ -79,6 +82,37 @@ export default function Index(props) {
       return !hiddenRows.includes(rowValue);
     });
   }
+
+  // Define a custom filter filter function!
+  function filterGreaterThan(rows, id, filterValue) {
+    return rows.filter((row) => {
+      const rowValue = Number(row.values[id]);
+      return rowValue >= filterValue;
+    });
+  }
+  const FilterForTotal = ({
+    column: { filterValue, preFilteredRows, setFilter, id },
+  }) =>
+    React.useMemo(
+      () => (
+        <div>
+          {filterValue === 1 ? (
+            <FaLock
+              cursor="pointer"
+              color={primaryDarkColor}
+              onClick={() => setFilter(0)}
+            />
+          ) : (
+            <FaLockOpen
+              cursor="pointer"
+              color={primaryDarkColor}
+              onClick={() => setFilter(1)}
+            />
+          )}
+        </div>
+      ),
+      [filterValue, setFilter]
+    );
 
   // trigger to custom filter
   function DefaultColumnFilter() {
@@ -113,7 +147,7 @@ export default function Index(props) {
       },
       {
         Header: 'ID',
-        accessor: 'material_id',
+        accessor: 'materialId',
         width: 125,
         disableResizing: true,
         isVisible: window.innerWidth > 576,
@@ -129,11 +163,27 @@ export default function Index(props) {
         disableFilters: true,
       },
       {
-        Header: 'Saldo',
-        accessor: 'total',
-        width: 80,
+        Header: 'Preço',
+        accessor: 'value',
+        width: 100,
         disableResizing: true,
         disableFilters: true,
+        Cell: ({ value }) => <div className="text-end"> {value}</div>,
+      },
+      {
+        Header: () => (
+          // FORMAT HEADER
+          <div className="p-auto text-center">S Comum</div>
+        ),
+        accessor: 'freeInventory',
+        width: 100,
+        disableResizing: true,
+        isVisible: window.innerWidth > 576,
+        Cell: ({ value }) => <div className="p-auto text-end">{value}</div>,
+        disableSortBy: true,
+        filterValue: 1,
+        filter: filterGreaterThan,
+        Filter: FilterForTotal,
       },
       {
         // Make an expander cell
@@ -145,7 +195,7 @@ export default function Index(props) {
         Cell: ({ row }) => (
           <Col className="d-flex">
             <Form.Control
-              id={`s_${row.values.material_id}`}
+              id={`s_${row.values.materialId}`}
               size="sm"
               type="number"
               onChange={(e) => handleQuantityChange(e, row)}
@@ -165,7 +215,7 @@ export default function Index(props) {
     [handlePushItem]
   );
 
-  const data = React.useMemo(() => materialsBalance, [materialsBalance]);
+  const data = React.useMemo(() => inventoryData, [inventoryData]);
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -185,6 +235,7 @@ export default function Index(props) {
         asc: true,
       },
     ],
+    filters: [{ id: 'freeInventory', value: 1 }],
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),

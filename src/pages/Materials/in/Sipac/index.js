@@ -123,7 +123,7 @@ export default function inputMaterial() {
     setSipac({ ...novoSipac });
   };
 
-  const handleStore = async (e, index) => {
+  const handleStore = async (e, index, free = false) => {
     e.preventDefault();
     const novoSipac = { ...sipac };
     const req = novoSipac.info.splice(index, 1)[0];
@@ -167,24 +167,31 @@ export default function inputMaterial() {
     try {
       setIsLoading(true);
 
+      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
       const response = await axiosRest.post(`/materials/in/`, renamedReq);
-      setSipac({ ...novoSipac });
 
+      // DEIXA PARA USO COMUM DO ALMOXARIFADO SE FOR SINALIZADO PELO USUARIO NO RECEBIMENTO
+      if (free) {
+        const freeData = await response.data;
+        delete Object.assign(freeData, { items: freeData.MaterialInItems })
+          .MaterialInItems; // rename key
+        delete Object.assign(freeData, { materialInId: freeData.id }).id; // rename key
+        delete freeData.requiredBy;
+
+        await axiosRest.post(`/materials/release/`, freeData);
+      }
+
+      setSipac({ ...novoSipac });
       setIsLoading(false);
 
       toast.success(
         `Material da requisição ${response.data.req} recebido com sucesso`
       );
     } catch (err) {
-      const { errors } = err.response.data;
-
-      errors.map((error) =>
-        toast.error(error, {
-          autoClose: false,
-          draggable: true,
-          closeOnClick: true,
-        })
-      );
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
 
       setIsLoading(false);
     }

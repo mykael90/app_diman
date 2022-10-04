@@ -2,10 +2,8 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { Button, Modal } from 'react-bootstrap';
 
-import ListImport from './ListImport';
-
 export default function SearchModal(props) {
-  const { show, handleClose, push, hiddenItems, inventoryData } = props;
+  const { show, handleClose, materialId } = props;
 
   return (
     <Modal
@@ -16,20 +14,19 @@ export default function SearchModal(props) {
       size="xl"
     >
       <Modal.Header closeButton>
-        <Modal.Title>Inventário</Modal.Title>
+        <Modal.Title>Transações cod={materialId}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <ListImport
-          push={push}
-          hiddenItems={hiddenItems}
-          inventoryData={inventoryData}
-        />
+        <p>
+          Relatório de transações do item {materialId} e demais em
+          desenvolvimento
+        </p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
-          Close
+          Fechar
         </Button>
-        <Button variant="primary">Understood</Button>
+        <Button variant="primary">Entendido</Button>
       </Modal.Footer>
     </Modal>
   );
