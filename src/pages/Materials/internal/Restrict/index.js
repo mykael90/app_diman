@@ -18,6 +18,8 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 
+import ReleaseItemsModal from './components/ReleaseItemsModal';
+
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
@@ -34,6 +36,15 @@ const renderTooltip = (props, message) => (
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [reqs, setReqs] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [reqInModal, setReqInModal] = useState('');
+
+  const handleCloseModal = () => setShowModal(false);
+
+  const handleShowModal = (reqIn) => {
+    setReqInModal(reqIn);
+    setShowModal(true);
+  };
 
   useEffect(() => {
     async function getData() {
@@ -186,7 +197,7 @@ export default function Index() {
                   size="sm"
                   variant="outline-success"
                   className="border-0"
-                  onClick={(e) => console.log(e)}
+                  onClick={() => handleShowModal(row.original)}
                 >
                   <FaLockOpen />
                 </Button>
@@ -481,6 +492,11 @@ export default function Index() {
     <>
       <Loading isLoading={isLoading} />
       <Container>
+        <ReleaseItemsModal // modal p/ liberação de materiais
+          handleClose={handleCloseModal}
+          show={showModal}
+          data={reqInModal}
+        />
         <Row className="text-center py-3">
           <Card.Title>
             Operações de Restrições e Liberações: Materiais
