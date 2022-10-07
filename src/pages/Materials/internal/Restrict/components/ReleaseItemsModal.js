@@ -22,6 +22,44 @@ export default function SearchModal(props) {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const holder = {};
+  let RestrictItems = [];
+  let ReleaseItems = [];
+
+  data.MaterialRestricts?.forEach((value) => {
+    RestrictItems = [...RestrictItems, ...value.MaterialRestrictItems];
+  });
+  data.MaterialReleases?.forEach((value) => {
+    ReleaseItems = [...ReleaseItems, ...value.MaterialReleaseItems];
+  });
+
+  const RestrictItemsSum = Array.from(
+    RestrictItems.reduce(
+      (m, { material_id, quantity }) =>
+        m.set(material_id, (m.get(material_id) || 0) + quantity),
+      new Map()
+    ),
+    ([material_id, quantity]) => ({ material_id, quantity })
+  );
+
+  const ReleaseItemsSum = Array.from(
+    ReleaseItems.reduce(
+      (m, { material_id, quantity }) =>
+        m.set(material_id, (m.get(material_id) || 0) + quantity),
+      new Map()
+    ),
+    ([material_id, quantity]) => ({ material_id, quantity })
+  );
+
+  const balanceItems = RestrictItemsSum.map((item) => {
+    const x = 0;
+
+    return { item.material, balancedQuantity };
+  });
+
+  console.log(RestrictItemsSum);
+  console.log(ReleaseItemsSum);
+
   const handleStore = async (values, resetForm) => {
     const formattedValues = Object.fromEntries(
       Object.entries(values).filter(([_, v]) => v != null)
@@ -35,18 +73,18 @@ export default function SearchModal(props) {
 
     formattedValues.userId = userId;
     formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
-    formattedValues.items.forEach((item) => {
-      delete Object.assign(item, { material_id: item.material_id }).material_id; // rename key
-      item.value = item.value
-        .replace(/\./g, '')
-        .replace(/,/g, '.')
-        .replace(/[^0-9\.]+/g, '');
-    });
+    // formattedValues.items.forEach((item) => {
+    //   delete Object.assign(item, { material_id: item.material_id }).material_id; // rename key
+    //   item.value = item.value
+    //     .replace(/\./g, '')
+    //     .replace(/,/g, '.')
+    //     .replace(/[^0-9\.]+/g, '');
+    // });
 
-    formattedValues.value = formattedValues.items.reduce((ac, item) => {
-      ac += Number(item.quantity) * Number(item.value);
-      return ac;
-    }, 0);
+    // formattedValues.value = formattedValues.items.reduce((ac, item) => {
+    //   ac += Number(item.quantity) * Number(item.value);
+    //   return ac;
+    // }, 0);
 
     try {
       setIsLoading(true);
@@ -123,7 +161,7 @@ export default function SearchModal(props) {
     reqMaintenance: data.reqMaintenance,
     authorizedBy: '',
     obs: '',
-    items: data.MaterialRestricts?.MaterialRestrictItems,
+    items: data.MaterialRestricts?.[0].MaterialRestrictItems ?? '',
   };
 
   return (
@@ -136,11 +174,7 @@ export default function SearchModal(props) {
         keyboard={false}
         size="xl"
       >
-        <Modal.Header closeButton>
-          <Modal.Title>Transações cod=</Modal.Title>
-        </Modal.Header>
         <Modal.Body>
-          {JSON.stringify(data)}
           <Row className="bg-light border rounded d-flex justify-content-center pt-2">
             <Row
               className="px-0 mx-0 py-2 text-center"
@@ -259,7 +293,7 @@ export default function SearchModal(props) {
                     >
                       <span className="fs-6">LISTA DE MATERIAIS</span>
                     </Row>
-                    {/* <FieldArray name="items">
+                    <FieldArray name="items">
                       {(fieldArrayProps) => {
                         const { remove } = fieldArrayProps;
                         return (
@@ -349,7 +383,7 @@ export default function SearchModal(props) {
                                         className="p-0 m-0 ps-2"
                                       />
                                     </Form.Group>
-                                    <Form.Group
+                                    {/* <Form.Group
                                       as={Col}
                                       xs={12}
                                       sm={4}
@@ -367,7 +401,7 @@ export default function SearchModal(props) {
                                         size="sm"
                                         className="p-0 m-0 ps-2"
                                       />
-                                    </Form.Group>
+                                    </Form.Group> */}
                                     <Form.Group
                                       as={Col}
                                       xs={10}
@@ -437,7 +471,7 @@ export default function SearchModal(props) {
                           </Row>
                         );
                       }}
-                    </FieldArray> */}
+                    </FieldArray>
                     <Row className="pt-4">
                       <Col xs="auto">
                         {touched.items && typeof errors.items === 'string' ? (
@@ -455,10 +489,7 @@ export default function SearchModal(props) {
                         <Button
                           type="reset"
                           variant="danger"
-                          onClick={() => {
-                            resetForm();
-                            initialSchema();
-                          }}
+                          onClick={handleClose}
                         >
                           Cancelar
                         </Button>
@@ -475,12 +506,6 @@ export default function SearchModal(props) {
             </Row>
           </Row>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Fechar
-          </Button>
-          <Button variant="primary">Entendido</Button>
-        </Modal.Footer>
       </Modal>
     </>
   );
