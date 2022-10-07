@@ -14,7 +14,7 @@ import axios from '../../../../services/axios';
 import { primaryDarkColor, body2Color } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
 
-export default function RestrictItems({
+export default function ReleaseItems({
   data = {
     reqMaintenance: '63/2022',
     authorizedBy: {

@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-import { FaChartLine } from 'react-icons/fa';
+import { FaLockOpen, FaLock } from 'react-icons/fa';
 
 import {
   Container,
@@ -25,6 +25,12 @@ import Loading from '../../../../components/Loading';
 import TableGfilterNestedrow from '../../components/TableGfilterNestedRow';
 import TableNestedrow from '../../components/TableNestedRow';
 
+const renderTooltip = (props, message) => (
+  <Tooltip id="button-tooltip" {...props}>
+    {message}
+  </Tooltip>
+);
+
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [reqs, setReqs] = useState([]);
@@ -33,7 +39,7 @@ export default function Index() {
     async function getData() {
       try {
         setIsLoading(true);
-        const response = await axios.get('/materials/in/');
+        const response = await axios.get('/materials/in/rl');
         setReqs(response.data);
         setIsLoading(false);
       } catch (err) {
@@ -70,36 +76,42 @@ export default function Index() {
         accessor: 'req',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: 'Req. Man.',
         accessor: 'reqMaintenance',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: 'Tipo',
         accessor: 'type',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: 'Valor',
         accessor: 'value',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: 'Pedido em:',
         accessor: 'registerDate',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: 'Pedido por:',
         accessor: 'requiredBy',
         width: 150,
         disableResizing: true,
+        disableSortBy: true,
         Cell: (props) => {
           const custom = String(props.value).replace(
             /(^[a-z]*)\.([a-z]*).*/gm,
@@ -113,24 +125,13 @@ export default function Index() {
         accessor: 'createdAt',
         width: 120,
         disableResizing: true,
-      },
-      {
-        Header: 'Receb. por:',
-        accessor: 'receivedBy',
-        width: 150,
-        disableResizing: true,
-        Cell: (props) => {
-          const custom = String(props.value).replace(
-            /(^[a-z]*)\.([a-z]*).*/gm,
-            '$1.$2'
-          ); // deixar só os dois primeiros nomes
-          return <span> {custom}</span>;
-        },
+        disableSortBy: true,
       },
       {
         Header: 'Unidade de Custo',
         accessor: 'costUnit',
         isVisible: window.innerWidth > 576,
+        disableSortBy: true,
         // eslint-disable-next-line react/destructuring-assignment
         Cell: (props) => {
           const custom = String(props.value).replace(/([0-9]{2})/gm, '$1.');
@@ -149,32 +150,49 @@ export default function Index() {
         accessor: 'totalInventory',
         width: 100,
         disableResizing: true,
-        filterValue: 1,
         disableSortBy: true,
-        filter: filterGreaterThan,
-        Filter: FilterForTotal,
         Cell: ({ value, row }) => (
-          <div className="p-auto text-end">
-            {value}{' '}
-            <OverlayTrigger
-              placement="right"
-              delay={{ show: 250, hide: 400 }}
-              overlay={(props) =>
-                renderTooltip(props, 'Consultar histórico de transações')
-              }
-            >
-              <Button
-                size="sm"
-                variant="outline-primary"
-                className="border-0"
-                onClick={() => {
-                  handleShowModal(row.original.materialId);
-                }}
+          <Row>
+            {' '}
+            <Col className="p-auto text-end">
+              {value}{' '}
+              <OverlayTrigger
+                placement="right"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) =>
+                  renderTooltip(props, 'Realizar nova restrição')
+                }
               >
-                <FaChartLine />
-              </Button>
-            </OverlayTrigger>
-          </div>
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  className="border-0"
+                  onClick={(e) => console.log(e)}
+                >
+                  <FaLock />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+            <Col className="p-auto text-end">
+              {value}{' '}
+              <OverlayTrigger
+                placement="right"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) =>
+                  renderTooltip(props, 'Realizar nova liberação')
+                }
+              >
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  className="border-0"
+                  onClick={(e) => console.log(e)}
+                >
+                  <FaLockOpen />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+          </Row>
         ),
       },
     ],
@@ -235,17 +253,6 @@ export default function Index() {
 
   const renderRowSubSubComponent = React.useCallback(
     ({ row }) => (
-      <>
-        <span className="fw-bold">Especificação:</span>{' '}
-        {row.original.specification}
-      </>
-    ),
-    []
-  );
-
-  // Create a function that will render our row sub components
-  const renderRowSubComponent = React.useCallback(
-    ({ row }) => (
       <TableNestedrow
         style={{ padding: 0, margin: 0 }}
         columns={[
@@ -292,7 +299,10 @@ export default function Index() {
             // eslint-disable-next-line react/destructuring-assignment
           },
         ]}
-        data={row.original.MaterialInItems}
+        data={
+          row.original.MaterialRestrictItems ??
+          row.original.MaterialReleaseItems
+        }
         defaultColumn={{
           // Let's set up our default Filter UI
           // Filter: DefaultColumnFilter,
@@ -318,15 +328,164 @@ export default function Index() {
     []
   );
 
+  // Create a function that will render our row sub components
+  const renderRowSubComponent = React.useCallback(
+    ({ row }) => (
+      <>
+        <Row>
+          <Col className="fw-bold" style={{ fontSize: '.75em' }}>
+            RESTRIÇÕES
+          </Col>
+        </Row>
+        <TableNestedrow
+          style={{ padding: 0, margin: 0 }}
+          columns={[
+            {
+              // Make an expander cell
+              Header: () => null, // No header
+              id: 'expander', // It needs an ID
+              width: 30,
+              disableResizing: true,
+              disableSortBy: true,
+              Cell: ({ row }) => (
+                // Use Cell to render an expander for each row.
+                // We can use the getToggleRowExpandedProps prop-getter
+                // to build the expander.
+                <span {...row.getToggleRowExpandedProps()}>
+                  {row.isExpanded ? '▽' : '▷'}
+                </span>
+              ),
+            },
+            {
+              // Make an expander cell
+              Header: 'ID', // No header
+              accessor: 'id', // It needs an ID
+              width: 50,
+              disableResizing: true,
+              disableSortBy: true,
+            },
+            {
+              Header: 'Usuário',
+              accessor: 'userName',
+              width: 125,
+              disableResizing: true,
+              disableSortBy: true,
+              isVisible: window.innerWidth > 576,
+            },
+            {
+              Header: 'Data',
+              accessor: 'createdAt',
+              width: 100,
+              disableResizing: true,
+              disableSortBy: true,
+            },
+          ]}
+          data={row.original.MaterialRestricts}
+          defaultColumn={{
+            // Let's set up our default Filter UI
+            // Filter: DefaultColumnFilter,
+            minWidth: 30,
+            width: 50,
+            maxWidth: 800,
+          }}
+          initialState={{
+            sortBy: [
+              {
+                id: 'id',
+                asc: true,
+              },
+            ],
+            hiddenColumns: columns
+              .filter((col) => col.isVisible === false)
+              .map((col) => col.accessor),
+          }}
+          filterTypes={filterTypes}
+          renderRowSubComponent={renderRowSubSubComponent}
+        />
+        <Row>
+          <Col className="fw-bold" style={{ fontSize: '.75em' }}>
+            LIBERAÇÕES
+          </Col>
+        </Row>
+        <TableNestedrow
+          style={{ padding: 0, margin: 0 }}
+          columns={[
+            {
+              // Make an expander cell
+              Header: () => null, // No header
+              id: 'expander', // It needs an ID
+              width: 30,
+              disableResizing: true,
+              disableSortBy: true,
+              Cell: ({ row }) => (
+                // Use Cell to render an expander for each row.
+                // We can use the getToggleRowExpandedProps prop-getter
+                // to build the expander.
+                <span {...row.getToggleRowExpandedProps()}>
+                  {row.isExpanded ? '▽' : '▷'}
+                </span>
+              ),
+            },
+            {
+              // Make an expander cell
+              Header: 'ID', // No header
+              accessor: 'id', // It needs an ID
+              width: 50,
+              disableResizing: true,
+              disableSortBy: true,
+            },
+            {
+              Header: 'Usuário',
+              accessor: 'userName',
+              width: 125,
+              disableResizing: true,
+              disableSortBy: true,
+              isVisible: window.innerWidth > 576,
+            },
+            {
+              Header: 'Data',
+              accessor: 'createdAt',
+              width: 100,
+              disableResizing: true,
+              disableSortBy: true,
+            },
+          ]}
+          data={row.original.MaterialReleases}
+          defaultColumn={{
+            // Let's set up our default Filter UI
+            // Filter: DefaultColumnFilter,
+            minWidth: 30,
+            width: 50,
+            maxWidth: 800,
+          }}
+          initialState={{
+            sortBy: [
+              {
+                id: 'id',
+                asc: true,
+              },
+            ],
+            hiddenColumns: columns
+              .filter((col) => col.isVisible === false)
+              .map((col) => col.accessor),
+          }}
+          filterTypes={filterTypes}
+          renderRowSubComponent={renderRowSubSubComponent}
+        />
+      </>
+    ),
+    []
+  );
+
   return (
     <>
       <Loading isLoading={isLoading} />
       <Container>
         <Row className="text-center py-3">
-          <Card.Title>Relatório de Entrada: Materiais</Card.Title>
-          <Card.Text>
-            Materiais com entrada registrada por SIPAC, Doação, Retorno, etc.
-          </Card.Text>
+          <Card.Title>
+            Operações de Restrições e Liberações: Materiais
+          </Card.Title>
+          <Card.Text>Materiais vinculados a RM ou Retorno.</Card.Text>
         </Row>
 
         <TableGfilterNestedrow
