@@ -34,26 +34,26 @@ export default function SearchModal(props) {
 
   const RestrictItemsSum = Array.from(
     RestrictItems.reduce(
-      (m, { material_id, quantity }) =>
-        m.set(material_id, (m.get(material_id) || 0) + quantity),
+      (m, { materialId, quantity }) =>
+        m.set(materialId, (m.get(materialId) || 0) + quantity),
       new Map()
     ),
-    ([material_id, quantity]) => ({ material_id, quantity })
+    ([materialId, quantity]) => ({ materialId, quantity })
   );
 
   const ReleaseItemsSum = Array.from(
     ReleaseItems.reduce(
-      (m, { material_id, quantity }) =>
-        m.set(material_id, (m.get(material_id) || 0) + quantity),
+      (m, { materialId, quantity }) =>
+        m.set(materialId, (m.get(materialId) || 0) + quantity),
       new Map()
     ),
-    ([material_id, quantity]) => ({ material_id, quantity })
+    ([materialId, quantity]) => ({ materialId, quantity })
   );
 
   const balanceItems = RestrictItemsSum.map((item) => {
     const balancedQuantity = 0;
 
-    return { material_id: item.material_id, balancedQuantity };
+    return { materialId: item.materialId, balancedQuantity };
   });
 
   console.log(RestrictItemsSum);
@@ -74,7 +74,7 @@ export default function SearchModal(props) {
     formattedValues.userId = userId;
     formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
     // formattedValues.items.forEach((item) => {
-    //   delete Object.assign(item, { material_id: item.material_id }).material_id; // rename key
+    //   delete Object.assign(item, { materialId: item.materialId }).materialId; // rename key
     //   item.value = item.value
     //     .replace(/\./g, '')
     //     .replace(/,/g, '.')
@@ -307,7 +307,7 @@ export default function SearchModal(props) {
                                     </Col>
                                   </Row>
                                   <Row
-                                    key={item.material_id}
+                                    key={item.materialId}
                                     className="d-flex p-0 m-0 border-bottom"
                                   >
                                     <Form.Group
@@ -316,7 +316,7 @@ export default function SearchModal(props) {
                                       sm={4}
                                       md={3}
                                       lg={2}
-                                      controlId={`items[${index}].material_id`}
+                                      controlId={`items[${index}].materialId`}
                                       className="border-0 m-0 p-0"
                                     >
                                       {index === 0 ? (
@@ -328,7 +328,7 @@ export default function SearchModal(props) {
                                         type="text"
                                         plaintext
                                         readOnly
-                                        value={item.material_id}
+                                        value={item.materialId}
                                         onChange={handleChange}
                                         placeholder="Selecione o ID material"
                                         onBlur={handleBlur}

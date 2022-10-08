@@ -269,7 +269,7 @@ export default function Index() {
         columns={[
           {
             Header: 'ID',
-            accessor: 'material_id',
+            accessor: 'materialId',
             width: 125,
             disableResizing: true,
             isVisible: window.innerWidth > 576,
