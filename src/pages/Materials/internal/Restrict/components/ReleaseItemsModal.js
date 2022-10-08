@@ -22,7 +22,6 @@ export default function SearchModal(props) {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const holder = {};
   let RestrictItems = [];
   let ReleaseItems = [];
 
@@ -52,13 +51,14 @@ export default function SearchModal(props) {
   );
 
   const balanceItems = RestrictItemsSum.map((item) => {
-    const x = 0;
+    const balancedQuantity = 0;
 
-    return { item.material, balancedQuantity };
+    return { material_id: item.material_id, balancedQuantity };
   });
 
   console.log(RestrictItemsSum);
   console.log(ReleaseItemsSum);
+  console.log(balanceItems);
 
   const handleStore = async (values, resetForm) => {
     const formattedValues = Object.fromEntries(

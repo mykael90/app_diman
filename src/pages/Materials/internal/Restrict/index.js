@@ -268,21 +268,6 @@ export default function Index() {
         style={{ padding: 0, margin: 0 }}
         columns={[
           {
-            // Make an expander cell
-            Header: () => null, // No header
-            id: 'expander', // It needs an ID
-            width: 30,
-            disableResizing: true,
-            Cell: ({ row }) => (
-              // Use Cell to render an expander for each row.
-              // We can use the getToggleRowExpandedProps prop-getter
-              // to build the expander.
-              <span {...row.getToggleRowExpandedProps()}>
-                {row.isExpanded ? '▽' : '▷'}
-              </span>
-            ),
-          },
-          {
             Header: 'ID',
             accessor: 'material_id',
             width: 125,
