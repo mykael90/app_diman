@@ -19,6 +19,7 @@ import {
 } from 'react-bootstrap';
 
 import ReleaseItemsModal from './components/ReleaseItemsModal';
+import RestrictItemsModal from './components/RestrictItemsModal';
 
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
@@ -40,31 +41,41 @@ export default function Index() {
   const [showModalRes, setShowModalRes] = useState(false);
   const [reqInModal, setReqInModal] = useState('');
 
-  const handleCloseModalRel = () => setShowModalRel(false);
+  async function getData() {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/materials/in/rl');
+      setReqs(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const handleCloseModalRel = () => {
+    setShowModalRel(false);
+    getData();
+  };
+  const handleCloseModalRes = () => {
+    setShowModalRes(false);
+    getData();
+  };
 
   const handleShowModalRel = (reqIn) => {
     setReqInModal(reqIn);
     setShowModalRel(true);
   };
-
-  useEffect(() => {
-    async function getData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/in/rl');
-        setReqs(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
-
-    getData();
-  }, []);
+  const handleShowModalRes = (reqIn) => {
+    setReqInModal(reqIn);
+    setShowModalRes(true);
+  };
 
   const columns = React.useMemo(
     () => [
@@ -179,7 +190,7 @@ export default function Index() {
                   size="sm"
                   variant="outline-danger"
                   className="border-0"
-                  onClick={(e) => console.log(e)}
+                  onClick={() => handleShowModalRes(row.original)}
                 >
                   <FaLock />
                 </Button>
@@ -481,6 +492,11 @@ export default function Index() {
         <ReleaseItemsModal // modal p/ liberação de materiais
           handleClose={handleCloseModalRel}
           show={showModalRel}
+          data={reqInModal}
+        />
+        <RestrictItemsModal // modal p/ restricão de materiais
+          handleClose={handleCloseModalRes}
+          show={showModalRes}
           data={reqInModal}
         />
         <Row className="text-center py-3">

@@ -116,7 +116,7 @@ export default function SearchModal(props) {
       resetForm();
       handleClose();
 
-      toast.success(`Materiais liberados com sucesso`);
+      toast.success(`Materiais restringidos com sucesso`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -201,7 +201,7 @@ export default function SearchModal(props) {
               className="px-0 mx-0 py-2 text-center"
               style={{ background: primaryDarkColor, color: 'white' }}
             >
-              <span className="fs-5">LIBERAR MATERIAL PARA SALDO COMUM</span>
+              <span className="fs-5">COLOCAR MATERIAL PARA SALDO RESTRITO</span>
             </Row>
             <Row className="px-0 pt-2">
               <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
