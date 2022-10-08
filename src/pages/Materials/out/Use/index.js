@@ -92,74 +92,45 @@ export default function Index() {
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
 
-  const handleStore = async (values, resetForm) => {
-    const formattedValues = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v != null)
-    ); // LIMPANDO CHAVES NULL E UNDEFINED
+  const initialSchema = () => {
+    setSchema(
+      yup.object().shape({
+        reqMaintenance: yup
+          .string()
+          .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
+        workerId: yup.object().required('Requerido'),
+        authorizedBy: yup.object().required('Requerido'),
+        obs: yup.string(),
+        // eslint-disable-next-line react/forbid-prop-types
+        items: yup
+          .array()
+          .of(
+            yup.object().shape({
+              quantity: yup.number().required('Requerido').positive(),
+            })
+          )
+          .required()
+          .min(1, 'A lista de materiais não pode ser vazia'),
+      })
+    );
+  };
 
-    Object.keys(formattedValues).forEach((key) => {
-      if (formattedValues[key] === '') {
-        delete formattedValues[key];
-      }
-    }); // LIMPANDO CHAVES `EMPTY STRINGS`
-
-    formattedValues.userId = userId;
-    formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
-    formattedValues.workerId = formattedValues.workerId?.value;
-    formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
-    formattedValues.propertyId = formattedValues.propertyId?.value;
-    formattedValues.buildingId = formattedValues.buildingId?.value;
-    formattedValues.items.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
-      item.value = item.value
-        .replace(/\./g, '')
-        .replace(/,/g, '.')
-        .replace(/[^0-9\.]+/g, '');
-    });
-
-    formattedValues.value = formattedValues.items.reduce((ac, item) => {
-      ac += Number(item.quantity) * Number(item.value);
-      return ac;
-    }, 0);
-
-    console.log(formattedValues);
-
+  async function getMaterialsData() {
     try {
       setIsLoading(true);
-
-      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
-      await axios.post(`/materials/out/`, formattedValues);
-
+      const response = await axios.get('/materials/inventory/');
+      setinventoryData(response.data);
       setIsLoading(false);
-      setOpenCollapse(false);
-      resetForm();
-
-      toast.success(`Saída de material realizada com sucesso`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
         ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-
       setIsLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
-    async function getMaterialsData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/inventory/');
-        setinventoryData(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
     async function getUsersData() {
       try {
         setIsLoading(true);
@@ -209,6 +180,66 @@ export default function Index() {
     getPropertiesData();
   }, []);
 
+  const handleStore = async (values, resetForm) => {
+    const formattedValues = Object.fromEntries(
+      Object.entries(values).filter(([_, v]) => v != null)
+    ); // LIMPANDO CHAVES NULL E UNDEFINED
+
+    Object.keys(formattedValues).forEach((key) => {
+      if (formattedValues[key] === '') {
+        delete formattedValues[key];
+      }
+    }); // LIMPANDO CHAVES `EMPTY STRINGS`
+
+    formattedValues.userId = userId;
+    formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
+    formattedValues.workerId = formattedValues.workerId?.value;
+    formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
+    formattedValues.reqMaterial = formattedValues.reqMaterial?.value;
+    formattedValues.propertyId = formattedValues.propertyId?.value;
+    formattedValues.buildingId = formattedValues.buildingId?.value;
+    formattedValues.items.forEach((item) => {
+      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      item.value = item.value
+        .replace(/\./g, '')
+        .replace(/,/g, '.')
+        .replace(/[^0-9\.]+/g, '');
+    });
+
+    delete Object.assign(formattedValues, {
+      MaterialOutItems: formattedValues.items,
+    }).materialId;
+
+    formattedValues.value = formattedValues.items.reduce((ac, item) => {
+      ac += Number(item.quantity) * Number(item.value);
+      return ac;
+    }, 0);
+
+    console.log(formattedValues);
+
+    try {
+      setIsLoading(true);
+
+      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
+      await axios.post(`/materials/out/`, formattedValues);
+
+      setIsLoading(false);
+      setOpenCollapse(false);
+      resetForm();
+      initialSchema();
+      getMaterialsData();
+
+      toast.success(`Saída de material realizada com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
+
   async function getReqMaterialsData(reqMaintenance) {
     try {
       setIsLoading(true);
@@ -248,29 +279,6 @@ export default function Index() {
   const schemaSingleOutput = yup.object().shape({
     propertyId: yup.object().required('Requerido'),
   });
-
-  const initialSchema = () => {
-    setSchema(
-      yup.object().shape({
-        reqMaintenance: yup
-          .string()
-          .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
-        workerId: yup.object().required('Requerido'),
-        authorizedBy: yup.object().required('Requerido'),
-        obs: yup.string(),
-        // eslint-disable-next-line react/forbid-prop-types
-        items: yup
-          .array()
-          .of(
-            yup.object().shape({
-              quantity: yup.number().required('Requerido').positive(),
-            })
-          )
-          .required()
-          .min(1, 'A lista de materiais não pode ser vazia'),
-      })
-    );
-  };
 
   const apllySchema = (addSchema) => {
     const newSchema = schema.concat(addSchema);
@@ -398,20 +406,19 @@ export default function Index() {
                     {!!values.reqMaintenance && openCollapse ? (
                       <Form.Group controlId="reqMaterial">
                         <Form.Label>RMs VINCULADAS</Form.Label>
-                        <Form.Select
-                          type="text"
+                        <Select
+                          inputId="reqMaterial"
+                          options={reqRMs.map((reqRM) => ({
+                            value: reqRM.req,
+                            label: reqRM.req,
+                          }))}
                           value={values.reqMaterial}
-                          onChange={handleChange}
-                          isInvalid={touched.reqMaterial && errors.reqMaterial}
+                          onChange={(selected) => {
+                            setFieldValue('reqMaterial', selected);
+                          }}
                           onBlur={handleBlur}
-                        >
-                          <option>Selecione a RM</option>
-                          {reqRMs.map((reqRM) => (
-                            <option key={reqRM.id} value={reqRM.id}>
-                              {reqRM.req}
-                            </option>
-                          ))}
-                        </Form.Select>
+                          placeholder="Selecione a RM"
+                        />
                       </Form.Group>
                     ) : null}
                   </Col>
