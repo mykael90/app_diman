@@ -295,7 +295,7 @@ export default function Index() {
           className="px-0 mx-0 py-2 text-center"
           style={{ background: primaryDarkColor, color: 'white' }}
         >
-          <span className="fs-5">SAÍDA DE MATERIAL</span>
+          <span className="fs-5">SAÍDA DE MATERIAL: USO</span>
         </Row>
         <Row className="px-0 pt-2">
           <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
