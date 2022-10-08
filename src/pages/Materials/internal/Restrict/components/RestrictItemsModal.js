@@ -71,9 +71,8 @@ export default function SearchModal(props) {
   // i1 = item 1
   // i2 = item 2
   // Colocando nome e unidade no vetor balanceItems
-  // depois tem que ajeitar isso, pegar os materiais da entrada mesmo ao inves do 1º vetor do restricts
-  data.MaterialRestricts?.[0].MaterialRestrictItems.forEach((i1) => {
-    balanceItems.forEach((i2) => {
+  data.MaterialInItems?.forEach((i1) => {
+    balanceItems?.forEach((i2) => {
       if (i1.materialId === i2.materialId) {
         i2.name = i1.name;
         i2.unit = i1.unit;

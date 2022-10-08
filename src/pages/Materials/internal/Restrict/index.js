@@ -180,7 +180,7 @@ export default function Index() {
             <Col className="p-auto text-end">
               {value}{' '}
               <OverlayTrigger
-                placement="right"
+                placement="top"
                 delay={{ show: 250, hide: 400 }}
                 overlay={(props) =>
                   renderTooltip(props, 'Realizar nova restrição')
