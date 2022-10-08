@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
 import Select from 'react-select';
+import { forEach } from 'lodash';
 import axios from '../../../../../services/axios';
 import { primaryDarkColor, body2Color } from '../../../../../config/colors';
 import Loading from '../../../../../components/Loading';
@@ -22,6 +23,7 @@ export default function SearchModal(props) {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // CALCULANDO O SALDO DE MATERIAL RESTRITO QUE PODE SER LIBERADO
   let RestrictItems = [];
   let ReleaseItems = [];
 
@@ -49,16 +51,36 @@ export default function SearchModal(props) {
     ),
     ([materialId, quantity]) => ({ materialId, quantity })
   );
-
-  const balanceItems = RestrictItemsSum.map((item) => {
-    const balancedQuantity = 0;
-
-    return { materialId: item.materialId, balancedQuantity };
+  // ires = item restricted
+  // irel = item released
+  const balanceItems = RestrictItemsSum.map((ires) => {
+    const balancedQuantity =
+      ires.quantity -
+      ReleaseItemsSum.reduce((ac, irel) => {
+        if (irel.materialId === ires.materialId) {
+          ac += irel.quantity;
+        }
+        return ac;
+      }, 0);
+    return {
+      materialId: ires.materialId,
+      balancedQuantity,
+      quantity: balancedQuantity,
+    };
   });
-
-  console.log(RestrictItemsSum);
-  console.log(ReleaseItemsSum);
-  console.log(balanceItems);
+  // i1 = item 1
+  // i2 = item 2
+  // Colocando nome e unidade no vetor balanceItems
+  RestrictItems.forEach((i1) => {
+    balanceItems.forEach((i2) => {
+      if (i1.materialId === i2.materialId) {
+        i2.name = i1.name;
+        i2.unit = i1.unit;
+        i2.specification = i1.specification;
+        i2.value = i1.value;
+      }
+    });
+  });
 
   const handleStore = async (values, resetForm) => {
     const formattedValues = Object.fromEntries(
@@ -72,30 +94,26 @@ export default function SearchModal(props) {
     }); // LIMPANDO CHAVES `EMPTY STRINGS`
 
     formattedValues.userId = userId;
-    formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
-    // formattedValues.items.forEach((item) => {
-    //   delete Object.assign(item, { materialId: item.materialId }).materialId; // rename key
-    //   item.value = item.value
-    //     .replace(/\./g, '')
-    //     .replace(/,/g, '.')
-    //     .replace(/[^0-9\.]+/g, '');
-    // });
-
-    // formattedValues.value = formattedValues.items.reduce((ac, item) => {
-    //   ac += Number(item.quantity) * Number(item.value);
-    //   return ac;
-    // }, 0);
+    formattedValues.requiredBy = formattedValues.requiredBy?.value;
+    formattedValues.items.forEach((item) => {
+      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      item.value = item.value
+        .replace(/\./g, '')
+        .replace(/,/g, '.')
+        .replace(/[^0-9\.]+/g, '');
+    });
 
     try {
       setIsLoading(true);
 
-      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
-      await axios.post(`/materials/out/`, formattedValues);
+      // LIBERAÇÃO DO SALDO BLOQUEADO
+      await axios.post(`/materials/release/`, formattedValues);
 
       setIsLoading(false);
       resetForm();
+      handleClose();
 
-      toast.success(`Saída de material realizada com sucesso`);
+      toast.success(`Materiais liberados com sucesso`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -159,9 +177,9 @@ export default function SearchModal(props) {
     materialInId: data.id,
     reqMaterial: data.req,
     reqMaintenance: data.reqMaintenance,
-    authorizedBy: '',
+    requiredBy: '',
     obs: '',
-    items: data.MaterialRestricts?.[0].MaterialRestrictItems ?? '',
+    items: balanceItems.filter((item) => item.quantity > 0) ?? '',
   };
 
   return (
@@ -243,22 +261,22 @@ export default function SearchModal(props) {
                       </Form.Group>
 
                       <Form.Group as={Col} className="pb-3">
-                        <Form.Label>AUTORIZADO POR:</Form.Label>
+                        <Form.Label>REQUERIDO POR:</Form.Label>
                         <Select
-                          inputId="authorizedBy"
+                          inputId="requiredBy"
                           options={users.map((user) => ({
                             value: user.id,
                             label: user.name,
                           }))}
-                          value={values.authorizedBy}
+                          value={values.requiredBy}
                           onChange={(selected) => {
-                            setFieldValue('authorizedBy', selected);
+                            setFieldValue('requiredBy', selected);
                           }}
                           placeholder="Selecione o responsável"
                           onBlur={handleBlur}
                         />
-                        {touched.authorizedBy && !!errors.authorizedBy ? (
-                          <Badge bg="danger">{errors.authorizedBy}</Badge>
+                        {touched.requiredBy && !!errors.requiredBy ? (
+                          <Badge bg="danger">{errors.requiredBy}</Badge>
                         ) : null}
                       </Form.Group>
                     </Row>
@@ -383,25 +401,33 @@ export default function SearchModal(props) {
                                         className="p-0 m-0 ps-2"
                                       />
                                     </Form.Group>
-                                    {/* <Form.Group
+                                    <Form.Group
                                       as={Col}
-                                      xs={12}
+                                      xs={10}
                                       sm={4}
-                                      md={1}
-                                      controlId={`items[${index}].balance`}
-                                      className="d-none"
+                                      md="auto"
+                                      controlId={`items[${index}].balancedQuantity`}
+                                      className="border-0 m-0 p-0"
+                                      style={{ width: '80px' }}
                                     >
+                                      {' '}
+                                      {index === 0 ? (
+                                        <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
+                                          RESTRITO
+                                        </Form.Label>
+                                      ) : null}
                                       <Form.Control
                                         type="number"
                                         plaintext
-                                        value={item.balance}
+                                        readOnly
+                                        value={item.balancedQuantity}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         placeholder="SALDO"
                                         size="sm"
-                                        className="p-0 m-0 ps-2"
+                                        className="p-0 m-0 ps-2 text-end"
                                       />
-                                    </Form.Group> */}
+                                    </Form.Group>
                                     <Form.Group
                                       as={Col}
                                       xs={10}
@@ -409,11 +435,11 @@ export default function SearchModal(props) {
                                       md="auto"
                                       controlId={`items[${index}].quantity`}
                                       className="border-0 m-0 p-0"
-                                      style={{ width: '70px', zIndex: 100 }}
+                                      style={{ width: '80px' }}
                                     >
                                       {index === 0 ? (
                                         <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
-                                          QTD
+                                          LIBERAR
                                         </Form.Label>
                                       ) : null}
                                       <Form.Control
@@ -430,7 +456,7 @@ export default function SearchModal(props) {
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"
-                                        className="p-0 m-0 ps-2 text-end"
+                                        className="p-0 m-0 ps-2 pe-2 text-end"
                                       />
                                     </Form.Group>
                                     <Col
@@ -474,7 +500,13 @@ export default function SearchModal(props) {
                     </FieldArray>
                     <Row className="pt-4">
                       <Col xs="auto">
-                        {touched.items && typeof errors.items === 'string' ? (
+                        {values.items.length === 0 ? (
+                          <Badge bg="danger">
+                            Não há materiais bloqueados para liberar.
+                          </Badge>
+                        ) : null}
+
+                        {typeof errors.items === 'string' ? (
                           <Badge bg="danger">{errors.items}</Badge>
                         ) : touched.items && errors.items ? (
                           <Badge bg="danger">
@@ -489,7 +521,10 @@ export default function SearchModal(props) {
                         <Button
                           type="reset"
                           variant="danger"
-                          onClick={handleClose}
+                          onClick={() => {
+                            resetForm();
+                            handleClose();
+                          }}
                         >
                           Cancelar
                         </Button>
