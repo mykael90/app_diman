@@ -145,7 +145,7 @@ export default function SearchModal(props) {
 
   const handleQuantityChange = (e, balance, handleChange) => {
     if (e.target.value > balance) {
-      toast.error('A saída não pode superar o saldo do material');
+      toast.error('A liberação não pode superar o saldo bloqueado do material');
       e.target.value = balance;
       handleChange(e);
       return;
@@ -449,7 +449,7 @@ export default function SearchModal(props) {
                                         onChange={(e) =>
                                           handleQuantityChange(
                                             e,
-                                            item.balance,
+                                            item.balancedQuantity,
                                             handleChange
                                           )
                                         }

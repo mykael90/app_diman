@@ -754,7 +754,7 @@ export default function Index() {
                                       md="auto"
                                       controlId={`items[${index}].quantity`}
                                       className="border-0 m-0 p-0"
-                                      style={{ width: '70px', zIndex: 100 }}
+                                      style={{ width: '70px' }}
                                     >
                                       {index === 0 ? (
                                         <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
@@ -775,7 +775,7 @@ export default function Index() {
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"
-                                        className="p-0 m-0 ps-2 text-end"
+                                        className="p-0 m-0 ps-2 pe-2 text-end"
                                       />
                                     </Form.Group>
                                     <Col
