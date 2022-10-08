@@ -18,7 +18,7 @@ import { primaryDarkColor, body2Color } from '../../../../../config/colors';
 import Loading from '../../../../../components/Loading';
 
 export default function SearchModal(props) {
-  const { show, handleClose, data } = props;
+  const { show, handleCancelModal, handleClose, data } = props;
   const userId = useSelector((state) => state.auth.user.id);
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -523,7 +523,7 @@ export default function SearchModal(props) {
                           variant="danger"
                           onClick={() => {
                             resetForm();
-                            handleClose();
+                            handleCancelModal();
                           }}
                         >
                           Cancelar

@@ -59,6 +59,11 @@ export default function Index() {
     getData();
   }, []);
 
+  const handleCancelModal = () => {
+    setShowModalRel(false);
+    setShowModalRes(false);
+  };
+
   const handleCloseModalRel = () => {
     setShowModalRel(false);
     getData();
@@ -490,11 +495,13 @@ export default function Index() {
       <Loading isLoading={isLoading} />
       <Container>
         <ReleaseItemsModal // modal p/ liberação de materiais
+          handleCancelModal={handleCancelModal}
           handleClose={handleCloseModalRel}
           show={showModalRel}
           data={reqInModal}
         />
         <RestrictItemsModal // modal p/ restricão de materiais
+          handleCancelModal={handleCancelModal}
           handleClose={handleCloseModalRes}
           show={showModalRes}
           data={reqInModal}
