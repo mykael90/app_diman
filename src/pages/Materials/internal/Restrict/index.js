@@ -36,14 +36,15 @@ const renderTooltip = (props, message) => (
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [reqs, setReqs] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModalRel, setShowModalRel] = useState(false);
+  const [showModalRes, setShowModalRes] = useState(false);
   const [reqInModal, setReqInModal] = useState('');
 
-  const handleCloseModal = () => setShowModal(false);
+  const handleCloseModalRel = () => setShowModalRel(false);
 
-  const handleShowModal = (reqIn) => {
+  const handleShowModalRel = (reqIn) => {
     setReqInModal(reqIn);
-    setShowModal(true);
+    setShowModalRel(true);
   };
 
   useEffect(() => {
@@ -197,7 +198,7 @@ export default function Index() {
                   size="sm"
                   variant="outline-success"
                   className="border-0"
-                  onClick={() => handleShowModal(row.original)}
+                  onClick={() => handleShowModalRel(row.original)}
                 >
                   <FaLockOpen />
                 </Button>
@@ -478,8 +479,8 @@ export default function Index() {
       <Loading isLoading={isLoading} />
       <Container>
         <ReleaseItemsModal // modal p/ liberação de materiais
-          handleClose={handleCloseModal}
-          show={showModal}
+          handleClose={handleCloseModalRel}
+          show={showModalRel}
           data={reqInModal}
         />
         <Row className="text-center py-3">
