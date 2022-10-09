@@ -31,6 +31,16 @@ export default function index() {
               <Nav.Link href="#3">
                 <Link
                   className="text-decoration-none"
+                  to="/materials/in/supplier"
+                >
+                  Fornecedor
+                </Link>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="#4">
+                <Link
+                  className="text-decoration-none"
                   to="/materials/in/donation"
                 >
                   Doação
@@ -38,7 +48,7 @@ export default function index() {
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#4" disabled>
+              <Nav.Link href="#5" disabled>
                 <Link
                   className="text-decoration-none"
                   to="/materials/in/first"

@@ -1,6 +1,15 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { Accordion, Container, Row, Col, Table, Button } from 'react-bootstrap';
+import {
+  Accordion,
+  Container,
+  Row,
+  Col,
+  Table,
+  Button,
+  ButtonGroup,
+  Dropdown,
+} from 'react-bootstrap';
 
 import { body1Color, primaryDarkColor } from '../../../../../config/colors';
 
@@ -102,12 +111,28 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
                     </Button>
                   </Col>
                   <Col xs="auto" className="text-center">
-                    <Button
-                      variant="success"
-                      onClick={(e) => handleStore(e, index)}
-                    >
-                      Receber
-                    </Button>
+                    <Dropdown as={ButtonGroup}>
+                      <Button
+                        onClick={(e) => handleStore(e, index)}
+                        variant="success"
+                      >
+                        Receber
+                      </Button>
+
+                      <Dropdown.Toggle
+                        split
+                        variant="success"
+                        id="dropdown-split-basic"
+                      />
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          onClick={(e) => handleStore(e, index, true)}
+                        >
+                          Repor Estoque
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </Col>
                 </Row>
               </Container>

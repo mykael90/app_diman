@@ -64,7 +64,7 @@ export function GlobalFilter({
   );
 }
 
-export default function TableGfilterNestedrow({
+export default function TableGfilterNestedRowHiddenRows({
   columns,
   data,
   defaultColumn,
@@ -128,7 +128,7 @@ export default function TableGfilterNestedrow({
         </Col>
       </Row>
 
-      <Row className="pt-3">
+      <Row className="py-3">
         <Table bordered hover size="sm" {...getTableProps()} responsive="sm">
           <thead>
             {headerGroups.map((headerGroup) => (
@@ -136,18 +136,41 @@ export default function TableGfilterNestedrow({
                 {headerGroup.headers.map((column) => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                     {column.render('Header')}
+                    <div className="text-center">
+                      {column.canFilter ? column.render('Filter') : null}
+                    </div>
                     {column.canSort ? (
                       <span>
                         {' '}
-                        <FaSort />
                         {column.isSorted ? (
                           column.isSortedDesc ? (
-                            <FaSortAlphaUp />
+                            <Button
+                              title="Ordenado decrescente"
+                              size="sm"
+                              variant="outline-primary"
+                              className="border-0"
+                            >
+                              <FaSortAlphaUp />
+                            </Button>
                           ) : (
-                            <FaSortAlphaDown />
+                            <Button
+                              title="Ordenado crescente"
+                              size="sm"
+                              variant="outline-primary"
+                              className="border-0"
+                            >
+                              <FaSortAlphaDown />
+                            </Button>
                           )
                         ) : (
-                          ''
+                          <Button
+                            title="Clique para ordenar"
+                            size="sm"
+                            variant="outline-primary"
+                            className="border-0"
+                          >
+                            <FaSort />
+                          </Button>
                         )}
                       </span>
                     ) : null}

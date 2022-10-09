@@ -14,28 +14,26 @@ export default function importSipac({
   submitReq,
 }) {
   return (
-    <Row className="my-3">
-      <Col xs={12} md={8} lg={4}>
-        <Row
-          className="justify-content-center fs-5 py-2 rounded-top rounded-3"
-          style={{ background: primaryDarkColor, color: 'white' }}
-        >
-          Lista de importação
+    <Row className="bg-light border rounded d-flex justify-content-center pt-2">
+      <Row
+        className="px-0 mx-0 py-2 text-center"
+        style={{ background: primaryDarkColor, color: 'white' }}
+      >
+        <span className="fs-5">ENTRADA DE MATERIAL: SIPAC </span>
+      </Row>
+      <Row className="bg-light rounded-bottom rounded-3">
+        <Row className="my-3">
+          <AddReq submitReq={submitReq} />
         </Row>
-        <Row className="bg-light rounded-bottom rounded-3">
-          <Row className="my-3">
-            <AddReq submitReq={submitReq} />
-          </Row>
-          <Col className="border-top">
-            <Content
-              reqs={reqs}
-              deleteReq={deleteReq}
-              handleClear={handleClear}
-              handleSubmit={handleSubmit}
-            />
-          </Col>
-        </Row>
-      </Col>
+        <Col xs={10} sm={8} md={4} lg={3} className="border-top">
+          <Content
+            reqs={reqs}
+            deleteReq={deleteReq}
+            handleClear={handleClear}
+            handleSubmit={handleSubmit}
+          />
+        </Col>
+      </Row>
     </Row>
   );
 }

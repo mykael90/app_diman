@@ -1,16 +1,4 @@
-import React from 'react';
-import { Col, Badge } from 'react-bootstrap';
-
-import Select from 'react-select';
-
-const formatGroupLabel = (data) => (
-  <Col className="d-flex justify-content-between">
-    <span>{data.label}</span>
-    <Badge bg="secondary">{data.options.length}</Badge>
-  </Col>
-);
-
-const colourOptions = [
+export const colourOptions = [
   { value: 'ocean', label: 'Ocean', color: '#00B8D9', isFixed: true },
   { value: 'blue', label: 'Blue', color: '#0052CC', isDisabled: true },
   { value: 'purple', label: 'Purple', color: '#5243AA' },
@@ -23,14 +11,14 @@ const colourOptions = [
   { value: 'silver', label: 'Silver', color: '#666666' },
 ];
 
-const flavourOptions = [
+export const flavourOptions = [
   { value: 'vanilla', label: 'Vanilla', rating: 'safe' },
   { value: 'chocolate', label: 'Chocolate', rating: 'good' },
   { value: 'strawberry', label: 'Strawberry', rating: 'wild' },
   { value: 'salted-caramel', label: 'Salted Caramel', rating: 'crazy' },
 ];
 
-const groupedOptions = [
+export const groupedOptions = [
   {
     label: 'Colours',
     options: colourOptions,
@@ -40,13 +28,3 @@ const groupedOptions = [
     options: flavourOptions,
   },
 ];
-
-export default function index() {
-  return (
-    <Select
-      defaultValue={colourOptions[1]}
-      options={groupedOptions}
-      formatGroupLabel={formatGroupLabel}
-    />
-  );
-}

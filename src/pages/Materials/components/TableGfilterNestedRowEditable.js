@@ -10,9 +10,8 @@ import {
   useFlexLayout,
   useResizeColumns,
   useExpanded,
-  usePagination,
 } from 'react-table';
-import { Form, Table, Row, Col, Button } from 'react-bootstrap';
+import { Form, Table, Row, Col } from 'react-bootstrap';
 import {
   FaFilter,
   FaSortAlphaDown,
@@ -71,23 +70,14 @@ export default function TableGfilterNestedrow({
   filterTypes,
   initialState,
   renderRowSubComponent,
+  updateMyData,
+  skipPageReset,
 }) {
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    page, // Instead of using 'rows', we'll use page,
-    // which has only the rows for the active page
-
-    // The rest of these things are super handy, too ;)
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
+    rows,
     prepareRow,
     visibleColumns,
     state,
@@ -101,14 +91,21 @@ export default function TableGfilterNestedrow({
       globalFilter: 'text',
       filterTypes,
       initialState,
+      // use the skipPageReset option to disable page resetting temporarily
+      autoResetPage: !skipPageReset,
+      // updateMyData isn't part of the API, but
+      // anything we put into these options will
+      // automatically be available on the instance.
+      // That way we can call this function from our
+      // cell renderer!
+      updateMyData,
     },
     useFilters,
     useGlobalFilter,
     useSortBy,
     useFlexLayout,
     useResizeColumns,
-    useExpanded,
-    usePagination
+    useExpanded
   );
 
   return (
@@ -128,7 +125,7 @@ export default function TableGfilterNestedrow({
         </Col>
       </Row>
 
-      <Row className="pt-3">
+      <Row className="py-3">
         <Table bordered hover size="sm" {...getTableProps()} responsive="sm">
           <thead>
             {headerGroups.map((headerGroup) => (
@@ -157,7 +154,7 @@ export default function TableGfilterNestedrow({
             ))}
           </thead>
           <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
+            {rows.map((row) => {
               prepareRow(row);
               return (
                 <>
@@ -204,93 +201,6 @@ export default function TableGfilterNestedrow({
             })}
           </tbody>
         </Table>
-      </Row>
-
-      <Row className="d-flex align-items-center py-2">
-        <Col xs="12" sm="auto" className="d-flex py-1">
-          <div>
-            <Button
-              as={Col}
-              xs="auto"
-              variant="dark"
-              onClick={() => gotoPage(0)}
-              disabled={!canPreviousPage}
-              className="me-1"
-            >
-              {'<<'}
-            </Button>{' '}
-            <Button
-              as={Col}
-              xs="auto"
-              variant="dark"
-              onClick={() => previousPage()}
-              disabled={!canPreviousPage}
-              className="me-1"
-            >
-              {'<'}
-            </Button>{' '}
-            <Button
-              as={Col}
-              xs="auto"
-              variant="dark"
-              onClick={() => nextPage()}
-              disabled={!canNextPage}
-              className="me-1"
-            >
-              {'>'}
-            </Button>{' '}
-            <Button
-              as={Col}
-              xs="auto"
-              variant="dark"
-              onClick={() => gotoPage(pageCount - 1)}
-              disabled={!canNextPage}
-              className="me-1"
-            >
-              {'>>'}
-            </Button>{' '}
-          </div>
-        </Col>
-        <Col xs="12" sm="auto" className="d-flex py-1">
-          <span>
-            Página{' '}
-            <strong>
-              {state.pageIndex + 1} de {pageOptions.length}
-            </strong>
-          </span>
-        </Col>
-        <Col xs="auto" className="d-none d-sm-flex align-items-center py-1">
-          <span>Ir para página: </span>
-
-          <Form.Group as={Col} className="d-flex">
-            <Form.Control
-              size="sm"
-              type="number"
-              defaultValue={state.pageIndex + 1}
-              onChange={(e) => {
-                const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                gotoPage(page);
-              }}
-              style={{ width: '60px' }}
-              className="text-center"
-            />
-          </Form.Group>
-        </Col>
-        <Form.Group as={Col} xs="auto" className="d-flex py-1">
-          <Form.Select
-            size="sm"
-            value={state.pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-            }}
-          >
-            {[10, 20, 30, 40, 50].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                Mostrar {pageSize}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
       </Row>
     </>
   );

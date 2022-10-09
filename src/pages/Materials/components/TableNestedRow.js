@@ -49,19 +49,21 @@ export default function TableGfilterNestedrow({
               {headerGroup.headers.map((column) => (
                 <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                   {column.render('Header')}
-                  <span>
-                    {' '}
-                    <FaSort />
-                    {column.isSorted ? (
-                      column.isSortedDesc ? (
-                        <FaSortAlphaUp />
+                  {column.canSort ? (
+                    <span>
+                      {' '}
+                      <FaSort />
+                      {column.isSorted ? (
+                        column.isSortedDesc ? (
+                          <FaSortAlphaUp />
+                        ) : (
+                          <FaSortAlphaDown />
+                        )
                       ) : (
-                        <FaSortAlphaDown />
-                      )
-                    ) : (
-                      ''
-                    )}
-                  </span>
+                        ''
+                      )}
+                    </span>
+                  ) : null}
                 </th>
               ))}
             </tr>
@@ -93,7 +95,7 @@ export default function TableGfilterNestedrow({
                   <tr {...row.getRowProps()} className="border-0">
                     <td
                       colSpan={visibleColumns.length}
-                      style={{ borderColor: 'rgb(222,226,230)' }}
+                      style={{ width: '100%', borderColor: 'rgb(222,226,230)' }}
                     >
                       {/*
                           Inside it, call our renderRowSubComponent function. In reality,

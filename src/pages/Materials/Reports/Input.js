@@ -55,6 +55,12 @@ export default function Index() {
         ),
       },
       {
+        Header: 'Req. Man.',
+        accessor: 'reqMaintenance',
+        width: 120,
+        disableResizing: true,
+      },
+      {
         Header: 'Nº RM',
         accessor: 'req',
         width: 120,
@@ -71,8 +77,6 @@ export default function Index() {
         accessor: 'value',
         width: 120,
         disableResizing: true,
-        // eslint-disable-next-line react/destructuring-assignment
-        Cell: (props) => <span>R$ {props.value}</span>,
       },
       {
         Header: 'Pedido em:',
@@ -215,12 +219,12 @@ export default function Index() {
           },
           {
             Header: 'ID',
-            accessor: 'material_id',
+            accessor: 'materialId',
             width: 125,
             disableResizing: true,
             isVisible: window.innerWidth > 576,
           },
-          { Header: 'Denominação', accessor: 'name', width: 500 },
+          { Header: 'Denominação', accessor: 'name' },
           {
             Header: 'Unidade',
             accessor: 'unit',
@@ -239,7 +243,6 @@ export default function Index() {
             width: 100,
             disableResizing: true,
             // eslint-disable-next-line react/destructuring-assignment
-            Cell: (props) => <span>R$ {props.value}</span>,
           },
         ]}
         data={row.original.MaterialInItems}
@@ -247,7 +250,7 @@ export default function Index() {
           // Let's set up our default Filter UI
           // Filter: DefaultColumnFilter,
           minWidth: 30,
-          width: 120,
+          width: 50,
           maxWidth: 800,
         }}
         initialState={{
