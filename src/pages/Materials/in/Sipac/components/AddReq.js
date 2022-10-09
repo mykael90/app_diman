@@ -43,10 +43,10 @@ export default function AddReq({ submitReq, handleClear }) {
           <Row>
             <Form.Group
               as={Col}
-              xs={5}
-              sm={5}
-              md={3}
-              lg={2}
+              xs={9}
+              sm={8}
+              md={4}
+              lg={3}
               controlId="reqMaterial"
               className="pb-3"
             >

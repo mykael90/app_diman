@@ -28,6 +28,7 @@ import {
 import Loading from '../../../../components/Loading';
 
 import SearchModal from './components/SearchModal';
+import ReleaseItemsModal from './components/ReleaseItemsModal';
 
 import workers from '../../../../assets/JSON/workers_example.json';
 
@@ -85,12 +86,27 @@ export default function Index() {
     })
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showModalSearch, setShowModalSearch] = useState(false);
+  const [showModalRel, setShowModalRel] = useState(false);
   const [openCollapse, setOpenCollapse] = useState(false);
   const inputRef = useRef();
 
-  const handleCloseModal = () => setShowModal(false);
-  const handleShowModal = () => setShowModal(true);
+  const handleCancelModal = () => {
+    setShowModalRel(false);
+    setShowModalSearch(false);
+  };
+
+  const handleCloseModalRel = () => {
+    setShowModalRel(false);
+  };
+
+  const handleCloseModalSearch = () => setShowModalSearch(false);
+
+  const handleShowModalRel = () => {
+    setShowModalRel(true);
+  };
+
+  const handleShowModalSearch = () => setShowModalSearch(true);
 
   const initialSchema = () => {
     setSchema(
@@ -243,7 +259,7 @@ export default function Index() {
   async function getReqMaterialsData(reqMaintenance) {
     try {
       setIsLoading(true);
-      const response = await axios.get(`/materials/in/${reqMaintenance}`);
+      const response = await axios.get(`/materials/in/rl/${reqMaintenance}`);
       setReqRMs(response.data);
       setIsLoading(false);
     } catch (err) {
@@ -325,6 +341,17 @@ export default function Index() {
               setFieldTouched,
             }) => (
               <Form noValidate autoComplete="off">
+                <ReleaseItemsModal // modal p/ liberação de materiais
+                  handleCancelModal={handleCancelModal}
+                  handleClose={handleCloseModalRel}
+                  show={showModalRel}
+                  setFieldValue={setFieldValue}
+                  data={
+                    reqRMs.find(
+                      (item) => item.req === values.reqMaterial.value
+                    ) ?? []
+                  }
+                />
                 <Row>
                   <Form.Group
                     as={Col}
@@ -415,9 +442,11 @@ export default function Index() {
                           value={values.reqMaterial}
                           onChange={(selected) => {
                             setFieldValue('reqMaterial', selected);
+                            handleShowModalRel();
                           }}
                           onBlur={handleBlur}
                           placeholder="Selecione a RM"
+                          isDisabled={values.items.length > 0}
                         />
                       </Form.Group>
                     ) : null}
@@ -622,8 +651,8 @@ export default function Index() {
                         return (
                           <Row style={{ background: body2Color }}>
                             <SearchModal // modal p/ pesquisa de materiais
-                              handleClose={handleCloseModal}
-                              show={showModal}
+                              handleClose={handleCloseModalSearch}
+                              show={showModalSearch}
                               push={push}
                               hiddenItems={values.items.map(
                                 (item) => item.materialId
@@ -841,7 +870,7 @@ export default function Index() {
                         <Button
                           variant="outline-info"
                           onClick={() => {
-                            handleShowModal();
+                            handleShowModalSearch();
                             setFieldTouched('items');
                           }}
                         >
