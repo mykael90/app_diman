@@ -208,7 +208,7 @@ export default function Index() {
           },
           {
             Header: 'ID',
-            accessor: 'material_id',
+            accessor: 'materialId',
             width: 125,
             disableResizing: true,
             isVisible: window.innerWidth > 576,

@@ -206,31 +206,21 @@ export default function inputMaterial() {
     <>
       <Loading isLoading={isLoading} />
       <Container>
-        <Row>
-          <Card.Title>Entrada de material via almoxarifado central</Card.Title>
-          <Card.Text>
-            Referências e quantitativos de materiais automaticamente extraídos
-            via SIPAC.
-          </Card.Text>
-        </Row>
-
-        <Row>
-          {!sipac.info?.length ? (
-            <ImportSipac
-              handleSubmit={handleSubmit}
-              handleClear={handleClear}
-              reqs={reqs}
-              deleteReq={deleteReq}
-              submitReq={submitReq}
-            />
-          ) : (
-            <ResponseSipac
-              sipac={sipac}
-              handleStore={handleStore}
-              handleDelete={handleDelete}
-            />
-          )}
-        </Row>
+        {!sipac.info?.length ? (
+          <ImportSipac
+            handleSubmit={handleSubmit}
+            handleClear={handleClear}
+            reqs={reqs}
+            deleteReq={deleteReq}
+            submitReq={submitReq}
+          />
+        ) : (
+          <ResponseSipac
+            sipac={sipac}
+            handleStore={handleStore}
+            handleDelete={handleDelete}
+          />
+        )}
       </Container>
     </>
   );
