@@ -83,9 +83,11 @@ export default function SearchModal(props) {
   });
 
   const handleStore = async (values, resetForm) => {
-    const formattedValues = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v != null)
-    ); // LIMPANDO CHAVES NULL E UNDEFINED
+    const formattedValues = {
+      ...Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      ),
+    }; // LIMPANDO CHAVES NULL E UNDEFINED
 
     Object.keys(formattedValues).forEach((key) => {
       if (formattedValues[key] === '') {
@@ -95,23 +97,33 @@ export default function SearchModal(props) {
 
     formattedValues.userId = userId;
     formattedValues.requiredBy = formattedValues.requiredBy?.value;
+
     formattedValues.items.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      Object.assign(item, { MaterialId: item.materialId }); // rename key
       item.value = item.value
         .replace(/\./g, '')
         .replace(/,/g, '.')
         .replace(/[^0-9\.]+/g, '');
     });
 
+    setFieldValue(
+      'items',
+      values.items // formatar o numero da requisicao
+    ); // importando valores para tabela de saída e liberando
+
+    setFieldValue(
+      'reqMaterial',
+      {
+        value: values.reqMaterial,
+        label: values.reqMaterial,
+      } // formatar o numero da requisicao
+    );
+
     try {
       setIsLoading(true);
 
       // LIBERAÇÃO DO SALDO BLOQUEADO
       await axios.post(`/materials/release/`, formattedValues);
-      setFieldValue(
-        'items',
-        formattedValues.items // formatar o numero da requisicao
-      );
 
       setIsLoading(false);
       resetForm();

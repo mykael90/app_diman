@@ -64,7 +64,7 @@ export default function Index(props) {
         materialId: row.values.materialId,
         name: row.values.name,
         unit: row.values.unit,
-        balance: row.values.freeInventory,
+        balancedQuantity: row.values.freeInventory,
         value: row.values.value,
         quantity: row.values.quantity ?? 0,
       });

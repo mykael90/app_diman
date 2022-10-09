@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { FaTrashAlt, FaPlus } from 'react-icons/fa';
+import { FaTrashAlt, FaPlus, FaSearch } from 'react-icons/fa';
 import {
   Button,
   Row,
@@ -88,6 +88,7 @@ export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [showModalSearch, setShowModalSearch] = useState(false);
   const [showModalRel, setShowModalRel] = useState(false);
+  const [reqInModal, setReqInModal] = useState('');
   const [openCollapse, setOpenCollapse] = useState(false);
   const inputRef = useRef();
 
@@ -102,7 +103,8 @@ export default function Index() {
 
   const handleCloseModalSearch = () => setShowModalSearch(false);
 
-  const handleShowModalRel = () => {
+  const handleShowModalRel = (reqIn) => {
+    setReqInModal(reqIn);
     setShowModalRel(true);
   };
 
@@ -346,11 +348,7 @@ export default function Index() {
                   handleClose={handleCloseModalRel}
                   show={showModalRel}
                   setFieldValue={setFieldValue}
-                  data={
-                    reqRMs.find(
-                      (item) => item.req === values.reqMaterial.value
-                    ) ?? []
-                  }
+                  data={reqInModal}
                 />
                 <Row>
                   <Form.Group
@@ -441,8 +439,11 @@ export default function Index() {
                           }))}
                           value={values.reqMaterial}
                           onChange={(selected) => {
-                            setFieldValue('reqMaterial', selected);
-                            handleShowModalRel();
+                            handleShowModalRel(
+                              reqRMs.find(
+                                (item) => item.req === selected.value
+                              ) ?? []
+                            );
                           }}
                           onBlur={handleBlur}
                           placeholder="Selecione a RM"
@@ -750,13 +751,13 @@ export default function Index() {
                                       xs={12}
                                       sm={4}
                                       md={1}
-                                      controlId={`items[${index}].balance`}
+                                      controlId={`items[${index}].balancedQuantity`}
                                       className="d-none"
                                     >
                                       <Form.Control
                                         type="number"
                                         plaintext
-                                        value={item.balance}
+                                        value={item.balancedQuantity}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         placeholder="SALDO"
@@ -804,7 +805,7 @@ export default function Index() {
                                         onChange={(e) =>
                                           handleQuantityChange(
                                             e,
-                                            item.balance,
+                                            item.balancedQuantity,
                                             handleChange
                                           )
                                         }
@@ -864,20 +865,20 @@ export default function Index() {
                         ) : null}
                       </Col>
                     </Row>
-
                     <Row>
                       <Col xs="auto" className="text-center py-2">
                         <Button
-                          variant="outline-info"
+                          variant="outline-secondary"
                           onClick={() => {
                             handleShowModalSearch();
                             setFieldTouched('items');
                           }}
                         >
-                          Pesquisar
+                          <FaSearch /> Pesquisar no saldo comum
                         </Button>
                       </Col>
                     </Row>
+                    <hr />
 
                     <Row className="justify-content-center">
                       <Col xs="auto" className="text-center pt-2 pb-4">
