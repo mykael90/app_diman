@@ -7,12 +7,12 @@
       "email": "joao.lucas@gmail.com",
       "WorkersContact": [
         {
-          "type": "telefone",
+          "contacttypeId": 1,
           "contact": 5584999807445,
           "default": false
         },
         {
-          "type": "telefone",
+          "contacttypeId": 1,
           "contact": 5584999807445,
           "default": true
         }

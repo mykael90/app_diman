@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { FaTrashAlt, FaPlus } from 'react-icons/fa';
+import { FaTrashAlt, FaPlus, FaSearch } from 'react-icons/fa';
 import {
   Button,
   Row,
@@ -28,6 +28,7 @@ import {
 import Loading from '../../../../components/Loading';
 
 import SearchModal from './components/SearchModal';
+import ReleaseItemsModal from './components/ReleaseItemsModal';
 
 import workers from '../../../../assets/JSON/workers_example.json';
 
@@ -39,29 +40,13 @@ const formatGroupLabel = (data) => (
 );
 
 const propertiesOp = [];
-
-const workersJobs = workers
-  .filter(
-    (value, index, arr) =>
-      arr.findIndex((item) => item.job === value.job) === index
-  )
-  .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
-
-const workerOp = [];
-
-workersJobs.forEach((value) => {
-  workerOp.push([value, workers.filter((item) => item.job === value)]);
-});
-
-const workersOptions = workerOp.map((value) => ({
-  label: value[0],
-  options: value[1].map((item) => ({ value: item.id, label: item.name })),
-}));
+const workersOp = [];
 
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
+  const [workers, setWorkers] = useState([]);
   const [properties, setProperties] = useState([]);
   const [reqRMs, setReqRMs] = useState([]);
   const [schema, setSchema] = useState(
@@ -85,81 +70,69 @@ export default function Index() {
     })
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showModalSearch, setShowModalSearch] = useState(false);
+  const [showModalRel, setShowModalRel] = useState(false);
+  const [reqInModal, setReqInModal] = useState('');
   const [openCollapse, setOpenCollapse] = useState(false);
   const inputRef = useRef();
 
-  const handleCloseModal = () => setShowModal(false);
-  const handleShowModal = () => setShowModal(true);
+  const handleCancelModal = () => {
+    setShowModalRel(false);
+    setShowModalSearch(false);
+  };
 
-  const handleStore = async (values, resetForm) => {
-    const formattedValues = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v != null)
-    ); // LIMPANDO CHAVES NULL E UNDEFINED
+  const handleCloseModalRel = () => {
+    setShowModalRel(false);
+  };
 
-    Object.keys(formattedValues).forEach((key) => {
-      if (formattedValues[key] === '') {
-        delete formattedValues[key];
-      }
-    }); // LIMPANDO CHAVES `EMPTY STRINGS`
+  const handleCloseModalSearch = () => setShowModalSearch(false);
 
-    formattedValues.userId = userId;
-    formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
-    formattedValues.workerId = formattedValues.workerId?.value;
-    formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
-    formattedValues.propertyId = formattedValues.propertyId?.value;
-    formattedValues.buildingId = formattedValues.buildingId?.value;
-    formattedValues.items.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
-      item.value = item.value
-        .replace(/\./g, '')
-        .replace(/,/g, '.')
-        .replace(/[^0-9\.]+/g, '');
-    });
+  const handleShowModalRel = (reqIn) => {
+    setReqInModal(reqIn);
+    setShowModalRel(true);
+  };
 
-    formattedValues.value = formattedValues.items.reduce((ac, item) => {
-      ac += Number(item.quantity) * Number(item.value);
-      return ac;
-    }, 0);
+  const handleShowModalSearch = () => setShowModalSearch(true);
 
-    console.log(formattedValues);
+  const initialSchema = () => {
+    setSchema(
+      yup.object().shape({
+        reqMaintenance: yup
+          .string()
+          .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
+        workerId: yup.object().required('Requerido'),
+        authorizedBy: yup.object().required('Requerido'),
+        obs: yup.string(),
+        // eslint-disable-next-line react/forbid-prop-types
+        items: yup
+          .array()
+          .of(
+            yup.object().shape({
+              quantity: yup.number().required('Requerido').positive(),
+            })
+          )
+          .required()
+          .min(1, 'A lista de materiais não pode ser vazia'),
+      })
+    );
+  };
 
+  async function getMaterialsData() {
     try {
       setIsLoading(true);
-
-      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
-      await axios.post(`/materials/out/`, formattedValues);
-
+      const response = await axios.get('/materials/inventory/');
+      setinventoryData(response.data);
       setIsLoading(false);
-      setOpenCollapse(false);
-      resetForm();
-
-      toast.success(`Saída de material realizada com sucesso`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
         ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-
       setIsLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
-    async function getMaterialsData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/inventory/');
-        setinventoryData(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
     async function getUsersData() {
       try {
         setIsLoading(true);
@@ -192,8 +165,34 @@ export default function Index() {
             response.data.filter((item) => item.municipio === value),
           ]);
         });
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
 
-        setProperties(response.data);
+    async function getWorkersData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/workers/');
+        const workersJobs = response.data
+          .filter(
+            (value, index, arr) =>
+              arr.findIndex((item) => item.job === value.job) === index
+          )
+          .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
+
+        workersJobs.forEach((value) => {
+          workersOp.push([
+            value,
+            response.data.filter((item) => item.job === value),
+          ]);
+        });
+
+        setWorkers(response.data);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -207,12 +206,73 @@ export default function Index() {
     getMaterialsData();
     getUsersData();
     getPropertiesData();
+    getWorkersData();
   }, []);
+
+  const handleStore = async (values, resetForm) => {
+    const formattedValues = Object.fromEntries(
+      Object.entries(values).filter(([_, v]) => v != null)
+    ); // LIMPANDO CHAVES NULL E UNDEFINED
+
+    Object.keys(formattedValues).forEach((key) => {
+      if (formattedValues[key] === '') {
+        delete formattedValues[key];
+      }
+    }); // LIMPANDO CHAVES `EMPTY STRINGS`
+
+    formattedValues.userId = userId;
+    formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
+    formattedValues.workerId = formattedValues.workerId?.value;
+    formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
+    formattedValues.reqMaterial = formattedValues.reqMaterial?.value;
+    formattedValues.propertyId = formattedValues.propertyId?.value;
+    formattedValues.buildingId = formattedValues.buildingId?.value;
+    formattedValues.items.forEach((item) => {
+      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      item.value = item.value
+        .replace(/\./g, '')
+        .replace(/,/g, '.')
+        .replace(/[^0-9\.]+/g, '');
+    });
+
+    delete Object.assign(formattedValues, {
+      MaterialOutItems: formattedValues.items,
+    }).materialId;
+
+    formattedValues.value = formattedValues.items.reduce((ac, item) => {
+      ac += Number(item.quantity) * Number(item.value);
+      return ac;
+    }, 0);
+
+    console.log(formattedValues);
+
+    try {
+      setIsLoading(true);
+
+      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
+      await axios.post(`/materials/out/`, formattedValues);
+
+      setIsLoading(false);
+      setOpenCollapse(false);
+      resetForm();
+      initialSchema();
+      getMaterialsData();
+
+      toast.success(`Saída de material realizada com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
 
   async function getReqMaterialsData(reqMaintenance) {
     try {
       setIsLoading(true);
-      const response = await axios.get(`/materials/in/${reqMaintenance}`);
+      const response = await axios.get(`/materials/in/rl/${reqMaintenance}`);
       setReqRMs(response.data);
       setIsLoading(false);
     } catch (err) {
@@ -249,29 +309,6 @@ export default function Index() {
     propertyId: yup.object().required('Requerido'),
   });
 
-  const initialSchema = () => {
-    setSchema(
-      yup.object().shape({
-        reqMaintenance: yup
-          .string()
-          .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
-        workerId: yup.object().required('Requerido'),
-        authorizedBy: yup.object().required('Requerido'),
-        obs: yup.string(),
-        // eslint-disable-next-line react/forbid-prop-types
-        items: yup
-          .array()
-          .of(
-            yup.object().shape({
-              quantity: yup.number().required('Requerido').positive(),
-            })
-          )
-          .required()
-          .min(1, 'A lista de materiais não pode ser vazia'),
-      })
-    );
-  };
-
   const apllySchema = (addSchema) => {
     const newSchema = schema.concat(addSchema);
     setSchema(newSchema);
@@ -295,7 +332,7 @@ export default function Index() {
           className="px-0 mx-0 py-2 text-center"
           style={{ background: primaryDarkColor, color: 'white' }}
         >
-          <span className="fs-5">SAÍDA DE MATERIAL</span>
+          <span className="fs-5">SAÍDA DE MATERIAL: USO</span>
         </Row>
         <Row className="px-0 pt-2">
           <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
@@ -317,6 +354,13 @@ export default function Index() {
               setFieldTouched,
             }) => (
               <Form noValidate autoComplete="off">
+                <ReleaseItemsModal // modal p/ liberação de materiais
+                  handleCancelModal={handleCancelModal}
+                  handleClose={handleCloseModalRel}
+                  show={showModalRel}
+                  setFieldValue={setFieldValue}
+                  data={reqInModal}
+                />
                 <Row>
                   <Form.Group
                     as={Col}
@@ -398,20 +442,24 @@ export default function Index() {
                     {!!values.reqMaintenance && openCollapse ? (
                       <Form.Group controlId="reqMaterial">
                         <Form.Label>RMs VINCULADAS</Form.Label>
-                        <Form.Select
-                          type="text"
+                        <Select
+                          inputId="reqMaterial"
+                          options={reqRMs.map((reqRM) => ({
+                            value: reqRM.req,
+                            label: reqRM.req,
+                          }))}
                           value={values.reqMaterial}
-                          onChange={handleChange}
-                          isInvalid={touched.reqMaterial && errors.reqMaterial}
+                          onChange={(selected) => {
+                            handleShowModalRel(
+                              reqRMs.find(
+                                (item) => item.req === selected.value
+                              ) ?? []
+                            );
+                          }}
                           onBlur={handleBlur}
-                        >
-                          <option>Selecione a RM</option>
-                          {reqRMs.map((reqRM) => (
-                            <option key={reqRM.id} value={reqRM.id}>
-                              {reqRM.req}
-                            </option>
-                          ))}
-                        </Form.Select>
+                          placeholder="Selecione a RM"
+                          isDisabled={values.items.length > 0}
+                        />
                       </Form.Group>
                     ) : null}
                   </Col>
@@ -456,7 +504,13 @@ export default function Index() {
                           // id="workerId"
                           inputId="workerId"
                           // name="workerId"
-                          options={workersOptions}
+                          options={workersOp.map((value) => ({
+                            label: value[0],
+                            options: value[1].map((item) => ({
+                              value: item.id,
+                              label: item.name,
+                            })),
+                          }))}
                           formatGroupLabel={formatGroupLabel}
                           value={values.workerId}
                           onChange={(selected) => {
@@ -615,8 +669,8 @@ export default function Index() {
                         return (
                           <Row style={{ background: body2Color }}>
                             <SearchModal // modal p/ pesquisa de materiais
-                              handleClose={handleCloseModal}
-                              show={showModal}
+                              handleClose={handleCloseModalSearch}
+                              show={showModalSearch}
                               push={push}
                               hiddenItems={values.items.map(
                                 (item) => item.materialId
@@ -714,13 +768,13 @@ export default function Index() {
                                       xs={12}
                                       sm={4}
                                       md={1}
-                                      controlId={`items[${index}].balance`}
+                                      controlId={`items[${index}].balancedQuantity`}
                                       className="d-none"
                                     >
                                       <Form.Control
                                         type="number"
                                         plaintext
-                                        value={item.balance}
+                                        value={item.balancedQuantity}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         placeholder="SALDO"
@@ -754,7 +808,7 @@ export default function Index() {
                                       md="auto"
                                       controlId={`items[${index}].quantity`}
                                       className="border-0 m-0 p-0"
-                                      style={{ width: '70px', zIndex: 100 }}
+                                      style={{ width: '70px' }}
                                     >
                                       {index === 0 ? (
                                         <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
@@ -768,14 +822,14 @@ export default function Index() {
                                         onChange={(e) =>
                                           handleQuantityChange(
                                             e,
-                                            item.balance,
+                                            item.balancedQuantity,
                                             handleChange
                                           )
                                         }
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"
-                                        className="p-0 m-0 ps-2 text-end"
+                                        className="p-0 m-0 ps-2 pe-2 text-end"
                                       />
                                     </Form.Group>
                                     <Col
@@ -828,20 +882,20 @@ export default function Index() {
                         ) : null}
                       </Col>
                     </Row>
-
                     <Row>
                       <Col xs="auto" className="text-center py-2">
                         <Button
-                          variant="outline-info"
+                          variant="outline-secondary"
                           onClick={() => {
-                            handleShowModal();
+                            handleShowModalSearch();
                             setFieldTouched('items');
                           }}
                         >
-                          Pesquisar
+                          <FaSearch /> Pesquisar no saldo comum
                         </Button>
                       </Col>
                     </Row>
+                    <hr />
 
                     <Row className="justify-content-center">
                       <Col xs="auto" className="text-center pt-2 pb-4">
