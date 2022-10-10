@@ -40,29 +40,13 @@ const formatGroupLabel = (data) => (
 );
 
 const propertiesOp = [];
-
-const workersJobs = workers
-  .filter(
-    (value, index, arr) =>
-      arr.findIndex((item) => item.job === value.job) === index
-  )
-  .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
-
-const workerOp = [];
-
-workersJobs.forEach((value) => {
-  workerOp.push([value, workers.filter((item) => item.job === value)]);
-});
-
-const workersOptions = workerOp.map((value) => ({
-  label: value[0],
-  options: value[1].map((item) => ({ value: item.id, label: item.name })),
-}));
+const workersOp = [];
 
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
+  const [workers, setWorkers] = useState([]);
   const [properties, setProperties] = useState([]);
   const [reqRMs, setReqRMs] = useState([]);
   const [schema, setSchema] = useState(
@@ -181,8 +165,34 @@ export default function Index() {
             response.data.filter((item) => item.municipio === value),
           ]);
         });
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
 
-        setProperties(response.data);
+    async function getWorkersData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/workers/');
+        const workersJobs = response.data
+          .filter(
+            (value, index, arr) =>
+              arr.findIndex((item) => item.job === value.job) === index
+          )
+          .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
+
+        workersJobs.forEach((value) => {
+          workersOp.push([
+            value,
+            response.data.filter((item) => item.job === value),
+          ]);
+        });
+
+        setWorkers(response.data);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -196,6 +206,7 @@ export default function Index() {
     getMaterialsData();
     getUsersData();
     getPropertiesData();
+    getWorkersData();
   }, []);
 
   const handleStore = async (values, resetForm) => {
@@ -493,7 +504,13 @@ export default function Index() {
                           // id="workerId"
                           inputId="workerId"
                           // name="workerId"
-                          options={workersOptions}
+                          options={workersOp.map((value) => ({
+                            label: value[0],
+                            options: value[1].map((item) => ({
+                              value: item.id,
+                              label: item.name,
+                            })),
+                          }))}
                           formatGroupLabel={formatGroupLabel}
                           value={values.workerId}
                           onChange={(selected) => {
