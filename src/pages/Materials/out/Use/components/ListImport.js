@@ -207,7 +207,8 @@ export default function Index(props) {
               id={`s_${row.values.materialId}`}
               size="sm"
               type="number"
-              onChange={(e) => handleQuantityChange(e, row)}
+              // onChange={(e) => handleQuantityChange(e, row)}
+              //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
             />
             <Button
               onClick={(e) => handlePushItem(e, row)}
