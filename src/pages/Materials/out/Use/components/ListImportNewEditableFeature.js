@@ -100,21 +100,6 @@ export default function Index(props) {
   // illustrate that flow...
   const resetData = () => setMaterials(originalData);
 
-  const handleQuantityChange = (e, row) => {
-    const errors = [];
-    if (e.target.value > row.values.total)
-      errors.push('A saída não pode superar o saldo do material');
-    if (e.target.value < 0) errors.push('A saída não pode ser negativa');
-
-    if (errors.length > 0) {
-      errors.map((error) => toast.error(error));
-      e.target.value = 0;
-      return;
-    }
-
-    row.values.quantity = e.target.value;
-  };
-
   const handlePushItem = (e, row) => {
     // não incluir repetido na lista
     if (items.length > 0) {

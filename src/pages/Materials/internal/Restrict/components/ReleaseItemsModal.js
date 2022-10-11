@@ -144,9 +144,9 @@ export default function SearchModal(props) {
   }, []);
 
   const handleQuantityChange = (e, balance, handleChange) => {
-    if (e.target.value > balance) {
+    if (Number(e.target.value) > Number(balance)) {
       toast.error('A liberação não pode superar o saldo bloqueado do material');
-      e.target.value = balance;
+      e.target.value = Number(balance);
       handleChange(e);
       return;
     }

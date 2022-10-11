@@ -20,9 +20,15 @@ export default function Index(props) {
 
   const handleQuantityChange = (e, row) => {
     const errors = [];
-    if (e.target.value > row.values.freeInventory)
+
+    if (Number(e.target.value) > Number(row.values.freeInventory)) {
       errors.push('A saída não pode superar o saldo do material');
-    if (e.target.value < 0) errors.push('A saída não pode ser negativa');
+      e.target.value = Number(row.values.freeInventory);
+    }
+    if (Number(e.target.value < 0)) {
+      errors.push('A saída não pode ser negativa');
+      e.target.value = Number(0);
+    }
 
     if (errors.length > 0) {
       errors.map((error) => toast.error(error));

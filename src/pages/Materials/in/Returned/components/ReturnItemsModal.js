@@ -20,7 +20,7 @@ export default function SearchModal(props) {
   const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleStore = async (values, resetForm) => {
+  const handleStore = async (values, resetForm, free = false) => {
     const formattedValues = Object.fromEntries(
       Object.entries(values).filter(([_, v]) => v != null)
     ); // LIMPANDO CHAVES NULL E UNDEFINED
@@ -51,7 +51,21 @@ export default function SearchModal(props) {
       setIsLoading(true);
 
       // LIBERAÇÃO DO SALDO BLOQUEADO
-      await axios.post(`/materials/in/return`, formattedValues);
+      const response = await axios.post(
+        `/materials/in/return`,
+        formattedValues
+      );
+
+      // DEIXA PARA USO COMUM DO ALMOXARIFADO SE FOR SINALIZADO PELO USUARIO NO RECEBIMENTO
+      if (free) {
+        const freeData = await response.data;
+        delete Object.assign(freeData, { items: freeData.MaterialInItems })
+          .MaterialInItems; // rename key
+        delete Object.assign(freeData, { materialInId: freeData.id }).id; // rename key
+        delete freeData.requiredBy;
+
+        await axios.post(`/materials/release/`, freeData);
+      }
 
       setIsLoading(false);
       resetForm();
@@ -69,15 +83,15 @@ export default function SearchModal(props) {
   };
 
   const handleQuantityChange = (e, balance, handleChange) => {
-    if (e.target.value > balance) {
+    if (Number(e.target.value) > Number(balance)) {
       toast.error(
         'O retorno não pode superar a quantidade de saída do material'
       );
-      e.target.value = balance;
+      e.target.value = Number(balance);
       handleChange(e);
       return;
     }
-    if (e.target.value < 0) {
+    if (Number(e.target.value) < 0) {
       toast.error('A entrada não pode ser negativa');
       e.target.value = 0;
       handleChange(e);
