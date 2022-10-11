@@ -75,7 +75,7 @@ export default function Index() {
       },
       {
         Header: 'Autorizado por:',
-        accessor: 'authorizedBy',
+        accessor: 'authorizerUsername',
         width: 150,
         disableResizing: true,
         Cell: (props) => {
@@ -94,8 +94,8 @@ export default function Index() {
       },
       {
         Header: 'Retirado por:',
-        accessor: 'workerId',
-        width: 150,
+        accessor: 'removedBy',
+        width: 200,
         disableResizing: true,
         Cell: (props) => {
           const custom = String(props.value).replace(

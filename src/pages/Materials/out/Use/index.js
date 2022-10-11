@@ -229,10 +229,6 @@ export default function Index() {
     formattedValues.buildingId = formattedValues.buildingId?.value;
     formattedValues.items.forEach((item) => {
       delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
-      item.value = item.value
-        .replace(/\./g, '')
-        .replace(/,/g, '.')
-        .replace(/[^0-9\.]+/g, '');
     });
 
     delete Object.assign(formattedValues, {

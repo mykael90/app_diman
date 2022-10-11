@@ -65,7 +65,10 @@ export default function Index(props) {
         name: row.values.name,
         unit: row.values.unit,
         balancedQuantity: row.values.freeInventory,
-        value: row.values.value,
+        value: row.values.value
+          .replace(/\./g, '')
+          .replace(/,/g, '.')
+          .replace(/[^0-9\.]+/g, ''),
         quantity: row.values.quantity ?? 0,
       });
 

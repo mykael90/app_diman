@@ -22,7 +22,7 @@ export default function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const nameStored = useSelector((state) => state.auth.user.name);
+  const usernameStored = useSelector((state) => state.auth.user.username);
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -177,7 +177,7 @@ export default function Header() {
                   <Nav.Link>
                     <div className="text-nowrap flex-nowrap">
                       <FaCircle className="pb-0" size={14} color="#66ff33" />
-                      <span className="ms-2">{nameStored}</span>
+                      <span className="ms-2">{usernameStored}</span>
                     </div>
                   </Nav.Link>
                   <Nav.Link>
