@@ -160,12 +160,12 @@ export default function SearchModal(props) {
   }, []);
 
   const handleQuantityChange = (e, balance, handleChange) => {
-    if (Number(e.target.value) > Number(balance)) {
-      toast.error('A liberação não pode superar o saldo bloqueado do material');
-      e.target.value = balance;
-      handleChange(e);
-      return;
-    }
+    // if (Number(e.target.value) > Number(balance)) {
+    //   toast.error('A liberação não pode superar o saldo bloqueado do material');
+    //   e.target.value = balance;
+    //   handleChange(e);
+    //   return;
+    // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (e.target.value < 0) {
       toast.error('A saída não pode ser negativa');
       e.target.value = 0;
@@ -464,14 +464,13 @@ export default function SearchModal(props) {
                                         type="number"
                                         plaintext
                                         value={item.quantity}
-                                        // onChange={(e) =>
-                                        //   handleQuantityChange(
-                                        //     e,
-                                        //     item.balancedQuantity,
-                                        //     handleChange
-                                        //   )
-                                        // }
-                                        //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
+                                        onChange={(e) =>
+                                          handleQuantityChange(
+                                            e,
+                                            item.balancedQuantity,
+                                            handleChange
+                                          )
+                                        }                                       
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"

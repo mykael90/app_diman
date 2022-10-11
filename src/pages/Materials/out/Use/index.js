@@ -281,12 +281,12 @@ export default function Index() {
   }
 
   const handleQuantityChange = (e, balance, handleChange) => {
-    if (Number(e.target.value) > Number(balance)) {
-      toast.error('A saída não pode superar o saldo do material');
-      e.target.value = Number(balance);
-      handleChange(e);
-      return;
-    }
+    // if (Number(e.target.value) > Number(balance)) {
+    //   toast.error('A saída não pode superar o saldo do material');
+    //   e.target.value = Number(balance);
+    //   handleChange(e);
+    //   return;
+    // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (e.target.value < 0) {
       toast.error('A saída não pode ser negativa');
       e.target.value = 0;
@@ -815,14 +815,13 @@ export default function Index() {
                                         type="number"
                                         plaintext
                                         value={item.quantity}
-                                        // onChange={(e) =>
-                                        //   handleQuantityChange(
-                                        //     e,
-                                        //     item.balancedQuantity,
-                                        //     handleChange
-                                        //   )
-                                      // }
-                                      //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
+                                        onChange={(e) =>
+                                          handleQuantityChange(
+                                            e,
+                                            item.balancedQuantity,
+                                            handleChange
+                                          )
+                                      }                                      
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"

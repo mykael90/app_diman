@@ -21,10 +21,10 @@ export default function Index(props) {
   const handleQuantityChange = (e, row) => {
     const errors = [];
 
-    if (Number(e.target.value) > Number(row.values.freeInventory)) {
-      errors.push('A saída não pode superar o saldo do material');
-      e.target.value = Number(row.values.freeInventory);
-    }
+    // if (Number(e.target.value) > Number(row.values.freeInventory)) {
+    //   errors.push('A saída não pode superar o saldo do material');
+    //   e.target.value = Number(row.values.freeInventory);
+    // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (Number(e.target.value < 0)) {
       errors.push('A saída não pode ser negativa');
       e.target.value = Number(0);
@@ -207,8 +207,7 @@ export default function Index(props) {
               id={`s_${row.values.materialId}`}
               size="sm"
               type="number"
-              // onChange={(e) => handleQuantityChange(e, row)}
-              //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
+              onChange={(e) => handleQuantityChange(e, row)}
             />
             <Button
               onClick={(e) => handlePushItem(e, row)}
