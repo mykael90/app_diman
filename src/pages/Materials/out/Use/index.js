@@ -821,8 +821,8 @@ export default function Index() {
                                         //     item.balancedQuantity,
                                         //     handleChange
                                         //   )
-                                        //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
-                                        }
+                                      // }
+                                      //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"
