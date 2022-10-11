@@ -815,12 +815,13 @@ export default function Index() {
                                         type="number"
                                         plaintext
                                         value={item.quantity}
-                                        onChange={(e) =>
-                                          handleQuantityChange(
-                                            e,
-                                            item.balancedQuantity,
-                                            handleChange
-                                          )
+                                        // onChange={(e) =>
+                                        //   handleQuantityChange(
+                                        //     e,
+                                        //     item.balancedQuantity,
+                                        //     handleChange
+                                        //   )
+                                        //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
                                         }
                                         onBlur={handleBlur}
                                         placeholder="QTD"
