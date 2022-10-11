@@ -6,7 +6,16 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FaTrashAlt } from 'react-icons/fa';
-import { Button, Row, Col, Form, Badge, Modal } from 'react-bootstrap';
+import {
+  Button,
+  Row,
+  Col,
+  Form,
+  Badge,
+  Modal,
+  Dropdown,
+  ButtonGroup,
+} from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
@@ -19,8 +28,10 @@ export default function SearchModal(props) {
   const { show, handleCancelModal, handleClose, data } = props;
   const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
+  const [receiveFree, setReceiveFree] = useState(false);
 
-  const handleStore = async (values, resetForm, free = false) => {
+  const handleStore = async (values, resetForm, free) => {
+    console.log(free);
     const formattedValues = Object.fromEntries(
       Object.entries(values).filter(([_, v]) => v != null)
     ); // LIMPANDO CHAVES NULL E UNDEFINED
@@ -68,6 +79,7 @@ export default function SearchModal(props) {
       }
 
       setIsLoading(false);
+      setReceiveFree(false);
       resetForm();
       handleClose();
 
@@ -79,6 +91,7 @@ export default function SearchModal(props) {
         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
 
       setIsLoading(false);
+      setReceiveFree(false);
     }
   };
 
@@ -157,7 +170,7 @@ export default function SearchModal(props) {
                 initialValues={initialValues}
                 validationSchema={initialSchema}
                 onSubmit={(values, { resetForm }) => {
-                  handleStore(values, resetForm);
+                  handleStore(values, resetForm, receiveFree);
                 }}
               >
                 {({
@@ -452,9 +465,31 @@ export default function SearchModal(props) {
                         </Button>
                       </Col>
                       <Col xs="auto" className="text-center pt-2 pb-4">
-                        <Button variant="success" onClick={submitForm}>
-                          Retornar
-                        </Button>
+                        <Dropdown as={ButtonGroup}>
+                          <Button
+                            onClick={(e) => submitForm(e)}
+                            variant="success"
+                          >
+                            Retornar Restrito
+                          </Button>
+
+                          <Dropdown.Toggle
+                            split
+                            variant="success"
+                            id="dropdown-split-basic"
+                          />
+
+                          <Dropdown.Menu>
+                            <Dropdown.Item
+                              onClick={(e) => {
+                                setReceiveFree(true);
+                                submitForm(e);
+                              }}
+                            >
+                              Repor Estoque
+                            </Dropdown.Item>
+                          </Dropdown.Menu>
+                        </Dropdown>
                       </Col>
                     </Row>
                   </Form>
