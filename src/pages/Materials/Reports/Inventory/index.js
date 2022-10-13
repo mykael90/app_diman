@@ -96,11 +96,13 @@ function SelectColumnFilter({
   );
 }
 
-// Define a custom filter filter function!
+// Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
 function filterGreaterThan(rows, id, filterValue) {
+  console.log(filterValue)
   return rows.filter((row) => {
     const rowValue = Number(row.values[id]);
-    return rowValue >= filterValue;
+    if (filterValue===1) return rowValue !== 0; //fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
+    return true;
   });
 }
 
