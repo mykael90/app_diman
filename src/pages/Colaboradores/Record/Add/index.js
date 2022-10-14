@@ -19,6 +19,8 @@ export default function index({ submitReq }) {
   const [reqs, setReqs] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [contacttypes, setContacttypes] = useState([]);
+  const [jobtypes, setJobtypes] = useState([]);
+  const [contracts, setContracts] = useState([]);
 
   const schema = yup.object().shape({
     name: yup.string().required('Requerido'),
@@ -39,7 +41,7 @@ export default function index({ submitReq }) {
     cpf: '',
     WorkerContracts: [
       {
-        WorkerJobtype: '',
+        WorkerJobtypeId: '',
         start: '',
         ContractId: '',
       },
@@ -48,6 +50,8 @@ export default function index({ submitReq }) {
       {
         contacttypeId: '',
         contact: '',
+        obs: '',
+        default: '',
       },
     ],
   };
@@ -56,8 +60,14 @@ export default function index({ submitReq }) {
     async function getContacttypes() {
       try {
         setIsLoading(true);
-        const response = await axios.get(`/workers/contacttypes`);
-        setContacttypes(response.data);
+        const responseContact = await axios.get(`/workers/contacttypes`);
+        const responseContract = await axios.get(`/workers/contracts`);
+        const responseJob = await axios.get(`/workers/jobtypes`);
+
+        setContacttypes(responseContact.data);
+        setContracts(responseContract.data);
+        setJobtypes(responseJob.data);
+
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -251,7 +261,7 @@ export default function index({ submitReq }) {
                                 <Form.Group
                                   as={Col}
                                   xs={12}
-                                  md={4}
+                                  md={3}
                                   controlId={`WorkerContacts[${i}].contacttypeId`}
                                 >
                                   <Form.Select
@@ -273,13 +283,38 @@ export default function index({ submitReq }) {
                                 <Form.Group
                                   as={Col}
                                   xs={12}
-                                  md={4}
+                                  md={3}
                                   controlId={`WorkerContacts[${i}].contact`}
                                 >
                                   <Form.Control
                                     placeholder="Digite o contato"
                                     value={contato.contact}
                                     onChange={handleChange}
+                                  />
+                                </Form.Group>
+                                <Form.Group
+                                  as={Col}
+                                  xs={12}
+                                  md={3}
+                                  controlId={`WorkerContacts[${i}].obs`}
+                                >
+                                  <Form.Control
+                                    placeholder="Digite a observação"
+                                    value={contato.obs}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                                <Form.Group
+                                  as={Col}
+                                  xs={12}
+                                  md={2}
+                                  controlId={`WorkerContacts[${i}].default`}
+                                >
+                                  <Form.Check
+                                    type="switch"
+                                    id="custom-switch"
+                                    value={contato.default}
+                                    label="Padrão"
                                   />
                                 </Form.Group>
                                 <Col sm>
@@ -378,7 +413,7 @@ export default function index({ submitReq }) {
                       onChange={handleChange}
                       // isInvalid={touched.rg && !!errors.rg}
                       // isValid={touched.rg && !errors.rg}
-                      placeholder="Digite o RG"
+                      placeholder="Digite o Logradouro"
                       onBlur={handleBlur}
                     />
                     {/* <Form.Control.Feedback
@@ -403,7 +438,7 @@ export default function index({ submitReq }) {
                       onChange={handleChange}
                       // isInvalid={touched.birthdate && !!errors.birthdate}
                       // isValid={touched.birthdate && !errors.birthdate}
-                      placeholder="Selecione a data"
+                      placeholder="Digite o Número"
                       onBlur={handleBlur}
                     />
                     {/* <Form.Control.Feedback
@@ -427,7 +462,7 @@ export default function index({ submitReq }) {
                       onChange={handleChange}
                       // isInvalid={touched.name && !!errors.name}
                       // isValid={touched.name && !errors.name}
-                      placeholder="Digite o nome completo"
+                      placeholder="Digite o Complemento"
                       onBlur={handleBlur}
                     />
                     {/* <Form.Control.Feedback
@@ -529,15 +564,19 @@ export default function index({ submitReq }) {
                     className="pt-2"
                   >
                     <Form.Label>NÚMERO DO CONTRATO</Form.Label>
-                    <Form.Control
+                    <Form.Select
                       type="text"
-                      value={values.rg}
+                      value={values.WorkerContracts.ContractId}
                       onChange={handleChange}
-                      // isInvalid={touched.rg && !!errors.rg}
-                      // isValid={touched.rg && !errors.rg}
-                      placeholder="Digite a Cidade"
+                      placeholder="Selecione o Contrato"
                       onBlur={handleBlur}
-                    />
+                    >
+                      {contracts.map((contract) => (
+                        <option key={contract.id} value={contract.id}>
+                          {contract.codigoSipac}
+                        </option>
+                      ))}
+                    </Form.Select>
                     {/* <Form.Control.Feedback
                       tooltip
                       type="invalid"
@@ -554,15 +593,19 @@ export default function index({ submitReq }) {
                     className="pt-2"
                   >
                     <Form.Label>FUNÇÃO</Form.Label>
-                    <Form.Control
+                    <Form.Select
                       type="text"
                       value={values.WorkerContracts.WorkerJobtypeId}
                       onChange={handleChange}
-                      // isInvalid={touched.rg && !!errors.rg}
-                      // isValid={touched.rg && !errors.rg}
-                      placeholder="Digite a Cidade"
+                      placeholder="Selecione a Função"
                       onBlur={handleBlur}
-                    />
+                    >
+                      {jobtypes.map((job) => (
+                        <option key={job.id} value={job.id}>
+                          {job.job}
+                        </option>
+                      ))}
+                    </Form.Select>
                     {/* <Form.Control.Feedback
                       tooltip
                       type="invalid"
