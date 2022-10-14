@@ -530,7 +530,12 @@ export default function Index() {
                         <Form.Control
                           type="text"
                           value={values.place}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            setFieldValue(
+                              'place',
+                              e.target.value.toUpperCase()
+                            ); // UPPERCASE
+                          }}
                           isInvalid={touched.place && !!errors.place}
                           // isValid={touched.place && !errors.place}
                           onBlur={handleBlur}
@@ -637,7 +642,9 @@ export default function Index() {
                           rows={2}
                           type="text"
                           value={values.obs}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
+                          }}
                           isInvalid={touched.obs && !!errors.obs}
                           // isValid={touched.obs && !errors.obs}
                           placeholder="Observações gerais"
@@ -821,7 +828,7 @@ export default function Index() {
                                             item.balancedQuantity,
                                             handleChange
                                           )
-                                      }                                      
+                                        }
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"
