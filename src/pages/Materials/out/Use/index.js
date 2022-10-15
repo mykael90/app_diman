@@ -30,8 +30,6 @@ import Loading from '../../../../components/Loading';
 import SearchModal from './components/SearchModal';
 import ReleaseItemsModal from './components/ReleaseItemsModal';
 
-import workers from '../../../../assets/JSON/workers_example.json';
-
 const formatGroupLabel = (data) => (
   <Col className="d-flex justify-content-between">
     <span>{data.label}</span>
@@ -239,8 +237,6 @@ export default function Index() {
       ac += Number(item.quantity) * Number(item.value);
       return ac;
     }, 0);
-
-    console.log(formattedValues);
 
     try {
       setIsLoading(true);
