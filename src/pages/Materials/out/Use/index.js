@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { FaTrashAlt, FaPlus, FaSearch } from 'react-icons/fa';
 import {
@@ -10,9 +10,10 @@ import {
   Col,
   Form,
   Badge,
-  Dropdown,
-  ButtonGroup,
   Collapse,
+  Accordion,
+  useAccordionButton,
+  Card,
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
@@ -29,6 +30,19 @@ import Loading from '../../../../components/Loading';
 
 import SearchModal from './components/SearchModal';
 import ReleaseItemsModal from './components/ReleaseItemsModal';
+import ListReserves from './components/ListReserves';
+
+function CustomToggle({ children, eventKey }) {
+  const decoratedOnClick = useAccordionButton(eventKey, () =>
+    console.log('totally custom!')
+  );
+
+  return (
+    <Button type="button" variant="primary" onClick={decoratedOnClick}>
+      {children}
+    </Button>
+  );
+}
 
 const formatGroupLabel = (data) => (
   <Col className="d-flex justify-content-between">
@@ -47,6 +61,7 @@ export default function Index() {
   const [workers, setWorkers] = useState([]);
   const [properties, setProperties] = useState([]);
   const [reqRMs, setReqRMs] = useState([]);
+  const [reserves, setReserves] = useState([]);
   const [schema, setSchema] = useState(
     yup.object().shape({
       reqMaintenance: yup
@@ -201,10 +216,26 @@ export default function Index() {
       }
     }
 
+    async function getReservesData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/materials/reserve/');
+        setReserves(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
     getMaterialsData();
     getUsersData();
     getPropertiesData();
     getWorkersData();
+    getReservesData();
   }, []);
 
   const handleStore = async (values, resetForm) => {
@@ -924,8 +955,16 @@ export default function Index() {
         </Row>
       </Row>
 
-      <Row className="bg-light border rounded d-flex justify-content-center pt-2 mt-4">
-        RESERVAS
+      <Row className="bg-light border rounded d-flex justify-content-center py-2 mt-4">
+        <Accordion defaultActiveKey="0">
+          <CustomToggle eventKey="1">Reservas</CustomToggle>
+
+          <Accordion.Collapse eventKey="1">
+            <Card.Body>
+              <ListReserves reserves={reserves} />
+            </Card.Body>
+          </Accordion.Collapse>
+        </Accordion>
       </Row>
     </>
   );
