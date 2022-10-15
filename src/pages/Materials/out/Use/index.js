@@ -241,7 +241,7 @@ export default function Index() {
     try {
       setIsLoading(true);
 
-      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
+      // FAZ A SAÍDA, ATUALIZA O INVENTARIO E JA BLOQUEIA
       await axios.post(`/materials/out/`, formattedValues);
 
       setIsLoading(false);

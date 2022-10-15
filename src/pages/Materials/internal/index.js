@@ -16,7 +16,7 @@ export default function index() {
                   className="text-decoration-none"
                   to="/materials/internal/reserve"
                 >
-                  Reservas
+                  Reservar
                 </Link>
               </Nav.Link>
             </Nav.Item>
@@ -26,7 +26,7 @@ export default function index() {
                   className="text-decoration-none"
                   to="/materials/internal/restrict"
                 >
-                  Restrições
+                  Restringir/Liberar
                 </Link>
               </Nav.Link>
             </Nav.Item>

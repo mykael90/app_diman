@@ -37,36 +37,15 @@ const formatGroupLabel = (data) => (
   </Col>
 );
 
-const propertiesOp = [];
 const workersOp = [];
 
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
-  const [workers, setWorkers] = useState([]);
-  const [properties, setProperties] = useState([]);
+
   const [reqRMs, setReqRMs] = useState([]);
-  const [schema, setSchema] = useState(
-    yup.object().shape({
-      reqMaintenance: yup
-        .string()
-        .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
-      workerId: yup.object().required('Requerido'),
-      authorizedBy: yup.object().required('Requerido'),
-      obs: yup.string(),
-      // eslint-disable-next-line react/forbid-prop-types
-      items: yup
-        .array()
-        .of(
-          yup.object().shape({
-            quantity: yup.number().required('Requerido').positive(),
-          })
-        )
-        .required()
-        .min(1, 'A lista de materiais não pode ser vazia'),
-    })
-  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [showModalSearch, setShowModalSearch] = useState(false);
   const [showModalRel, setShowModalRel] = useState(false);
@@ -92,28 +71,24 @@ export default function Index() {
 
   const handleShowModalSearch = () => setShowModalSearch(true);
 
-  const initialSchema = () => {
-    setSchema(
-      yup.object().shape({
-        reqMaintenance: yup
-          .string()
-          .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
-        workerId: yup.object().required('Requerido'),
-        authorizedBy: yup.object().required('Requerido'),
-        obs: yup.string(),
-        // eslint-disable-next-line react/forbid-prop-types
-        items: yup
-          .array()
-          .of(
-            yup.object().shape({
-              quantity: yup.number().required('Requerido').positive(),
-            })
-          )
-          .required()
-          .min(1, 'A lista de materiais não pode ser vazia'),
-      })
-    );
-  };
+  const schema = yup.object().shape({
+    reqMaintenance: yup
+      .string()
+      .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
+    workerId: yup.object().required('Requerido'),
+    authorizedBy: yup.object().required('Requerido'),
+    obs: yup.string(),
+    // eslint-disable-next-line react/forbid-prop-types
+    MaterialReserveItems: yup
+      .array()
+      .of(
+        yup.object().shape({
+          quantity: yup.number().required('Requerido').positive(),
+        })
+      )
+      .required()
+      .min(1, 'A lista de materiais não pode ser vazia'),
+  });
 
   async function getMaterialsData() {
     try {
@@ -145,32 +120,6 @@ export default function Index() {
         setIsLoading(false);
       }
     }
-    async function getPropertiesData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/properties/');
-        const propertiesCities = response.data
-          .filter(
-            (value, index, arr) =>
-              arr.findIndex((item) => item.municipio === value.municipio) ===
-              index
-          )
-          .map((value) => value.municipio); // RETORNA OS DIFERENTES TRABALHOS
-
-        propertiesCities.forEach((value) => {
-          propertiesOp.push([
-            value,
-            response.data.filter((item) => item.municipio === value),
-          ]);
-        });
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
 
     async function getWorkersData() {
       try {
@@ -190,7 +139,6 @@ export default function Index() {
           ]);
         });
 
-        setWorkers(response.data);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -203,7 +151,6 @@ export default function Index() {
 
     getMaterialsData();
     getUsersData();
-    getPropertiesData();
     getWorkersData();
   }, []);
 
@@ -219,35 +166,31 @@ export default function Index() {
     }); // LIMPANDO CHAVES `EMPTY STRINGS`
 
     formattedValues.userId = userId;
-    formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
     formattedValues.workerId = formattedValues.workerId?.value;
     formattedValues.authorizedBy = formattedValues.authorizedBy?.value;
     formattedValues.reqMaterial = formattedValues.reqMaterial?.value;
-    formattedValues.propertyId = formattedValues.propertyId?.value;
-    formattedValues.buildingId = formattedValues.buildingId?.value;
-    formattedValues.items.forEach((item) => {
+    formattedValues.MaterialReserveItems.forEach((item) => {
       delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
     });
 
-    delete Object.assign(formattedValues, {
-      MaterialOutItems: formattedValues.items,
-    }).materialId;
-
-    formattedValues.value = formattedValues.items.reduce((ac, item) => {
-      ac += Number(item.quantity) * Number(item.value);
-      return ac;
-    }, 0);
+    formattedValues.value = formattedValues.MaterialReserveItems.reduce(
+      (ac, item) => {
+        ac += Number(item.quantity) * Number(item.value);
+        return ac;
+      },
+      0
+    );
 
     try {
       setIsLoading(true);
 
-      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
-      await axios.post(`/materials/out/`, formattedValues);
+      console.log(formattedValues);
+      // RESERVA, ATUALIZA O INVENTARIO E JA BLOQUEIA
+      await axios.post(`/materials/reserve/`, formattedValues);
 
       setIsLoading(false);
       setOpenCollapse(false);
       resetForm();
-      initialSchema();
       getMaterialsData();
 
       toast.success(`Reserva de material realizada com sucesso`);
@@ -278,13 +221,13 @@ export default function Index() {
 
   const handleQuantityChange = (e, balance, handleChange) => {
     // if (Number(e.target.value) > Number(balance)) {
-    //   toast.error('A saída não pode superar o saldo do material');
+    //   toast.error('A reserva não pode superar o saldo do material');
     //   e.target.value = Number(balance);
     //   handleChange(e);
     //   return;
     // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (e.target.value < 0) {
-      toast.error('A saída não pode ser negativa');
+      toast.error('A reserva não pode ser negativa');
       e.target.value = 0;
       handleChange(e);
       return;
@@ -297,24 +240,14 @@ export default function Index() {
     return req.includes('/') ? req : `${req}/${currentYear}`;
   };
 
-  const schemaSingleOutput = yup.object().shape({
-    propertyId: yup.object().required('Requerido'),
-  });
-
-  const apllySchema = (addSchema) => {
-    const newSchema = schema.concat(addSchema);
-    setSchema(newSchema);
-  };
-
   const initialValues = {
     reqMaintenance: '',
     authorizedBy: '',
     workerId: '',
     place: '',
-    buildingId: '',
     reqMaterial: '',
     obs: '',
-    items: [],
+    MaterialReserveItems: [],
   };
   return (
     <>
@@ -324,7 +257,7 @@ export default function Index() {
           className="px-0 mx-0 py-2 text-center"
           style={{ background: primaryDarkColor, color: 'white' }}
         >
-          <span className="fs-5">RESERVA DE MATERUIAL</span>
+          <span className="fs-5">RESERVA DE MATERIAL</span>
         </Row>
         <Row className="px-0 pt-2">
           <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
@@ -408,27 +341,6 @@ export default function Index() {
                     </Col>
                   ) : null}
 
-                  {!openCollapse ? (
-                    <Col xs="auto" className="ps-1 pt-4">
-                      <Button
-                        variant="secondary"
-                        onClick={() => {
-                          !values.reqMaintenance &&
-                            !errors.reqMaintenance && // verficcar se é vazio e n tem erro
-                            setOpenCollapse(!openCollapse);
-                          !values.reqMaintenance &&
-                            !errors.reqMaintenance && // verficcar se é vazio e n tem erro
-                            apllySchema(schemaSingleOutput);
-                        }}
-                        aria-controls="collapse-form"
-                        aria-expanded={openCollapse}
-                        className="mt-2"
-                      >
-                        Avulso
-                      </Button>
-                    </Col>
-                  ) : null}
-
                   <Col xs={12} md={3} lg={2} className="pb-3">
                     {' '}
                     {!!values.reqMaintenance && openCollapse ? (
@@ -450,7 +362,7 @@ export default function Index() {
                           }}
                           onBlur={handleBlur}
                           placeholder="Selecione a RM"
-                          isDisabled={values.items.length > 0}
+                          isDisabled={values.MaterialReserveItems.length > 0}
                         />
                       </Form.Group>
                     ) : null}
@@ -547,89 +459,6 @@ export default function Index() {
                       </Form.Group>
                     </Row>
 
-                    {!values.reqMaintenance && openCollapse ? (
-                      <Row>
-                        <Form.Group
-                          as={Col}
-                          xs={12}
-                          controlId="propertyId"
-                          className="pb-3"
-                        >
-                          <Form.Label>PROPRIEDADE:</Form.Label>
-                          <Select
-                            id="propertyId"
-                            options={propertiesOp.map((value) => ({
-                              label: value[0],
-                              options: value[1].map((item) => ({
-                                value: item.id,
-                                label: item.nomeImovel,
-                              })),
-                            }))}
-                            formatGroupLabel={formatGroupLabel}
-                            value={values.propertyId}
-                            onChange={(selected) => {
-                              setFieldValue('propertyId', selected);
-                              setFieldValue('buildingId', '');
-                              setFieldTouched('buildingId', false);
-                            }}
-                            isInvalid={
-                              touched.propertyId && !!errors.propertyId
-                            }
-                            isValid={touched.propertyId && !errors.propertyId}
-                            placeholder="Selecione a propriedade"
-                          />
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.buildingId}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </Row>
-                    ) : null}
-                    {!values.reqMaintenance && openCollapse ? (
-                      <Row>
-                        <Form.Group
-                          as={Col}
-                          xs={12}
-                          className="pb-3"
-                          controlId="buildingId"
-                        >
-                          <Form.Label>PRÉDIO:</Form.Label>
-                          <Select
-                            id="buildingId"
-                            options={properties
-                              .filter((property) =>
-                                values.propertyId
-                                  ? property.id === values.propertyId.value
-                                  : false
-                              )[0]
-                              ?.buildingsSipac.map((building) => ({
-                                value: building.id,
-                                label: building.name,
-                              }))}
-                            value={values.buildingId}
-                            onChange={(selected) => {
-                              setFieldValue('buildingId', selected);
-                            }}
-                            isInvalid={
-                              touched.buildingId && !!errors.buildingId
-                            }
-                            isValid={touched.buildingId && !errors.buildingId}
-                            placeholder="Selecione o prédio"
-                          />
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.buildingId}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </Row>
-                    ) : null}
-
                     <Row>
                       <Form.Group xs={12} className="pb-3" controlId="obs">
                         <Form.Label>OBSERVAÇÕES GERAIS:</Form.Label>
@@ -662,7 +491,7 @@ export default function Index() {
                     >
                       <span className="fs-6">LISTA DE MATERIAIS</span>
                     </Row>
-                    <FieldArray name="items">
+                    <FieldArray name="MaterialReserveItems">
                       {(fieldArrayProps) => {
                         const { remove, push } = fieldArrayProps;
                         return (
@@ -671,14 +500,14 @@ export default function Index() {
                               handleClose={handleCloseModalSearch}
                               show={showModalSearch}
                               push={push}
-                              hiddenItems={values.items.map(
+                              hiddenItems={values.MaterialReserveItems.map(
                                 (item) => item.materialId
                               )}
                               inventoryData={inventoryData}
                             />
 
-                            {values.items.length > 0 &&
-                              values.items.map((item, index) => (
+                            {values.MaterialReserveItems.length > 0 &&
+                              values.MaterialReserveItems.map((item, index) => (
                                 <>
                                   <Row className="d-block d-sm-none">
                                     <Col className="fw-bold">
@@ -695,7 +524,7 @@ export default function Index() {
                                       sm={4}
                                       md={3}
                                       lg={2}
-                                      controlId={`items[${index}].materialId`}
+                                      controlId={`MaterialReserveItems[${index}].materialId`}
                                       className="border-0 m-0 p-0"
                                     >
                                       {index === 0 ? (
@@ -717,7 +546,7 @@ export default function Index() {
                                     </Form.Group>
                                     <Form.Group
                                       as={Col}
-                                      controlId={`items[${index}].name`}
+                                      controlId={`MaterialReserveItems[${index}].name`}
                                       className="border-0 m-0 p-0"
                                     >
                                       {index === 0 ? (
@@ -742,7 +571,7 @@ export default function Index() {
                                       xs={12}
                                       sm={4}
                                       md={1}
-                                      controlId={`items[${index}].unit`}
+                                      controlId={`MaterialReserveItems[${index}].unit`}
                                       className="border-0 m-0 p-0"
                                     >
                                       {index === 0 ? (
@@ -767,7 +596,7 @@ export default function Index() {
                                       xs={12}
                                       sm={4}
                                       md={1}
-                                      controlId={`items[${index}].balancedQuantity`}
+                                      controlId={`MaterialReserveItems[${index}].balancedQuantity`}
                                       className="d-none"
                                     >
                                       <Form.Control
@@ -786,7 +615,7 @@ export default function Index() {
                                       xs={12}
                                       sm={4}
                                       md={1}
-                                      controlId={`items[${index}].value`}
+                                      controlId={`MaterialReserveItems[${index}].value`}
                                       className="d-none"
                                     >
                                       <Form.Control
@@ -805,7 +634,7 @@ export default function Index() {
                                       xs={10}
                                       sm={4}
                                       md="auto"
-                                      controlId={`items[${index}].quantity`}
+                                      controlId={`MaterialReserveItems[${index}].quantity`}
                                       className="border-0 m-0 p-0"
                                       style={{ width: '70px' }}
                                     >
@@ -872,9 +701,13 @@ export default function Index() {
                     </FieldArray>
                     <Row className="pt-4">
                       <Col xs="auto">
-                        {touched.items && typeof errors.items === 'string' ? (
-                          <Badge bg="danger">{errors.items}</Badge>
-                        ) : touched.items && errors.items ? (
+                        {touched.MaterialReserveItems &&
+                        typeof errors.MaterialReserveItems === 'string' ? (
+                          <Badge bg="danger">
+                            {errors.MaterialReserveItems}
+                          </Badge>
+                        ) : touched.MaterialReserveItems &&
+                          errors.MaterialReserveItems ? (
                           <Badge bg="danger">
                             A quantidade de item não pode ser 0.
                           </Badge>
@@ -887,7 +720,7 @@ export default function Index() {
                           variant="outline-secondary"
                           onClick={() => {
                             handleShowModalSearch();
-                            setFieldTouched('items');
+                            setFieldTouched('MaterialReserveItems');
                           }}
                         >
                           <FaSearch /> Pesquisar no saldo comum
@@ -903,7 +736,6 @@ export default function Index() {
                           variant="warning"
                           onClick={() => {
                             resetForm();
-                            initialSchema();
                             setOpenCollapse(false);
                           }}
                         >
@@ -912,7 +744,7 @@ export default function Index() {
                       </Col>
                       <Col xs="auto" className="text-center pt-2 pb-4">
                         <Button variant="success" onClick={submitForm}>
-                          Confirmar saída
+                          Confirmar reserva
                         </Button>
                       </Col>
                     </Row>
@@ -922,6 +754,7 @@ export default function Index() {
             )}
           </Formik>
         </Row>
+        <tableExample />
       </Row>
     </>
   );

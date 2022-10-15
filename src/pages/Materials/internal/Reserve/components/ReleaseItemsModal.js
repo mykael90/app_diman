@@ -107,7 +107,7 @@ export default function SearchModal(props) {
     });
 
     setFieldValue(
-      'items',
+      'MaterialReserveItems',
       values.items // formatar o numero da requisicao
     ); // importando valores para tabela de saída e liberando
 
@@ -470,7 +470,7 @@ export default function SearchModal(props) {
                                             item.balancedQuantity,
                                             handleChange
                                           )
-                                        }                                       
+                                        }
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"
