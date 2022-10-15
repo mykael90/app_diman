@@ -923,6 +923,10 @@ export default function Index() {
           </Formik>
         </Row>
       </Row>
+
+      <Row className="bg-light border rounded d-flex justify-content-center pt-2 mt-4">
+        RESERVAS
+      </Row>
     </>
   );
 }

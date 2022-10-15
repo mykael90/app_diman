@@ -74,7 +74,15 @@ export default function Index() {
   const schema = yup.object().shape({
     reqMaintenance: yup
       .string()
-      .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
+      .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida')
+      .required('Requerido'),
+    intendedUse: yup
+      .date()
+      .min(
+        new Date().toISOString().split('T')[0],
+        'Escolha uma data futura para reserva'
+      )
+      .required('Requerido'),
     workerId: yup.object().required('Requerido'),
     authorizedBy: yup.object().required('Requerido'),
     obs: yup.string(),
@@ -247,6 +255,7 @@ export default function Index() {
     place: '',
     reqMaterial: '',
     obs: '',
+    intendedUse: '',
     MaterialReserveItems: [],
   };
   return (
@@ -341,10 +350,16 @@ export default function Index() {
                     </Col>
                   ) : null}
 
-                  <Col xs={12} md={3} lg={2} className="pb-3">
-                    {' '}
-                    {!!values.reqMaintenance && openCollapse ? (
-                      <Form.Group controlId="reqMaterial">
+                  {openCollapse ? (
+                    <>
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        md={3}
+                        lg={2}
+                        className="pb-3"
+                        controlId="reqMaterial"
+                      >
                         <Form.Label>RMs VINCULADAS</Form.Label>
                         <Select
                           inputId="reqMaterial"
@@ -365,12 +380,37 @@ export default function Index() {
                           isDisabled={values.MaterialReserveItems.length > 0}
                         />
                       </Form.Group>
-                    ) : null}
-                  </Col>
 
-                  <Col className="pb-3">
-                    {openCollapse ? (
-                      <Form.Group>
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        md={3}
+                        lg={2}
+                        className="pb-3"
+                        controlId="intendedUse"
+                      >
+                        <Form.Label>RETIRAR EM:</Form.Label>
+                        <Form.Control
+                          type="date"
+                          value={values.intendedUse}
+                          onChange={handleChange}
+                          // isInvalid={touched.intendedUse && !!errors.intendedUse}
+                          // isValid={touched.place && !errors.place}
+                          onBlur={handleBlur}
+                          placeholder="Escolha a data"
+                        />
+                        {touched.intendedUse && !!errors.intendedUse ? (
+                          <Badge bg="danger">{errors.intendedUse}</Badge>
+                        ) : null}
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        md={6}
+                        lg={6}
+                        className="pb-3"
+                      >
                         <Form.Label>AUTORIZADO POR:</Form.Label>
                         <Select
                           inputId="authorizedBy"
@@ -389,8 +429,8 @@ export default function Index() {
                           <Badge bg="danger">{errors.authorizedBy}</Badge>
                         ) : null}
                       </Form.Group>
-                    ) : null}
-                  </Col>
+                    </>
+                  ) : null}
                 </Row>
 
                 <Collapse in={openCollapse}>
@@ -403,7 +443,7 @@ export default function Index() {
                         // controlId="workerId"
                         className="pb-3"
                       >
-                        <Form.Label>RETIRADO POR:</Form.Label>
+                        <Form.Label>RESERVA PARA:</Form.Label>
                         <Select
                           // id="workerId"
                           inputId="workerId"
