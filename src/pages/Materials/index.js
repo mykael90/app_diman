@@ -22,6 +22,7 @@ import Loan from './out/Loan';
 import Internal from './internal';
 import Restrict from './internal/Restrict';
 import Reserve from './internal/Reserve';
+import ListReserves from './internal/ListReserves/ListReserves';
 
 import Reports from './Reports';
 import Input from './Reports/Input';
@@ -81,6 +82,7 @@ export default function MaterialsRoutes() {
       <Route path="internal" element={<Internal />}>
         <Route path="restrict" element={<Restrict />} />{' '}
         <Route path="reserve" element={<Reserve />} />{' '}
+        <Route path="listreserves" element={<ListReserves />} />{' '}
       </Route>
 
       <Route path="reports" element={<Reports />}>

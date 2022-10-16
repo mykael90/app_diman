@@ -114,6 +114,11 @@ export default function Index() {
   }
 
   useEffect(() => {
+    // Focus on inputRef
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+
     async function getUsersData() {
       try {
         setIsLoading(true);

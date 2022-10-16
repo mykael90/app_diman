@@ -4,26 +4,19 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaShare, FaDolly, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaExclamation, FaDolly, FaTimes } from 'react-icons/fa';
 
-import {
-  Container,
-  Row,
-  Card,
-  Col,
-  Button,
-  OverlayTrigger,
-  Tooltip,
-} from 'react-bootstrap';
+import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-import axios from '../../../../../services/axios';
-import Loading from '../../../../../components/Loading';
+import axios from '../../../../services/axios';
+import Loading from '../../../../components/Loading';
 
 // import generic table from material's components with global filter and nested row
-import TableGfilterNestedrow from '../../../components/TableGfilterNestedRow';
-import TableNestedrow from '../../../components/TableNestedRow';
+import TableGfilterNestedrow from '../../components/TableGfilterNestedRow';
+import TableNestedrow from '../../components/TableNestedRow';
 
 const renderTooltip = (props, message) => (
   <Tooltip id="button-tooltip" {...props}>
@@ -31,20 +24,35 @@ const renderTooltip = (props, message) => (
   </Tooltip>
 );
 
-const handleStoreAsk = (e) => {
-  e.preventDefault();
-  const check = e.currentTarget.nextSibling;
-  const times = check.nextSibling;
-  check.className = check.className.replace('d-none', 'd-block');
-  times.className = times.className.replace('d-none', 'd-block');
-  console.log(e.currentTarget.className);
-  e.currentTarget.className += ' d-none';
-  console.log(e.currentTarget.className);
-  // e.currentTarget.remove();
-};
-
-export default function Index({ reserves, getReservesData, userId }) {
+export default function Index() {
+  const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
+  const [reserves, setReserves] = useState([]);
+  const inputRef = useRef();
+
+  async function getReservesData() {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/materials/reserve');
+      setReserves(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    // Focus on inputRef
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+
+    getReservesData();
+  }, []);
 
   const handleUpdateSeparetedAt = async (values) => {
     const { id: materialReserveId } = values;
@@ -75,79 +83,18 @@ export default function Index({ reserves, getReservesData, userId }) {
     }
   };
 
-  const handleStoreFast = async (values) => {
-    const updateWithdrawnAt = {
-      withdrawnAt: new Date().toISOString(),
-    };
-
-    const formattedValues = {
-      ...Object.fromEntries(
-        Object.entries(values).filter(([_, v]) => v != null)
-      ),
-    }; // LIMPANDO CHAVES NULL E UNDEFINED
-
-    delete Object.assign(formattedValues, {
-      materialReserveId: formattedValues.id,
-    }).id; // id de saída gerado automaticamente, se deixar vai usar o id da reserva
-    delete formattedValues.created_at; // mesmo raciocinio acima
-
-    formattedValues.userId = userId;
-    formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
-    formattedValues.MaterialReserveItems.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
-      item.value = item.value
-        .replace(/\./g, '')
-        .replace(/,/g, '.')
-        .replace(/[^0-9\.]+/g, '');
-    });
-
-    Object.assign(formattedValues, {
-      MaterialOutItems: formattedValues.MaterialReserveItems,
-    }); // rename key
-
-    try {
-      setIsLoading(true);
-
-      // ATUALIZAR QUANTIDADES DO INVENTARIO
-      for (const item of formattedValues.MaterialReserveItems) {
-        const response = await axios.get(
-          `/materials/inventory/${item.MaterialId}`
-        );
-        const { releaseInventory, reserveInventory } = response.data;
-        const updateInventory = {
-          releaseInventory: Number(releaseInventory) + Number(item.quantity),
-          reserveInventory: Number(reserveInventory) - Number(item.quantity),
-        };
-
-        await axios.put(
-          `/materials/inventory/${item.MaterialId}`,
-          updateInventory
-        );
-      }
-
-      if (!('separatedAt' in formattedValues)) handleUpdateSeparetedAt(values); // SE NAO TIVER SEPARADO JA SEPARA NA SAIDA
-
-      // FAZ A SAÍDA RAPIDA
-      await axios.post(`/materials/out/`, formattedValues);
-
-      // ATUALIZA DATA DE SAIDA DA RESERVA
-      await axios.put(
-        `/materials/reserve/${formattedValues.materialReserveId}`,
-        updateWithdrawnAt
+  const handleCancelAsk = (e, values) => {
+    e.preventDefault();
+    if (userId !== values.userId)
+      return toast.error(
+        `Reserva só pode ser cancelada pelo usuário que a criou.`
       );
+    const exclamation = e.currentTarget.nextSibling;
+    exclamation.className = exclamation.className.replace('d-none', 'd-inline');
+    e.currentTarget.className += ' d-none';
+    return true;
 
-      setIsLoading(false);
-      getReservesData();
-
-      toast.success(`Saída de reserva realizada com sucesso`);
-    } catch (err) {
-      // eslint-disable-next-line no-unused-expressions
-      err.response?.data?.errors
-        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-
-      setIsLoading(false);
-    }
+    // e.currentTarget.remove();
   };
 
   const handleCancelReserve = async (values) => {
@@ -202,7 +149,7 @@ export default function Index({ reserves, getReservesData, userId }) {
       setIsLoading(false);
       getReservesData();
 
-      toast.info(`Cancelamento de reserva realizado`);
+      return toast.info(`Cancelamento de reserva realizado`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -243,16 +190,12 @@ export default function Index({ reserves, getReservesData, userId }) {
         disableResizing: true,
       },
       {
-        Header: 'Reserva para:',
-        accessor: 'workerName',
-      },
-      {
-        Header: 'Autorização:',
-        accessor: 'authorizerUsername',
-        width: 200,
+        Header: 'Reservado por:',
+        accessor: 'userUsername',
+        width: 160,
         disableResizing: true,
-        Cell: (props) => {
-          const custom = String(props.value).replace(
+        Cell: ({ value }) => {
+          const custom = String(value).replace(
             /(^[a-z]*)\.([a-z]*).*/gm,
             '$1.$2'
           ); // deixar só os dois primeiros nomes
@@ -260,12 +203,16 @@ export default function Index({ reserves, getReservesData, userId }) {
         },
       },
       {
-        Header: 'Reservado por:',
-        accessor: 'userUsername',
-        width: 200,
+        Header: 'Reserva para:',
+        accessor: 'workerName',
+      },
+      {
+        Header: 'Autorização:',
+        accessor: 'authorizerUsername',
+        width: 160,
         disableResizing: true,
-        Cell: (props) => {
-          const custom = String(props.value).replace(
+        Cell: ({ value }) => {
+          const custom = String(value).replace(
             /(^[a-z]*)\.([a-z]*).*/gm,
             '$1.$2'
           ); // deixar só os dois primeiros nomes
@@ -280,27 +227,87 @@ export default function Index({ reserves, getReservesData, userId }) {
         Cell: ({ value, row }) => (
           <Row>
             <Col className="p-auto text-center">
+              {value ? <span>{value}</span> : <span>(não)</span>}
+            </Col>
+          </Row>
+        ),
+      },
+      {
+        Header: 'Utilizada:',
+        accessor: 'withdrawnAtBr',
+        width: 120,
+        disableResizing: true,
+        Cell: ({ value, row }) => (
+          <Row>
+            <Col className="p-auto text-center">
               {value ? (
                 <span>{value}</span>
               ) : (
-                <OverlayTrigger
-                  placement="top"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={(props) =>
-                    renderTooltip(props, 'Realizar separação')
-                  }
-                >
-                  <Button
-                    size="sm"
-                    variant="outline-primary"
-                    className="border-0"
-                    onClick={() => {
-                      handleUpdateSeparetedAt(row.original);
-                    }}
-                  >
-                    <FaDolly />
-                  </Button>
-                </OverlayTrigger>
+                <span>
+                  {row.original?.canceledAtBr ? '(cancelada)' : '(não)'}
+                </span>
+              )}
+            </Col>
+          </Row>
+        ),
+      },
+
+      {
+        Header: 'Cancelada:',
+        accessor: 'canceledAtBr',
+        width: 120,
+        disableResizing: true,
+        Cell: ({ value, row }) => (
+          <Row>
+            <Col className="p-auto text-center">
+              {value ? (
+                <span>{value}</span>
+              ) : (
+                <>
+                  {' '}
+                  {row.original?.withdrawnAtBr ? (
+                    '(utilizada)'
+                  ) : (
+                    <>
+                      <OverlayTrigger
+                        placement="top"
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={(props) =>
+                          renderTooltip(props, 'Cancelar reserva')
+                        }
+                      >
+                        <Button
+                          size="sm"
+                          variant="outline-danger"
+                          className="border-0"
+                          onClick={(e) => {
+                            handleCancelAsk(e, row.original);
+                          }}
+                        >
+                          <FaTimes />
+                        </Button>
+                      </OverlayTrigger>
+                      <OverlayTrigger
+                        placement="top"
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={(props) =>
+                          renderTooltip(props, 'Confirmar ação')
+                        }
+                      >
+                        <Button
+                          size="sm"
+                          variant="outline-warning"
+                          className="border-0 d-none"
+                          onClick={() => {
+                            handleCancelReserve(row.original);
+                          }}
+                        >
+                          <FaExclamation />
+                        </Button>
+                      </OverlayTrigger>
+                    </>
+                  )}{' '}
+                </>
               )}
             </Col>
           </Row>
@@ -312,67 +319,6 @@ export default function Index({ reserves, getReservesData, userId }) {
         width: 120,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
-      },
-      {
-        Header: () => null,
-        id: 'withdrawnAtBr',
-        width: 40,
-        disableResizing: true,
-        disableSortBy: true,
-        Cell: ({ value, row }) => (
-          <Row>
-            {' '}
-            <Col className="p-auto text-end">
-              {value}{' '}
-              <OverlayTrigger
-                placement="top"
-                delay={{ show: 250, hide: 400 }}
-                overlay={(props) => renderTooltip(props, 'Realizar ação')}
-              >
-                <Button
-                  size="sm"
-                  variant="outline-primary"
-                  className="border-0"
-                  onClick={handleStoreAsk}
-                >
-                  <FaShare />
-                </Button>
-              </OverlayTrigger>
-              <OverlayTrigger
-                placement="top"
-                delay={{ show: 250, hide: 400 }}
-                overlay={(props) => renderTooltip(props, 'Confirmar saída')}
-              >
-                <Button
-                  size="sm"
-                  variant="outline-success"
-                  className="border-0 d-none"
-                  onClick={() => {
-                    handleStoreFast(row.original);
-                  }}
-                >
-                  <FaCheck />
-                </Button>
-              </OverlayTrigger>
-              <OverlayTrigger
-                placement="top"
-                delay={{ show: 250, hide: 400 }}
-                overlay={(props) => renderTooltip(props, 'Cancelar reserva')}
-              >
-                <Button
-                  size="sm"
-                  variant="outline-danger"
-                  className="border-0 mt-2 d-none"
-                  onClick={() => {
-                    handleCancelReserve(row.original);
-                  }}
-                >
-                  <FaTimes />
-                </Button>
-              </OverlayTrigger>
-            </Col>
-          </Row>
-        ),
       },
     ],
     []

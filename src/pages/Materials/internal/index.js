@@ -14,6 +14,16 @@ export default function index() {
               <Nav.Link href="#1">
                 <Link
                   className="text-decoration-none"
+                  to="/materials/internal/listreserves"
+                >
+                  Relação de Reservas
+                </Link>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="#2">
+                <Link
+                  className="text-decoration-none"
                   to="/materials/internal/reserve"
                 >
                   Reservar
@@ -21,7 +31,7 @@ export default function index() {
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#2">
+              <Nav.Link href="#3">
                 <Link
                   className="text-decoration-none"
                   to="/materials/internal/restrict"

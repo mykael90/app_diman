@@ -108,7 +108,7 @@ export default function Header() {
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#4"
-                  onClick={() => navigate('/materials/internal/reserve')}
+                  onClick={() => navigate('/materials/internal/listreserves')}
                 >
                   Operações Internas
                 </NavDropdown.Item>

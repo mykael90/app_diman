@@ -26,7 +26,7 @@ export default function Index(props) {
     //   e.target.value = Number(row.values.freeInventory);
     // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (Number(e.target.value < 0)) {
-      errors.push('A saída não pode ser negativa');
+      errors.push('A reserva não pode ser negativa');
       e.target.value = Number(0);
     }
 
@@ -60,7 +60,7 @@ export default function Index(props) {
         });
 
         if (exists) {
-          toast.error('Item já incluído na lista de saída');
+          toast.error('Item já incluído na lista de reserva');
           return;
         }
       }
@@ -92,16 +92,15 @@ export default function Index(props) {
     });
   }
 
-// Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
-function filterGreaterThan(rows, id, filterValue) {
-  console.log(filterValue)
-  return rows.filter((row) => {
-    const rowValue = Number(row.values[id]);
-    if (filterValue===1) return rowValue !== 0; //fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
-    return true;
-  });
-}
-
+  // Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
+  function filterGreaterThan(rows, id, filterValue) {
+    console.log(filterValue);
+    return rows.filter((row) => {
+      const rowValue = Number(row.values[id]);
+      if (filterValue === 1) return rowValue !== 0; // fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
+      return true;
+    });
+  }
 
   const FilterForTotal = ({
     column: { filterValue, preFilteredRows, setFilter, id },
@@ -200,7 +199,7 @@ function filterGreaterThan(rows, id, filterValue) {
       },
       {
         // Make an expander cell
-        Header: 'Saída', // No header
+        Header: 'Reserva', // No header
         id: 'quantity', // It needs an ID
         width: 120,
         disableResizing: true,

@@ -145,7 +145,27 @@ export default function Index() {
     }
   }
 
+  async function getReservesData() {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/materials/reserve/actives');
+      setReserves(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
+    // Focus on inputRef
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+
     async function getUsersData() {
       try {
         setIsLoading(true);
@@ -216,32 +236,19 @@ export default function Index() {
       }
     }
 
-    async function getReservesData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/reserve/');
-        setReserves(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
-
+    getReservesData();
     getMaterialsData();
     getUsersData();
     getPropertiesData();
     getWorkersData();
-    getReservesData();
   }, []);
 
   const handleStore = async (values, resetForm) => {
-    const formattedValues = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v != null)
-    ); // LIMPANDO CHAVES NULL E UNDEFINED
+    const formattedValues = {
+      ...Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      ),
+    }; // LIMPANDO CHAVES NULL E UNDEFINED
 
     Object.keys(formattedValues).forEach((key) => {
       if (formattedValues[key] === '') {
@@ -260,9 +267,9 @@ export default function Index() {
       delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
     });
 
-    delete Object.assign(formattedValues, {
+    Object.assign(formattedValues, {
       MaterialOutItems: formattedValues.items,
-    }).materialId;
+    });
 
     formattedValues.value = formattedValues.items.reduce((ac, item) => {
       ac += Number(item.quantity) * Number(item.value);
@@ -961,7 +968,11 @@ export default function Index() {
 
           <Accordion.Collapse eventKey="1">
             <Card.Body>
-              <ListReserves reserves={reserves} />
+              <ListReserves
+                reserves={reserves}
+                getReservesData={getReservesData}
+                userId={userId}
+              />
             </Card.Body>
           </Accordion.Collapse>
         </Accordion>
