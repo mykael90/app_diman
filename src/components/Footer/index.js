@@ -36,7 +36,10 @@ export default function Footer() {
               DEVELOPMENT
             </span>
             <div>
-              <FaUserCircle /> mykael.mello@ufrn.br
+              <FaUserCircle /> Mykael Mello
+            </div>
+            <div>
+              <FaUserCircle /> Alexandre Cesar
             </div>
           </Col>
           <Col xs="auto" className="d-flex align-items-center">

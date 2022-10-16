@@ -38,7 +38,7 @@ export default function Header() {
 
       <StyledNavbar
         collapseOnSelect
-        expand="md"
+        expand="lg"
         className="border-bottom border-2 justify-content-center"
         style={{ background: '#F8F9FA' }}
       >
@@ -63,16 +63,16 @@ export default function Header() {
                 COLAB
               </Nav.Link> */}
 
-              <NavDropdown title="COLAB" id="collasible-nav-dropdown">
+              <NavDropdown title="COLABORADORES" id="collasible-nav-dropdown">
                 <NavDropdown.Item // teste
                   href="#1"
-                  onClick={() => navigate('/materials/in/sipac')}
+                  onClick={() => navigate('/colaboradores1/frequencia/')}
                 >
                   Frequência
                 </NavDropdown.Item>
                 <NavDropdown.Item
                   href="#2"
-                  onClick={() => navigate('/materials/out/use')}
+                  onClick={() => navigate('/colaboradores1/ocorrencia/')}
                 >
                   Ocorrência
                 </NavDropdown.Item>
@@ -107,68 +107,174 @@ export default function Header() {
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
-                  href="#4"
+                  href="#7"
                   onClick={() => navigate('/materials/internal/listreserves')}
                 >
                   Operações Internas
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
-                  href="#4"
+                  href="#8"
                   onClick={() => navigate('/materials/reports/inventory')}
                 >
                   Relatórios
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
-                  href="#8"
+                  href="#9"
                   onClick={() => navigate('/materials/record/list')}
                 >
                   Cadastro
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
-                  href="#4"
+                  href="#10"
                   onClick={() => navigate('/materials/definitions/terminology')}
                 >
                   Definições
                 </NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link href="#9" onClick={() => navigate('/equip')}>
+              <Nav.Link href="#11" onClick={() => navigate('/equip')}>
                 EQUIP
               </Nav.Link>
 
-              <Nav.Link href="#10" onClick={() => navigate('/eletrica')}>
-                ELÉTRICA
-              </Nav.Link>
-
-              <NavDropdown title="AGUA" id="collasible-nav-dropdown">
-                <NavDropdown.Item href="#11">Poços artesianos</NavDropdown.Item>
-                <NavDropdown.Item href="#12">
-                  Reservatórios Elevados
+              <NavDropdown title="USADOS" id="collasible-nav-dropdown">
+                <NavDropdown.Item // teste
+                  href="#12"
+                  onClick={() => navigate('/used/in/sipac')}
+                >
+                  Entrada
+                </NavDropdown.Item>
+                <NavDropdown.Item
+                  href="#13"
+                  onClick={() => navigate('/used/out/use')}
+                >
+                  Saída
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="#13">Manobras</NavDropdown.Item>
+                <NavDropdown.Item
+                  href="#14"
+                  onClick={() => navigate('/used/internal/listreserves')}
+                >
+                  Operações Internas
+                </NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="#14">Relatórios</NavDropdown.Item>
+                <NavDropdown.Item
+                  href="#15"
+                  onClick={() => navigate('/used/reports/inventory')}
+                >
+                  Relatórios
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#16"
+                  onClick={() => navigate('/used/record/list')}
+                >
+                  Cadastro
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#17"
+                  onClick={() => navigate('/used/definitions/terminology')}
+                >
+                  Definições
+                </NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link href="#15" onClick={() => navigate('/esgoto')}>
-                ESGOTO
-              </Nav.Link>
+              <NavDropdown title="INFRA" id="collasible-nav-dropdown">
+                <NavDropdown.Item
+                  href="#18"
+                  onClick={() => navigate('/infra/edificio')}
+                >
+                  Edifícios
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#19"
+                  onClick={() => navigate('/infra/eletrica')}
+                >
+                  Elétrica
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#20"
+                  onClick={() => navigate('/infra/agua')}
+                >
+                  Água
+                </NavDropdown.Item>
+                <NavDropdown.Item
+                  href="#21"
+                  onClick={() => navigate('/infra/esgoto')}
+                >
+                  Esgoto
+                </NavDropdown.Item>
+                <NavDropdown.Item
+                  href="#22"
+                  onClick={() => navigate('/infra/drenagem')}
+                >
+                  Drenagem
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#23"
+                  onClick={() => navigate('/infra/pavimento')}
+                >
+                  Pavimentação
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#24"
+                  onClick={() => navigate('/infra/deposito')}
+                >
+                  Depósito Infra
+                </NavDropdown.Item>
+              </NavDropdown>
 
-              <Nav.Link href="#16" onClick={() => navigate('/drenagem')}>
-                DRENAGEM
-              </Nav.Link>
+              <NavDropdown title="FORNECEDORES" id="collasible-nav-dropdown">
+                <NavDropdown.Item
+                  href="#25"
+                  onClick={() => navigate('/providers/record/list')}
+                >
+                  Cadastro
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#26"
+                  onClick={() => navigate('/providers/contracts/list')}
+                >
+                  Contratos
+                </NavDropdown.Item>
+              </NavDropdown>
 
-              <Nav.Link href="#17" onClick={() => navigate('/pavimento')}>
-                PAVIMENTO
-              </Nav.Link>
+              <NavDropdown title="FROTA" id="collasible-nav-dropdown">
+                <NavDropdown.Item
+                  href="#27"
+                  onClick={() => navigate('/frota/record/list')}
+                >
+                  Cadastro
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#28"
+                  onClick={() => navigate('/frota/ocorrencia')}
+                >
+                  Ocorrência
+                </NavDropdown.Item>
+              </NavDropdown>
 
-              <Nav.Link href="#18" onClick={() => navigate('/edificio')}>
-                EDIFÍCIO
-              </Nav.Link>
+              <NavDropdown title="ADM" id="collasible-nav-dropdown">
+                <NavDropdown.Item href="#29" onClick={() => navigate('/users')}>
+                  Usuários
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#30"
+                  onClick={() => navigate('/unidades')}
+                >
+                  Unidades
+                </NavDropdown.Item>
+              </NavDropdown>
             </Nav>
 
             <Nav className="me-0 mt-2">

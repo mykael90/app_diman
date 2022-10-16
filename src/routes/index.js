@@ -11,13 +11,14 @@ import Login from '../pages/Login';
 import Colaboradores from '../pages/Colaboradores';
 import Materials from '../pages/Materials';
 import Equip from '../pages/Equip';
-import Eletrica from '../pages/Eletrica';
-import Agua from '../pages/Agua';
-import Esgoto from '../pages/Esgoto';
-import Drenagem from '../pages/Drenagem';
-import Pavimento from '../pages/Pavimento';
-import Edificio from '../pages/Edificio';
+import Eletrica from '../pages/Infra/Eletrica';
+import Agua from '../pages/Infra/Agua';
+import Esgoto from '../pages/Infra/Esgoto';
+import Drenagem from '../pages/Infra/Drenagem';
+import Pavimento from '../pages/Infra/Pavimento';
+import Edificio from '../pages/Infra/Edificio';
 import Page404 from '../pages/Page404';
+import Providers from '../pages/Providers';
 import Unauthorized from '../components/Unauthorized';
 
 const ROLES = {
@@ -38,12 +39,13 @@ export default function RoutesPages() {
       <Route exact path="/colaboradores/*" element={<Colaboradores />} />
 
       <Route exact path="/equip/*" element={<Equip />} />
-      <Route exact path="/eletrica/*" element={<Eletrica />} />
-      <Route exact path="/agua/*" element={<Agua />} />
-      <Route exact path="/esgoto/*" element={<Esgoto />} />
-      <Route exact path="/drenagem/*" element={<Drenagem />} />
-      <Route exact path="/pavimento/*" element={<Pavimento />} />
-      <Route exact path="/edificio/*" element={<Edificio />} />
+      <Route exact path="/infra/eletrica/*" element={<Eletrica />} />
+      <Route exact path="/infra/agua/*" element={<Agua />} />
+      <Route exact path="/infra/esgoto/*" element={<Esgoto />} />
+      <Route exact path="/infra/drenagem/*" element={<Drenagem />} />
+      <Route exact path="/infra/pavimento/*" element={<Pavimento />} />
+      <Route exact path="/infra/edificio/*" element={<Edificio />} />
+      <Route exact path="/providers/*" element={<Providers />} />
 
       <Route path="/Unauthorized" element={<Unauthorized />} />
       {/* we want to protect these routes */}
