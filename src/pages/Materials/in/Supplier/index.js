@@ -123,8 +123,16 @@ export default function Index() {
 
   const handleStore = async (values, resetForm) => {
     const formattedValues = {
-      ...values,
-    };
+      ...Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      ),
+    }; // LIMPANDO CHAVES NULL E UNDEFINED
+
+    Object.keys(formattedValues).forEach((key) => {
+      if (formattedValues[key] === '') {
+        delete formattedValues[key];
+      }
+    }); // LIMPANDO CHAVES `EMPTY STRINGS`
 
     formattedValues.materialIntypeId = 4;
     formattedValues.userId = userId;
@@ -164,7 +172,12 @@ export default function Index() {
   };
 
   const initialValues = {
+    req: '',
+    invoice: '',
     providerId: '',
+    requiredBy: '',
+    registerDate: '',
+    obs: '',
     MaterialInItems: [],
   };
   return (
@@ -301,7 +314,7 @@ export default function Index() {
                       onChange={(selected) => {
                         setFieldValue('requiredBy', selected);
                       }}
-                      placeholder="Selecione o responsável"
+                      placeholder="Selecione o requerinte"
                       onBlur={handleBlur}
                     />
                     {touched.requiredBy && !!errors.requiredBy ? (
