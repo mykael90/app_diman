@@ -108,6 +108,7 @@ export default function Index() {
       }
     }); // LIMPANDO CHAVES `EMPTY STRINGS`
 
+    formattedValues.materialIntypeId = 4;
     formattedValues.userId = userId;
     formattedValues.providerId = formattedValues.providerId?.value;
     formattedValues.MaterialInItems.forEach((item) => {
@@ -125,14 +126,23 @@ export default function Index() {
     try {
       setIsLoading(true);
 
-      console.log(formattedValues);
-      // RESERVA, ATUALIZA O INVENTARIO E JA BLOQUEIA
-      // await axios.post(`/materials/in/general`, formattedValues);
+      const response = await axios.post(
+        `/materials/in/general`,
+        formattedValues
+      );
+
+      const freeData = await response.data;
+      delete Object.assign(freeData, { items: freeData.MaterialInItems })
+        .MaterialInItems; // rename key
+      delete Object.assign(freeData, { materialInId: freeData.id }).id; // rename key
+      delete freeData.requiredBy;
+
+      await axios.post(`/materials/release/`, freeData);
 
       setIsLoading(false);
       resetForm();
 
-      toast.success(`Reserva de material realizada com sucesso`);
+      toast.success(`Entrada de material realizada com sucesso`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -226,7 +236,7 @@ export default function Index() {
                     ) : null}
                   </Form.Group>
 
-                  <Form.Group as={Col} xs={12} md={6} lg={6} className="pb-3">
+                  <Form.Group as={Col} xs={12} md={6} lg={8} className="pb-3">
                     <Form.Label>FORNECEDOR:</Form.Label>
                     <Select
                       inputId="providerId"
@@ -260,7 +270,7 @@ export default function Index() {
                       }}
                       isInvalid={touched.obs && !!errors.obs}
                       // isValid={touched.obs && !errors.obs}
-                      placeholder="Conferente | Placa de carro | Nome de motorista"
+                      placeholder="Conferente | Entrega parcial? | Placa de carro | Nome de motorista"
                       onBlur={handleBlur}
                     />
                     <Form.Control.Feedback
@@ -475,7 +485,7 @@ export default function Index() {
                       <Badge bg="danger">{errors.MaterialInItems}</Badge>
                     ) : touched.MaterialInItems && errors.MaterialInItems ? (
                       <Badge bg="danger">
-                        A quantidade e preço do item não pode ser 0.
+                        A quantidade/preço do item não pode ser 0.
                       </Badge>
                     ) : null}
                   </Col>

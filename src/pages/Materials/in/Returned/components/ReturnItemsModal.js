@@ -61,7 +61,6 @@ export default function SearchModal(props) {
     try {
       setIsLoading(true);
 
-      // LIBERAÇÃO DO SALDO BLOQUEADO
       const response = await axios.post(
         `/materials/in/general`,
         formattedValues
