@@ -24,7 +24,7 @@ export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [providers, setProviders] = useState([]);
-
+  const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModalSearch, setShowModalSearch] = useState(false);
   const inputRef = useRef();
@@ -36,12 +36,14 @@ export default function Index() {
   const schema = yup.object().shape({
     req: yup
       .string()
-      .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida')
-      .required('Requerido'),
-    invoice: yup
-      .number()
-      .typeError('Digite apenas números')
-      .required('Requerido'),
+      .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
+    invoice: yup.number().typeError('Digite apenas números'),
+    registerDate: yup
+      .date()
+      .max(
+        new Date().toISOString().split('T')[0],
+        'Escolha uma data passada para empenho'
+      ),
     providerId: yup.object().required('Requerido'),
     obs: yup.string(),
     // eslint-disable-next-line react/forbid-prop-types
@@ -57,25 +59,25 @@ export default function Index() {
       .min(1, 'A lista de materiais não pode ser vazia'),
   });
 
-  async function getMaterialsData() {
-    try {
-      setIsLoading(true);
-      const response = await axios.get('/materials/');
-      setinventoryData(response.data);
-      setIsLoading(false);
-    } catch (err) {
-      // eslint-disable-next-line no-unused-expressions
-      err.response?.data?.errors
-        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-      setIsLoading(false);
-    }
-  }
-
   useEffect(() => {
     // Focus on inputRef
     if (inputRef.current) {
       inputRef.current.focus();
+    }
+
+    async function getMaterialsData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/materials/');
+        setinventoryData(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
     }
 
     async function getProvidersData() {
@@ -93,26 +95,43 @@ export default function Index() {
       }
     }
 
+    async function getUsersData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/users/');
+        setUsers(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
     getMaterialsData();
     getProvidersData();
+    getUsersData();
   }, []);
 
-  const handleStore = async (values, resetForm) => {
-    const formattedValues = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v != null)
-    ); // LIMPANDO CHAVES NULL E UNDEFINED
+  const formatReq = (req) => {
+    if (!req) return;
+    const currentYear = new Date().getFullYear();
+    return req.includes('/') ? req : `${req}/${currentYear}`;
+  };
 
-    Object.keys(formattedValues).forEach((key) => {
-      if (formattedValues[key] === '') {
-        delete formattedValues[key];
-      }
-    }); // LIMPANDO CHAVES `EMPTY STRINGS`
+  const handleStore = async (values, resetForm) => {
+    const formattedValues = {
+      ...values,
+    };
 
     formattedValues.materialIntypeId = 4;
     formattedValues.userId = userId;
     formattedValues.providerId = formattedValues.providerId?.value;
+    formattedValues.requiredBy = formattedValues.requiredBy?.value;
     formattedValues.MaterialInItems.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      Object.assign(item, { MaterialId: item.materialId }); // rename key
     });
 
     formattedValues.value = formattedValues.MaterialInItems.reduce(
@@ -126,18 +145,8 @@ export default function Index() {
     try {
       setIsLoading(true);
 
-      const response = await axios.post(
-        `/materials/in/general`,
-        formattedValues
-      );
-
-      const freeData = await response.data;
-      delete Object.assign(freeData, { items: freeData.MaterialInItems })
-        .MaterialInItems; // rename key
-      delete Object.assign(freeData, { materialInId: freeData.id }).id; // rename key
-      delete freeData.requiredBy;
-
-      await axios.post(`/materials/release/`, freeData);
+      console.log(formattedValues);
+      await axios.post(`/materials/in/general`, formattedValues);
 
       setIsLoading(false);
       resetForm();
@@ -145,6 +154,7 @@ export default function Index() {
       toast.success(`Entrada de material realizada com sucesso`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
+      console.log(err);
       err.response?.data?.errors
         ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
@@ -154,10 +164,7 @@ export default function Index() {
   };
 
   const initialValues = {
-    req: '',
-    invoice: '',
     providerId: '',
-    obs: '',
     MaterialInItems: [],
   };
   return (
@@ -200,7 +207,7 @@ export default function Index() {
                     controlId="req"
                     className="pb-3"
                   >
-                    <Form.Label>RM PREGÃO/CONTRATO</Form.Label>
+                    <Form.Label>RM PR/CT</Form.Label>
                     <Form.Control
                       type="tel"
                       value={values.req}
@@ -208,7 +215,10 @@ export default function Index() {
                       autoFocus
                       ref={inputRef}
                       placeholder="Nº Requisição"
-                      onBlur={handleBlur}
+                      onBlur={(e) => {
+                        setFieldValue('req', formatReq(e.target.value));
+                        handleBlur(e);
+                      }}
                     />
                     {touched.req && !!errors.req ? (
                       <Badge bg="danger">{errors.req}</Badge>
@@ -235,14 +245,13 @@ export default function Index() {
                       <Badge bg="danger">{errors.invoice}</Badge>
                     ) : null}
                   </Form.Group>
-
                   <Form.Group as={Col} xs={12} md={6} lg={8} className="pb-3">
                     <Form.Label>FORNECEDOR:</Form.Label>
                     <Select
                       inputId="providerId"
-                      options={providers.map((user) => ({
-                        value: user.id,
-                        label: user.nomeFantasia,
+                      options={providers.map((provider) => ({
+                        value: provider.id,
+                        label: provider.nomeFantasia,
                       }))}
                       value={values.providerId}
                       onChange={(selected) => {
@@ -253,6 +262,50 @@ export default function Index() {
                     />
                     {touched.providerId && !!errors.providerId ? (
                       <Badge bg="danger">{errors.providerId}</Badge>
+                    ) : null}
+                  </Form.Group>
+                </Row>
+                <Row>
+                  <Form.Group
+                    as={Col}
+                    xs={12}
+                    md={3}
+                    lg={2}
+                    className="pb-3"
+                    controlId="registerDate"
+                  >
+                    <Form.Label>DATA EMPENHO:</Form.Label>
+                    <Form.Control
+                      type="date"
+                      value={values.registerDate}
+                      onChange={handleChange}
+                      // isInvalid={touched.registerDate && !!errors.registerDate}
+                      // isValid={touched.place && !errors.place}
+                      onBlur={handleBlur}
+                      placeholder="Escolha a data"
+                    />
+                    {touched.registerDate && !!errors.registerDate ? (
+                      <Badge bg="danger">{errors.registerDate}</Badge>
+                    ) : null}
+                  </Form.Group>
+
+                  <Form.Group as={Col} xs={12} md={9} lg={10} className="pb-3">
+                    <Form.Label>PEDIDO POR:</Form.Label>
+                    <Select
+                      inputId="requiredBy"
+                      options={users.map((user) => ({
+                        value: user.username,
+                        label: user.name,
+                      }))}
+                      value={values.requiredBy}
+                      onChange={(selected) => {
+                        setFieldValue('requiredBy', selected);
+                      }}
+                      placeholder="Selecione o responsável"
+                      onBlur={handleBlur}
+                    />
+                    {touched.requiredBy && !!errors.requiredBy ? (
+                      <Badge bg="danger">{errors.requiredBy}</Badge>
                     ) : null}
                   </Form.Group>
                 </Row>

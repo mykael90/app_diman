@@ -83,9 +83,11 @@ export default function SearchModal(props) {
   });
 
   const handleStore = async (values, resetForm) => {
-    const formattedValues = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v != null)
-    ); // LIMPANDO CHAVES NULL E UNDEFINED
+    const formattedValues = {
+      ...Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      ),
+    }; // LIMPANDO CHAVES NULL E UNDEFINED
 
     Object.keys(formattedValues).forEach((key) => {
       if (formattedValues[key] === '') {
