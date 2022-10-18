@@ -91,7 +91,7 @@ export default function Index({ reserves, getReservesData, userId }) {
     }).id; // id de saída gerado automaticamente, se deixar vai usar o id da reserva
     delete formattedValues.created_at; // mesmo raciocinio acima
 
-    formattedValues.userId = userId;
+    formattedValues.UserId = userId;
     formattedValues.materialOuttypeId = 1; // SAÍDA PARA USO
     formattedValues.MaterialReserveItems.forEach((item) => {
       delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
