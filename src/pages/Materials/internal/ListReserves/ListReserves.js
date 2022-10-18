@@ -192,7 +192,7 @@ export default function Index() {
       {
         Header: 'Reservado por:',
         accessor: 'userUsername',
-        width: 160,
+        width: 140,
         disableResizing: true,
         Cell: ({ value }) => {
           const custom = String(value).replace(
@@ -209,7 +209,7 @@ export default function Index() {
       {
         Header: 'Autorização:',
         accessor: 'authorizerUsername',
-        width: 160,
+        width: 140,
         disableResizing: true,
         Cell: ({ value }) => {
           const custom = String(value).replace(
@@ -222,7 +222,7 @@ export default function Index() {
       {
         Header: 'Separação:',
         accessor: 'separatedAtBr',
-        width: 120,
+        width: 100,
         disableResizing: true,
         Cell: ({ value, row }) => (
           <Row>
@@ -235,7 +235,7 @@ export default function Index() {
       {
         Header: 'Utilizada:',
         accessor: 'withdrawnAtBr',
-        width: 120,
+        width: 100,
         disableResizing: true,
         Cell: ({ value, row }) => (
           <Row>
@@ -255,7 +255,7 @@ export default function Index() {
       {
         Header: 'Cancelada:',
         accessor: 'canceledAtBr',
-        width: 120,
+        width: 100,
         disableResizing: true,
         Cell: ({ value, row }) => (
           <Row>
@@ -317,6 +317,13 @@ export default function Index() {
         Header: 'Valor',
         accessor: 'valueBr',
         width: 120,
+        disableResizing: true,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: 'Local',
+        accessor: 'place',
+        width: 150,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
       },
