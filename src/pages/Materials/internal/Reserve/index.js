@@ -37,12 +37,11 @@ const formatGroupLabel = (data) => (
   </Col>
 );
 
-const workersOp = [];
-
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
+  const [workers, setWorkers] = useState([]);
 
   const [reqRMs, setReqRMs] = useState([]);
 
@@ -135,6 +134,7 @@ export default function Index() {
     }
 
     async function getWorkersData() {
+      const workersOp = [];
       try {
         setIsLoading(true);
         const response = await axios.get('/workers/');
@@ -151,6 +151,8 @@ export default function Index() {
             response.data.filter((item) => item.job === value),
           ]);
         });
+
+        setWorkers(workersOp);
 
         setIsLoading(false);
       } catch (err) {
@@ -455,7 +457,7 @@ export default function Index() {
                           // id="workerId"
                           inputId="workerId"
                           // name="workerId"
-                          options={workersOp.map((value) => ({
+                          options={workers.map((value) => ({
                             label: value[0],
                             options: value[1].map((item) => ({
                               value: item.id,

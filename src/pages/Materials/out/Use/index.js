@@ -51,15 +51,13 @@ const formatGroupLabel = (data) => (
   </Col>
 );
 
-const propertiesOp = [];
-const workersOp = [];
-
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
   const [workers, setWorkers] = useState([]);
   const [properties, setProperties] = useState([]);
+  const [propertiesData, setPropertiesData] = useState([]);
   const [reqRMs, setReqRMs] = useState([]);
   const [reserves, setReserves] = useState([]);
   const [schema, setSchema] = useState(
@@ -181,6 +179,7 @@ export default function Index() {
       }
     }
     async function getPropertiesData() {
+      const propertiesOp = [];
       try {
         setIsLoading(true);
         const response = await axios.get('/properties/');
@@ -198,6 +197,8 @@ export default function Index() {
             response.data.filter((item) => item.municipio === value),
           ]);
         });
+        setProperties(propertiesOp);
+        setPropertiesData(response.data);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
         err.response?.data?.errors
@@ -208,6 +209,7 @@ export default function Index() {
     }
 
     async function getWorkersData() {
+      const workersOp = [];
       try {
         setIsLoading(true);
         const response = await axios.get('/workers/');
@@ -225,7 +227,7 @@ export default function Index() {
           ]);
         });
 
-        setWorkers(response.data);
+        setWorkers(workersOp);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -534,7 +536,7 @@ export default function Index() {
                           // id="workerId"
                           inputId="workerId"
                           // name="workerId"
-                          options={workersOp.map((value) => ({
+                          options={workers.map((value) => ({
                             label: value[0],
                             options: value[1].map((item) => ({
                               value: item.id,
@@ -596,7 +598,7 @@ export default function Index() {
                           <Form.Label>PROPRIEDADE:</Form.Label>
                           <Select
                             id="propertyId"
-                            options={propertiesOp.map((value) => ({
+                            options={properties.map((value) => ({
                               label: value[0],
                               options: value[1].map((item) => ({
                                 value: item.id,
@@ -621,7 +623,7 @@ export default function Index() {
                             type="invalid"
                             style={{ position: 'static' }}
                           >
-                            {errors.buildingId}
+                            {errors.propertyId}
                           </Form.Control.Feedback>
                         </Form.Group>
                       </Row>
@@ -637,7 +639,7 @@ export default function Index() {
                           <Form.Label>PRÉDIO:</Form.Label>
                           <Select
                             id="buildingId"
-                            options={properties
+                            options={propertiesData
                               .filter((property) =>
                                 values.propertyId
                                   ? property.id === values.propertyId.value
