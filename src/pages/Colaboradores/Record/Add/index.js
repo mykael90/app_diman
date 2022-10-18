@@ -33,6 +33,20 @@ export default function index({ submitReq }) {
       .required('Campo obrigatório'),
   });
 
+  async function handleStore(values, resetForm) {
+    console.log(values);
+    try {
+      const responseContact = await axios.post(`/workers/`, values);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+    resetForm();
+  }
+
   const initialValues = {
     name: '',
     email: '',
@@ -49,9 +63,21 @@ export default function index({ submitReq }) {
         contacttypeId: '',
         contact: '',
         obs: '',
-        default: '',
+        default: false,
       },
     ],
+    Addresses: {
+      country: '',
+      city: '',
+      district: '',
+      street: '',
+      zipcode: '',
+      number: '',
+      complement: '',
+      WorkerAddress: {
+        title: '',
+      },
+    },
   };
 
   useEffect(() => {
@@ -94,8 +120,7 @@ export default function index({ submitReq }) {
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
-              console.log(values);
-              resetForm();
+              handleStore(values, resetForm);
             }}
           >
             {({
@@ -376,13 +401,13 @@ export default function index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    controlId="zipcode"
+                    controlId="Addresses.zipcode"
                     className="pt-2"
                   >
                     <Form.Label>CEP</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.cpf}
+                      value={values.Addresses.zipcode}
                       onChange={handleChange}
                       // isInvalid={touched.cpf && !!errors.cpf}
                       // isValid={touched.cpf && !errors.cpf}
@@ -401,13 +426,13 @@ export default function index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    controlId="street"
+                    controlId="Addresses.street"
                     className="pt-2"
                   >
                     <Form.Label>LOGRADOURO</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.rg}
+                      value={values.Addresses.street}
                       onChange={handleChange}
                       // isInvalid={touched.rg && !!errors.rg}
                       // isValid={touched.rg && !errors.rg}
@@ -426,13 +451,13 @@ export default function index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    controlId="number"
+                    controlId="Addresses.number"
                     className="pt-2"
                   >
                     <Form.Label>NÚMERO</Form.Label>
                     <Form.Control
                       type="number"
-                      value={values.birthdate}
+                      value={values.Addresses.number}
                       onChange={handleChange}
                       // isInvalid={touched.birthdate && !!errors.birthdate}
                       // isValid={touched.birthdate && !errors.birthdate}
@@ -450,38 +475,14 @@ export default function index({ submitReq }) {
                   <Form.Group
                     as={Col}
                     xs={12}
-                    controlId="complement"
-                    className="pt-2"
-                  >
-                    <Form.Label>COMPLEMENTO</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.name}
-                      onChange={handleChange}
-                      // isInvalid={touched.name && !!errors.name}
-                      // isValid={touched.name && !errors.name}
-                      placeholder="Digite o Complemento"
-                      onBlur={handleBlur}
-                    />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.name}
-                    </Form.Control.Feedback> */}
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
                     md={4}
-                    controlId="district"
+                    controlId="Addresses.district"
                     className="pt-2"
                   >
                     <Form.Label>BAIRRO</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.cpf}
+                      value={values.Addresses.district}
                       onChange={handleChange}
                       // isInvalid={touched.cpf && !!errors.cpf}
                       // isValid={touched.cpf && !errors.cpf}
@@ -500,13 +501,13 @@ export default function index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    controlId="city"
+                    controlId="Addresses.city"
                     className="pt-2"
                   >
                     <Form.Label>CIDADE</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.rg}
+                      value={values.Addresses.city}
                       onChange={handleChange}
                       // isInvalid={touched.rg && !!errors.rg}
                       // isValid={touched.rg && !errors.rg}
@@ -525,13 +526,13 @@ export default function index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    controlId="country"
+                    controlId="Addresses.country"
                     className="pt-2"
                   >
                     <Form.Label>PAÍS</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.birthdate}
+                      value={values.Addresses.country}
                       onChange={handleChange}
                       // isInvalid={touched.birthdate && !!errors.birthdate}
                       // isValid={touched.birthdate && !errors.birthdate}
@@ -544,6 +545,54 @@ export default function index({ submitReq }) {
                       style={{ position: 'static' }}
                     >
                       {errors.birthdate}
+                    </Form.Control.Feedback> */}
+                  </Form.Group>
+                  <Form.Group
+                    as={Col}
+                    xs={8}
+                    controlId="Addresses.complement"
+                    className="pt-2"
+                  >
+                    <Form.Label>COMPLEMENTO</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={values.Addresses.complement}
+                      onChange={handleChange}
+                      // isInvalid={touched.name && !!errors.name}
+                      // isValid={touched.name && !errors.name}
+                      placeholder="Digite o Complemento"
+                      onBlur={handleBlur}
+                    />
+                    {/* <Form.Control.Feedback
+                      tooltip
+                      type="invalid"
+                      style={{ position: 'static' }}
+                    >
+                      {errors.name}
+                    </Form.Control.Feedback> */}
+                  </Form.Group>
+                  <Form.Group
+                    as={Col}
+                    xs={4}
+                    controlId="Addresses.WorkerAddress.title"
+                    className="pt-2"
+                  >
+                    <Form.Label>Titulo</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={values.Addresses.WorkerAddress.title}
+                      onChange={handleChange}
+                      // isInvalid={touched.name && !!errors.name}
+                      // isValid={touched.name && !errors.name}
+                      placeholder="Digite o Titulo do Endereço"
+                      onBlur={handleBlur}
+                    />
+                    {/* <Form.Control.Feedback
+                      tooltip
+                      type="invalid"
+                      style={{ position: 'static' }}
+                    >
+                      {errors.name}
                     </Form.Control.Feedback> */}
                   </Form.Group>
                 </Row>
