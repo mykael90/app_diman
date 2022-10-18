@@ -350,6 +350,7 @@ export default function Index() {
     reqMaintenance: '',
     authorizedBy: '',
     workerId: '',
+    propertyId: '',
     place: '',
     buildingId: '',
     reqMaterial: '',
@@ -393,6 +394,7 @@ export default function Index() {
                   setFieldValue={setFieldValue}
                   data={reqInModal}
                 />
+                <br />
                 <Row>
                   <Form.Group
                     as={Col}
@@ -592,12 +594,12 @@ export default function Index() {
                         <Form.Group
                           as={Col}
                           xs={12}
-                          controlId="propertyId"
+                          // controlId="propertyId"
                           className="pb-3"
                         >
                           <Form.Label>PROPRIEDADE:</Form.Label>
                           <Select
-                            id="propertyId"
+                            inputId="propertyId"
                             options={properties.map((value) => ({
                               label: value[0],
                               options: value[1].map((item) => ({
@@ -612,19 +614,12 @@ export default function Index() {
                               setFieldValue('buildingId', '');
                               setFieldTouched('buildingId', false);
                             }}
-                            isInvalid={
-                              touched.propertyId && !!errors.propertyId
-                            }
-                            isValid={touched.propertyId && !errors.propertyId}
                             placeholder="Selecione a propriedade"
+                            onBlur={handleBlur}
                           />
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.propertyId}
-                          </Form.Control.Feedback>
+                          {touched.propertyId && !!errors.propertyId ? (
+                            <Badge bg="danger">{errors.propertyId}</Badge>
+                          ) : null}
                         </Form.Group>
                       </Row>
                     ) : null}
@@ -638,7 +633,7 @@ export default function Index() {
                         >
                           <Form.Label>PRÉDIO:</Form.Label>
                           <Select
-                            id="buildingId"
+                            inputId="buildingId"
                             options={propertiesData
                               .filter((property) =>
                                 values.propertyId
@@ -653,19 +648,8 @@ export default function Index() {
                             onChange={(selected) => {
                               setFieldValue('buildingId', selected);
                             }}
-                            isInvalid={
-                              touched.buildingId && !!errors.buildingId
-                            }
-                            isValid={touched.buildingId && !errors.buildingId}
                             placeholder="Selecione o prédio"
                           />
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.buildingId}
-                          </Form.Control.Feedback>
                         </Form.Group>
                       </Row>
                     ) : null}
@@ -951,7 +935,13 @@ export default function Index() {
                         </Button>
                       </Col>
                       <Col xs="auto" className="text-center pt-2 pb-4">
-                        <Button variant="success" onClick={submitForm}>
+                        <Button
+                          variant="success"
+                          onClick={(e) => {
+                            submitForm(e);
+                            setFieldTouched('propertyId'); // tive que "tocar" a força, por algum motivo nao ta disparando o touch no propertyId quando submit
+                          }}
+                        >
                           Confirmar saída
                         </Button>
                       </Col>
