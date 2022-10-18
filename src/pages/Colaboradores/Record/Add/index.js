@@ -39,13 +39,11 @@ export default function index({ submitReq }) {
     birthdate: '',
     rg: '',
     cpf: '',
-    WorkerContracts: [
-      {
-        WorkerJobtypeId: '',
-        start: '',
-        ContractId: '',
-      },
-    ],
+    WorkerContracts: {
+      WorkerJobtypeId: '',
+      start: '',
+      ContractId: '',
+    },
     WorkerContacts: [
       {
         contacttypeId: '',
@@ -560,7 +558,7 @@ export default function index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    controlId="ContractId"
+                    controlId="WorkerContracts.ContractId"
                     className="pt-2"
                   >
                     <Form.Label>NÚMERO DO CONTRATO</Form.Label>
@@ -571,6 +569,7 @@ export default function index({ submitReq }) {
                       placeholder="Selecione o Contrato"
                       onBlur={handleBlur}
                     >
+                      <option>Selecione o Contrato</option>
                       {contracts.map((contract) => (
                         <option key={contract.id} value={contract.id}>
                           {contract.codigoSipac}
@@ -589,7 +588,7 @@ export default function index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    controlId="WorkerJobType"
+                    controlId="WorkerContracts.WorkerJobtypeId"
                     className="pt-2"
                   >
                     <Form.Label>FUNÇÃO</Form.Label>
@@ -600,6 +599,7 @@ export default function index({ submitReq }) {
                       placeholder="Selecione a Função"
                       onBlur={handleBlur}
                     >
+                      <option>Selecione a Função</option>
                       {jobtypes.map((job) => (
                         <option key={job.id} value={job.id}>
                           {job.job}
@@ -618,7 +618,7 @@ export default function index({ submitReq }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    controlId="start"
+                    controlId="WorkerContracts.start"
                     className="pt-2"
                   >
                     <Form.Label>INÍCIO</Form.Label>
