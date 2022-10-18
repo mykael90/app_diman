@@ -150,7 +150,7 @@ export default function Index() {
   const initialState = {
     sortBy: [
       {
-        id: 'req',
+        id: 'createdAt',
         desc: true,
       },
     ],
