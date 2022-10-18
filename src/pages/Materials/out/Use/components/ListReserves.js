@@ -249,7 +249,7 @@ export default function Index({ reserves, getReservesData, userId }) {
       {
         Header: 'Autorização:',
         accessor: 'authorizerUsername',
-        width: 200,
+        width: 180,
         disableResizing: true,
         Cell: (props) => {
           const custom = String(props.value).replace(
@@ -262,7 +262,7 @@ export default function Index({ reserves, getReservesData, userId }) {
       {
         Header: 'Reservado por:',
         accessor: 'userUsername',
-        width: 200,
+        width: 180,
         disableResizing: true,
         Cell: (props) => {
           const custom = String(props.value).replace(
@@ -310,6 +310,13 @@ export default function Index({ reserves, getReservesData, userId }) {
         Header: 'Valor',
         accessor: 'valueBr',
         width: 120,
+        disableResizing: true,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: 'Local',
+        accessor: 'place',
+        width: 150,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
       },
