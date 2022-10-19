@@ -14,6 +14,8 @@ import { Formik, Field, ErrorMessage, FieldArray } from 'formik'; // FormValidat
 import axios from '../../../../services/axios';
 import { primaryDarkColor } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
+import { propTypes } from 'react-bootstrap/esm/Image';
+import { check } from 'prettier';
 
 export default function index({ submitReq }) {
   const [reqs, setReqs] = useState('');
@@ -37,6 +39,7 @@ export default function index({ submitReq }) {
     console.log(values);
     try {
       const responseContact = await axios.post(`/workers/`, values);
+      //resetForm();
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -44,8 +47,11 @@ export default function index({ submitReq }) {
         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
       setIsLoading(false);
     }
-    resetForm();
   }
+
+  const contactPadrao = () => {
+    const [padrao, setpadrao] = useState(false);
+  };
 
   const initialValues = {
     name: '',
@@ -124,6 +130,7 @@ export default function index({ submitReq }) {
             }}
           >
             {({
+              setFieldValue,
               submitForm,
               resetForm,
               handleChange,
@@ -335,11 +342,15 @@ export default function index({ submitReq }) {
                                 >
                                   <Form.Check
                                     type="switch"
-                                    id="custom-switch"
-                                    value={contato.default}
+                                    onClick={() => {
+                                      contato.default == false
+                                        ? (contato.default = true)
+                                        : (contato.default = false);
+                                    }}
                                     label="Padrão"
                                   />
                                 </Form.Group>
+                                {console.log(contato.default)}
                                 <Col sm>
                                   {values.WorkerContacts.length <= 1 ? (
                                     <Button
