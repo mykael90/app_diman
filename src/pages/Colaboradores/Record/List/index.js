@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
-import { get } from 'lodash';
 import { toast } from 'react-toastify';
 
 import { Container, Row, Card } from 'react-bootstrap';
@@ -11,30 +10,57 @@ import Loading from '../../../../components/Loading';
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../../../Materials/components/TableGfilterNestedRow';
 
-import workers from '../../../../assets/JSON/workers.json';
-
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
-  const [materials, setMaterials] = useState([]);
+  const [workers, setWorkers] = useState([]);
+  const [data, setData] = useState([]);
 
-  // useEffect(() => {
-  //   async function getData() {
-  //     try {
-  //       setIsLoading(true);
-  //       const response = await axios.get('/materials/');
-  //       setMaterials(response.data);
-  //       setIsLoading(false);
-  //     } catch (err) {
-  //       // eslint-disable-next-line no-unused-expressions
-  //       err.response?.data?.errors
-  //         ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-  //         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-  //       setIsLoading(false);
-  //     }
-  //   }
+  useEffect(() => {
+    async function getWorkers() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`/workers`);
+        console.log(response.data);
+        setWorkers(response.data);
 
-  //   getData();
-  // }, []);
+        const employees = {
+          colab: [],
+        };
+
+        for (const i in response.data) {
+          const item = response.data[i];
+          var contato = '';
+
+          item.WorkerContacts.map((item) => {
+            if (item.default && item.contacttypeId == 2) {
+              contato = item.contact;
+            }
+          });
+          employees.colab.push({
+            name: item.name,
+            cpf: item.cpf,
+            birthdate: item.birthdate,
+            email: item.email,
+            contact: contato,
+          });
+        }
+
+        console.log(employees);
+
+        setData(employees);
+
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
+    getWorkers();
+  }, []);
 
   const columns = React.useMemo(
     () => [
@@ -47,30 +73,31 @@ export default function Index() {
     []
   );
 
-  var employees = {
-    colab: [],
-  };
+  // const employees = {
+  //   colab: [],
+  // };
 
-  for (var i in workers.workers) {
-    var item = workers.workers[i];
-    var contato = '';
+  // for (const i in workers.workers) {
+  //   const item = workers.workers[i];
+  //   var contato = '';
 
-    item.WorkersContact.map(function (item) {
-      if (item.default && item.contacttypeId == 1) {
-        contato = item.contact;
-      }
-    });
-    employees.colab.push({
-      name: item.name,
-      cpf: item.cpf,
-      birthdate: item.birthdate,
-      email: item.email,
-      contact: contato,
-    });
-  }
+  //   item.WorkersContact.map((item) => {
+  //     if (item.default && item.contacttypeId == 1) {
+  //       contato = item.contact;
+  //     }
+  //   });
+  //   employees.colab.push({
+  //     name: item.name,
+  //     cpf: item.cpf,
+  //     birthdate: item.birthdate,
+  //     email: item.email,
+  //     contact: contato,
+  //   });
+  // }
 
-  const datasetFormated = [...employees.colab];
-  const data = React.useMemo(() => datasetFormated, []);
+  // const datasetFormated = [...employees.colab];
+  // console.log(datasetFormated);
+  // const data = React.useMemo(() => datasetFormated, []);
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -143,7 +170,7 @@ export default function Index() {
 
         <TableGfilterNestedrow
           columns={columns}
-          data={data}
+          data={workers}
           defaultColumn={defaultColumn}
           initialState={initialState}
           filterTypes={filterTypes}
