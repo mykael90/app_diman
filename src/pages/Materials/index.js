@@ -28,6 +28,7 @@ import Reports from './Reports';
 import Input from './Reports/Input';
 import Output from './Reports/Output';
 import Inventory from './Reports/Inventory';
+import MaintenanceBalanceOutput from './Reports/MaintenanceBalanceOutput';
 
 import Record from './Record';
 import List from './Record/List';
@@ -89,6 +90,10 @@ export default function MaterialsRoutes() {
       </Route>
 
       <Route path="reports" element={<Reports />}>
+        <Route
+          path="maintenancebalanceoutput"
+          element={<MaintenanceBalanceOutput />}
+        />{' '}
         <Route path="inventory" element={<Inventory />} />{' '}
         <Route path="Input" element={<Input />} />{' '}
         <Route path="output" element={<Output />} />{' '}
