@@ -1,3 +1,5 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -13,42 +15,13 @@ import TableGfilterNestedrow from '../../../Materials/components/TableGfilterNes
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [workers, setWorkers] = useState([]);
-  const [data, setData] = useState([]);
 
   useEffect(() => {
     async function getWorkers() {
       try {
         setIsLoading(true);
         const response = await axios.get(`/workers`);
-        console.log(response.data);
         setWorkers(response.data);
-
-        const employees = {
-          colab: [],
-        };
-
-        for (const i in response.data) {
-          const item = response.data[i];
-          var contato = '';
-
-          item.WorkerContacts.map((item) => {
-            if (item.default && item.contacttypeId == 2) {
-              contato = item.contact;
-            }
-          });
-          employees.colab.push({
-            name: item.name,
-            cpf: item.cpf,
-            birthdate: item.birthdate,
-            email: item.email,
-            contact: contato,
-          });
-        }
-
-        console.log(employees);
-
-        setData(employees);
-
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -73,31 +46,29 @@ export default function Index() {
     []
   );
 
-  // const employees = {
-  //   colab: [],
-  // };
+  const employees = {
+    colab: [],
+  };
 
-  // for (const i in workers.workers) {
-  //   const item = workers.workers[i];
-  //   var contato = '';
+  for (const i in workers) {
+    const worker = workers[i];
+    let contato = '';
+    worker.WorkerContacts.map((item) => {
+      if (item.default && item.contacttypeId === 2) {
+        contato = item.contact;
+      }
+    });
+    employees.colab.push({
+      name: worker.name,
+      cpf: worker.cpf,
+      birthdate: worker.birthdate,
+      email: worker.email,
+      contact: contato,
+    });
+  }
 
-  //   item.WorkersContact.map((item) => {
-  //     if (item.default && item.contacttypeId == 1) {
-  //       contato = item.contact;
-  //     }
-  //   });
-  //   employees.colab.push({
-  //     name: item.name,
-  //     cpf: item.cpf,
-  //     birthdate: item.birthdate,
-  //     email: item.email,
-  //     contact: contato,
-  //   });
-  // }
-
-  // const datasetFormated = [...employees.colab];
-  // console.log(datasetFormated);
-  // const data = React.useMemo(() => datasetFormated, []);
+  const datasetFormated = [...employees.colab];
+  const data = React.useMemo(() => datasetFormated, []);
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -170,7 +141,7 @@ export default function Index() {
 
         <TableGfilterNestedrow
           columns={columns}
-          data={workers}
+          data={data}
           defaultColumn={defaultColumn}
           initialState={initialState}
           filterTypes={filterTypes}
