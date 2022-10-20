@@ -157,7 +157,8 @@ export default function inputMaterial() {
     renamedReq.items = req.itensJSON.map((item) => ({
       MaterialId: item['Código'],
       quantity: item.A.replace(/,/g, '.'), // ajustar regex
-      value: item.Valor.replace(/\./g, '')
+      value: item['Valor A.']
+        .replace(/\./g, '')
         .replace(/,/g, '.')
         .replace(/[^0-9\.]+/g, ''), // ajustar regex
       name: item['Denominação'],

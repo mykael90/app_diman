@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { FaTrashAlt, FaPlus, FaSearch } from 'react-icons/fa';
 import {
@@ -10,9 +10,10 @@ import {
   Col,
   Form,
   Badge,
-  Dropdown,
-  ButtonGroup,
   Collapse,
+  Accordion,
+  useAccordionButton,
+  Card,
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
@@ -29,8 +30,19 @@ import Loading from '../../../../components/Loading';
 
 import SearchModal from './components/SearchModal';
 import ReleaseItemsModal from './components/ReleaseItemsModal';
+import ListReserves from './components/ListReserves';
 
-import workers from '../../../../assets/JSON/workers_example.json';
+function CustomToggle({ children, eventKey }) {
+  const decoratedOnClick = useAccordionButton(eventKey, () =>
+    console.log('totally custom!')
+  );
+
+  return (
+    <Button type="button" variant="primary" onClick={decoratedOnClick}>
+      {children}
+    </Button>
+  );
+}
 
 const formatGroupLabel = (data) => (
   <Col className="d-flex justify-content-between">
@@ -39,16 +51,15 @@ const formatGroupLabel = (data) => (
   </Col>
 );
 
-const propertiesOp = [];
-const workersOp = [];
-
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
   const [workers, setWorkers] = useState([]);
   const [properties, setProperties] = useState([]);
+  const [propertiesData, setPropertiesData] = useState([]);
   const [reqRMs, setReqRMs] = useState([]);
+  const [reserves, setReserves] = useState([]);
   const [schema, setSchema] = useState(
     yup.object().shape({
       reqMaintenance: yup
@@ -132,7 +143,27 @@ export default function Index() {
     }
   }
 
+  async function getReservesData() {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/materials/reserve/actives');
+      setReserves(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
+    // Focus on inputRef
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+
     async function getUsersData() {
       try {
         setIsLoading(true);
@@ -148,6 +179,7 @@ export default function Index() {
       }
     }
     async function getPropertiesData() {
+      const propertiesOp = [];
       try {
         setIsLoading(true);
         const response = await axios.get('/properties/');
@@ -165,6 +197,8 @@ export default function Index() {
             response.data.filter((item) => item.municipio === value),
           ]);
         });
+        setProperties(propertiesOp);
+        setPropertiesData(response.data);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
         err.response?.data?.errors
@@ -175,6 +209,7 @@ export default function Index() {
     }
 
     async function getWorkersData() {
+      const workersOp = [];
       try {
         setIsLoading(true);
         const response = await axios.get('/workers/');
@@ -192,7 +227,7 @@ export default function Index() {
           ]);
         });
 
-        setWorkers(response.data);
+        setWorkers(workersOp);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -203,6 +238,7 @@ export default function Index() {
       }
     }
 
+    getReservesData();
     getMaterialsData();
     getUsersData();
     getPropertiesData();
@@ -210,9 +246,11 @@ export default function Index() {
   }, []);
 
   const handleStore = async (values, resetForm) => {
-    const formattedValues = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v != null)
-    ); // LIMPANDO CHAVES NULL E UNDEFINED
+    const formattedValues = {
+      ...Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      ),
+    }; // LIMPANDO CHAVES NULL E UNDEFINED
 
     Object.keys(formattedValues).forEach((key) => {
       if (formattedValues[key] === '') {
@@ -229,27 +267,21 @@ export default function Index() {
     formattedValues.buildingId = formattedValues.buildingId?.value;
     formattedValues.items.forEach((item) => {
       delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
-      item.value = item.value
-        .replace(/\./g, '')
-        .replace(/,/g, '.')
-        .replace(/[^0-9\.]+/g, '');
     });
 
-    delete Object.assign(formattedValues, {
+    Object.assign(formattedValues, {
       MaterialOutItems: formattedValues.items,
-    }).materialId;
+    });
 
     formattedValues.value = formattedValues.items.reduce((ac, item) => {
       ac += Number(item.quantity) * Number(item.value);
       return ac;
     }, 0);
 
-    console.log(formattedValues);
-
     try {
       setIsLoading(true);
 
-      // RECEBE, ATUALIZA O INVENTARIO E JA BLOQUEIA
+      // FAZ A SAÍDA, ATUALIZA O INVENTARIO E JA BLOQUEIA
       await axios.post(`/materials/out/`, formattedValues);
 
       setIsLoading(false);
@@ -285,12 +317,12 @@ export default function Index() {
   }
 
   const handleQuantityChange = (e, balance, handleChange) => {
-    if (e.target.value > balance) {
-      toast.error('A saída não pode superar o saldo do material');
-      e.target.value = balance;
-      handleChange(e);
-      return;
-    }
+    // if (Number(e.target.value) > Number(balance)) {
+    //   toast.error('A saída não pode superar o saldo do material');
+    //   e.target.value = Number(balance);
+    //   handleChange(e);
+    //   return;
+    // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (e.target.value < 0) {
       toast.error('A saída não pode ser negativa');
       e.target.value = 0;
@@ -318,6 +350,7 @@ export default function Index() {
     reqMaintenance: '',
     authorizedBy: '',
     workerId: '',
+    propertyId: '',
     place: '',
     buildingId: '',
     reqMaterial: '',
@@ -361,6 +394,7 @@ export default function Index() {
                   setFieldValue={setFieldValue}
                   data={reqInModal}
                 />
+                <br />
                 <Row>
                   <Form.Group
                     as={Col}
@@ -504,7 +538,7 @@ export default function Index() {
                           // id="workerId"
                           inputId="workerId"
                           // name="workerId"
-                          options={workersOp.map((value) => ({
+                          options={workers.map((value) => ({
                             label: value[0],
                             options: value[1].map((item) => ({
                               value: item.id,
@@ -534,7 +568,12 @@ export default function Index() {
                         <Form.Control
                           type="text"
                           value={values.place}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            setFieldValue(
+                              'place',
+                              e.target.value.toUpperCase()
+                            ); // UPPERCASE
+                          }}
                           isInvalid={touched.place && !!errors.place}
                           // isValid={touched.place && !errors.place}
                           onBlur={handleBlur}
@@ -555,13 +594,13 @@ export default function Index() {
                         <Form.Group
                           as={Col}
                           xs={12}
-                          controlId="propertyId"
+                          // controlId="propertyId"
                           className="pb-3"
                         >
                           <Form.Label>PROPRIEDADE:</Form.Label>
                           <Select
-                            id="propertyId"
-                            options={propertiesOp.map((value) => ({
+                            inputId="propertyId"
+                            options={properties.map((value) => ({
                               label: value[0],
                               options: value[1].map((item) => ({
                                 value: item.id,
@@ -575,19 +614,12 @@ export default function Index() {
                               setFieldValue('buildingId', '');
                               setFieldTouched('buildingId', false);
                             }}
-                            isInvalid={
-                              touched.propertyId && !!errors.propertyId
-                            }
-                            isValid={touched.propertyId && !errors.propertyId}
                             placeholder="Selecione a propriedade"
+                            onBlur={handleBlur}
                           />
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.buildingId}
-                          </Form.Control.Feedback>
+                          {touched.propertyId && !!errors.propertyId ? (
+                            <Badge bg="danger">{errors.propertyId}</Badge>
+                          ) : null}
                         </Form.Group>
                       </Row>
                     ) : null}
@@ -601,8 +633,8 @@ export default function Index() {
                         >
                           <Form.Label>PRÉDIO:</Form.Label>
                           <Select
-                            id="buildingId"
-                            options={properties
+                            inputId="buildingId"
+                            options={propertiesData
                               .filter((property) =>
                                 values.propertyId
                                   ? property.id === values.propertyId.value
@@ -616,19 +648,8 @@ export default function Index() {
                             onChange={(selected) => {
                               setFieldValue('buildingId', selected);
                             }}
-                            isInvalid={
-                              touched.buildingId && !!errors.buildingId
-                            }
-                            isValid={touched.buildingId && !errors.buildingId}
                             placeholder="Selecione o prédio"
                           />
-                          <Form.Control.Feedback
-                            tooltip
-                            type="invalid"
-                            style={{ position: 'static' }}
-                          >
-                            {errors.buildingId}
-                          </Form.Control.Feedback>
                         </Form.Group>
                       </Row>
                     ) : null}
@@ -641,7 +662,9 @@ export default function Index() {
                           rows={2}
                           type="text"
                           value={values.obs}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
+                          }}
                           isInvalid={touched.obs && !!errors.obs}
                           // isValid={touched.obs && !errors.obs}
                           placeholder="Observações gerais"
@@ -912,7 +935,13 @@ export default function Index() {
                         </Button>
                       </Col>
                       <Col xs="auto" className="text-center pt-2 pb-4">
-                        <Button variant="success" onClick={submitForm}>
+                        <Button
+                          variant="success"
+                          onClick={(e) => {
+                            submitForm(e);
+                            setFieldTouched('propertyId'); // tive que "tocar" a força, por algum motivo nao ta disparando o touch no propertyId quando submit
+                          }}
+                        >
                           Confirmar saída
                         </Button>
                       </Col>
@@ -923,6 +952,22 @@ export default function Index() {
             )}
           </Formik>
         </Row>
+      </Row>
+
+      <Row className="bg-light border rounded d-flex justify-content-center py-2 mt-4">
+        <Accordion defaultActiveKey="0">
+          <CustomToggle eventKey="1">Reservas</CustomToggle>
+
+          <Accordion.Collapse eventKey="1">
+            <Card.Body>
+              <ListReserves
+                reserves={reserves}
+                getReservesData={getReservesData}
+                userId={userId}
+              />
+            </Card.Body>
+          </Accordion.Collapse>
+        </Accordion>
       </Row>
     </>
   );

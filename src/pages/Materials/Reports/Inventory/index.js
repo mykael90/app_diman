@@ -96,11 +96,13 @@ function SelectColumnFilter({
   );
 }
 
-// Define a custom filter filter function!
+// Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
 function filterGreaterThan(rows, id, filterValue) {
+  console.log(filterValue);
   return rows.filter((row) => {
     const rowValue = Number(row.values[id]);
-    return rowValue >= filterValue;
+    if (filterValue === 1) return rowValue !== 0; // fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
+    return true;
   });
 }
 
@@ -207,8 +209,42 @@ export default function Index() {
             disableSortBy: true,
             Filter: SelectColumnFilter,
             filter: 'groupMaterial',
+            Cell: ({ value, row }) => (
+              <div
+                style={{
+                  color:
+                    row.original.freeInventory == 0
+                      ? 'tomato'
+                      : row.original.freeInventory < 0
+                      ? 'red'
+                      : 'inherit',
+                }}
+              >
+                {' '}
+                {value}
+              </div>
+            ),
           },
-          { Header: 'Denominação', accessor: 'name', disableFilters: true },
+          {
+            Header: 'Denominação',
+            accessor: 'name',
+            disableFilters: true,
+            Cell: ({ value, row }) => (
+              <div
+                style={{
+                  color:
+                    row.original.freeInventory == 0
+                      ? 'tomato'
+                      : row.original.freeInventory < 0
+                      ? 'red'
+                      : 'inherit',
+                }}
+              >
+                {' '}
+                {value}
+              </div>
+            ),
+          },
           {
             Header: 'Unidade',
             accessor: 'unit',
@@ -216,6 +252,21 @@ export default function Index() {
             disableSortBy: true,
             disableResizing: true,
             disableFilters: true,
+            Cell: ({ value, row }) => (
+              <div
+                style={{
+                  color:
+                    row.original.freeInventory == 0
+                      ? 'tomato'
+                      : row.original.freeInventory < 0
+                      ? 'red'
+                      : 'inherit',
+                }}
+              >
+                {' '}
+                {value}
+              </div>
+            ),
           },
           {
             Header: () => (
@@ -227,7 +278,22 @@ export default function Index() {
             disableSortBy: true,
             disableResizing: true,
             disableFilters: true,
-            Cell: ({ value }) => <div className="text-end"> {value}</div>,
+            Cell: ({ value, row }) => (
+              <div
+                className="text-end"
+                style={{
+                  color:
+                    row.original.freeInventory == 0
+                      ? 'tomato'
+                      : row.original.freeInventory < 0
+                      ? 'red'
+                      : 'inherit',
+                }}
+              >
+                {' '}
+                {value}
+              </div>
+            ),
           },
         ],
       },
@@ -250,7 +316,12 @@ export default function Index() {
             disableSortBy: true,
             isVisible: window.innerWidth > 576,
             Cell: ({ value, row }) => (
-              <div className="p-auto text-end">
+              <div
+                className="p-auto text-end"
+                style={{
+                  color: value == 0 ? 'tomato' : value < 0 ? 'red' : 'inherit',
+                }}
+              >
                 {value}{' '}
                 <OverlayTrigger
                   placement="right"
@@ -285,7 +356,17 @@ export default function Index() {
             disableSortBy: true,
             isVisible: window.innerWidth > 576,
             Cell: ({ value, row }) => (
-              <div className="p-auto text-end">
+              <div
+                className="p-auto text-end"
+                style={{
+                  color:
+                    row.original.freeInventory == 0
+                      ? 'tomato'
+                      : row.original.freeInventory < 0
+                      ? 'red'
+                      : 'inherit',
+                }}
+              >
                 {value}{' '}
                 <OverlayTrigger
                   placement="right"
@@ -320,7 +401,17 @@ export default function Index() {
             disableSortBy: true,
             isVisible: window.innerWidth > 576,
             Cell: ({ value, row }) => (
-              <div className="p-auto text-end">
+              <div
+                className="p-auto text-end"
+                style={{
+                  color:
+                    row.original.freeInventory == 0
+                      ? 'tomato'
+                      : row.original.freeInventory < 0
+                      ? 'red'
+                      : 'inherit',
+                }}
+              >
                 {value}{' '}
                 <OverlayTrigger
                   placement="right"
@@ -356,7 +447,17 @@ export default function Index() {
             filter: filterGreaterThan,
             Filter: FilterForTotal,
             Cell: ({ value, row }) => (
-              <div className="p-auto text-end">
+              <div
+                className="p-auto text-end"
+                style={{
+                  color:
+                    row.original.freeInventory == 0
+                      ? 'tomato'
+                      : row.original.freeInventory < 0
+                      ? 'red'
+                      : 'inherit',
+                }}
+              >
                 {value}{' '}
                 <OverlayTrigger
                   placement="right"

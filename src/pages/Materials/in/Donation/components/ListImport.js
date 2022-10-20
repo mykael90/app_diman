@@ -26,7 +26,7 @@ export default function Index(props) {
     //   e.target.value = Number(row.values.freeInventory);
     // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (Number(e.target.value < 0)) {
-      errors.push('A saída não pode ser negativa');
+      errors.push('A reserva não pode ser negativa');
       e.target.value = Number(0);
     }
 
@@ -52,7 +52,7 @@ export default function Index(props) {
         let exists = false;
 
         hiddenRows.every((value) => {
-          if (value.materialId === row.values.materialId) {
+          if (value.materialId === row.values.id) {
             exists = true;
             return false;
           }
@@ -60,25 +60,21 @@ export default function Index(props) {
         });
 
         if (exists) {
-          toast.error('Item já incluído na lista de saída');
+          toast.error('Item já incluído na lista de reserva');
           return;
         }
       }
 
       // adicionar na lista de saída
       push({
-        materialId: row.values.materialId,
+        materialId: row.values.id,
         name: row.values.name,
         unit: row.values.unit,
-        balancedQuantity: row.values.freeInventory,
-        value: row.values.value
-          .replace(/\./g, '')
-          .replace(/,/g, '.')
-          .replace(/[^0-9\.]+/g, ''),
+        value: 0.0,
         quantity: row.values.quantity ?? 0,
       });
 
-      const newHiddenRows = [...hiddenRows, row.values.materialId];
+      const newHiddenRows = [...hiddenRows, row.values.id];
       setHiddenRows(newHiddenRows);
     },
     [hiddenRows, push]
@@ -92,16 +88,15 @@ export default function Index(props) {
     });
   }
 
-// Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
-function filterGreaterThan(rows, id, filterValue) {
-  console.log(filterValue)
-  return rows.filter((row) => {
-    const rowValue = Number(row.values[id]);
-    if (filterValue===1) return rowValue !== 0; //fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
-    return true;
-  });
-}
-
+  // Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
+  function filterGreaterThan(rows, id, filterValue) {
+    console.log(filterValue);
+    return rows.filter((row) => {
+      const rowValue = Number(row.values[id]);
+      if (filterValue === 1) return rowValue !== 0; // fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
+      return true;
+    });
+  }
 
   const FilterForTotal = ({
     column: { filterValue, preFilteredRows, setFilter, id },
@@ -160,7 +155,7 @@ function filterGreaterThan(rows, id, filterValue) {
       },
       {
         Header: 'ID',
-        accessor: 'materialId',
+        accessor: 'id',
         width: 125,
         disableResizing: true,
         isVisible: window.innerWidth > 576,
@@ -176,31 +171,8 @@ function filterGreaterThan(rows, id, filterValue) {
         disableFilters: true,
       },
       {
-        Header: 'Preço',
-        accessor: 'value',
-        width: 100,
-        disableResizing: true,
-        disableFilters: true,
-        Cell: ({ value }) => <div className="text-end"> {value}</div>,
-      },
-      {
-        Header: () => (
-          // FORMAT HEADER
-          <div className="p-auto text-center">S Comum</div>
-        ),
-        accessor: 'freeInventory',
-        width: 100,
-        disableResizing: true,
-        isVisible: window.innerWidth > 576,
-        Cell: ({ value }) => <div className="p-auto text-end">{value}</div>,
-        disableSortBy: true,
-        filterValue: 1,
-        filter: filterGreaterThan,
-        Filter: FilterForTotal,
-      },
-      {
         // Make an expander cell
-        Header: 'Saída', // No header
+        Header: 'Reserva', // No header
         id: 'quantity', // It needs an ID
         width: 120,
         disableResizing: true,
@@ -208,7 +180,7 @@ function filterGreaterThan(rows, id, filterValue) {
         Cell: ({ row }) => (
           <Col className="d-flex">
             <Form.Control
-              id={`s_${row.values.materialId}`}
+              id={`s_${row.values.id}`}
               size="sm"
               type="number"
               onChange={(e) => handleQuantityChange(e, row)}

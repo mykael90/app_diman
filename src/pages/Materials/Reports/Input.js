@@ -123,11 +123,11 @@ export default function Index() {
         // eslint-disable-next-line react/destructuring-assignment
         Cell: (props) => {
           const custom = String(props.value).replace(/([0-9]{2})/gm, '$1.');
-          return (
+          return props.value ? (
             <span title={props.row.original.costUnitNome}>
               {custom} {props.row.original.costUnitSigla}
             </span>
-          );
+          ) : null;
         },
       },
     ],
@@ -150,7 +150,7 @@ export default function Index() {
   const initialState = {
     sortBy: [
       {
-        id: 'req',
+        id: 'createdAt',
         desc: true,
       },
     ],

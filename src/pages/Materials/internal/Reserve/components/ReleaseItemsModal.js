@@ -12,12 +12,13 @@ import { toast } from 'react-toastify';
 import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
 import Select from 'react-select';
+import { forEach } from 'lodash';
 import axios from '../../../../../services/axios';
 import { primaryDarkColor, body2Color } from '../../../../../config/colors';
 import Loading from '../../../../../components/Loading';
 
 export default function SearchModal(props) {
-  const { show, handleCancelModal, handleClose, data } = props;
+  const { show, handleCancelModal, handleClose, data, setFieldValue } = props;
   const userId = useSelector((state) => state.auth.user.id);
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,15 +71,13 @@ export default function SearchModal(props) {
   // i1 = item 1
   // i2 = item 2
   // Colocando nome e unidade no vetor balanceItems
-  data.MaterialInItems?.forEach((i1) => {
-    balanceItems?.forEach((i2) => {
+  RestrictItems.forEach((i1) => {
+    balanceItems.forEach((i2) => {
       if (i1.materialId === i2.materialId) {
         i2.name = i1.name;
         i2.unit = i1.unit;
         i2.specification = i1.specification;
         i2.value = i1.value;
-        i2.balancedQuantity = i1.quantity - i2.balancedQuantity;
-        i2.quantity = i1.quantity - i2.quantity;
       }
     });
   });
@@ -98,25 +97,39 @@ export default function SearchModal(props) {
 
     formattedValues.userId = userId;
     formattedValues.requiredBy = formattedValues.requiredBy?.value;
+
     formattedValues.items.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      Object.assign(item, { MaterialId: item.materialId }); // rename key
       item.value = item.value
         .replace(/\./g, '')
         .replace(/,/g, '.')
         .replace(/[^0-9\.]+/g, '');
     });
 
+    setFieldValue(
+      'MaterialReserveItems',
+      values.items // formatar o numero da requisicao
+    ); // importando valores para tabela de saída e liberando
+
+    setFieldValue(
+      'reqMaterial',
+      {
+        value: values.reqMaterial,
+        label: values.reqMaterial,
+      } // formatar o numero da requisicao
+    );
+
     try {
       setIsLoading(true);
 
       // LIBERAÇÃO DO SALDO BLOQUEADO
-      await axios.post(`/materials/restrict/`, formattedValues);
+      await axios.post(`/materials/release/`, formattedValues);
 
       setIsLoading(false);
       resetForm();
       handleClose();
 
-      toast.success(`Materiais restringidos com sucesso`);
+      toast.success(`Materiais liberados com sucesso`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -147,12 +160,12 @@ export default function SearchModal(props) {
   }, []);
 
   const handleQuantityChange = (e, balance, handleChange) => {
-    if (Number(e.target.value) > Number(balance)) {
-      toast.error('A restrição não pode superar o saldo liberado do material');
-      e.target.value = Number(balance);
-      handleChange(e);
-      return;
-    }
+    // if (Number(e.target.value) > Number(balance)) {
+    //   toast.error('A liberação não pode superar o saldo bloqueado do material');
+    //   e.target.value = balance;
+    //   handleChange(e);
+    //   return;
+    // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (e.target.value < 0) {
       toast.error('A saída não pode ser negativa');
       e.target.value = 0;
@@ -201,7 +214,9 @@ export default function SearchModal(props) {
               className="px-0 mx-0 py-2 text-center"
               style={{ background: primaryDarkColor, color: 'white' }}
             >
-              <span className="fs-5">COLOCAR MATERIAL PARA SALDO RESTRITO</span>
+              <span className="fs-5">
+                LIBERAR MATERIAL PARA SALDO COMUM E IMPORTAR PARA SAÍDA
+              </span>
             </Row>
             <Row className="px-0 pt-2">
               <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
@@ -416,7 +431,7 @@ export default function SearchModal(props) {
                                       {' '}
                                       {index === 0 ? (
                                         <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
-                                          LIBERADO
+                                          RESTRITO
                                         </Form.Label>
                                       ) : null}
                                       <Form.Control
@@ -442,7 +457,7 @@ export default function SearchModal(props) {
                                     >
                                       {index === 0 ? (
                                         <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
-                                          RESTRINGIR
+                                          LIBERAR
                                         </Form.Label>
                                       ) : null}
                                       <Form.Control
@@ -505,7 +520,7 @@ export default function SearchModal(props) {
                       <Col xs="auto">
                         {values.items.length === 0 ? (
                           <Badge bg="danger">
-                            Não há materiais liberados para restringir.
+                            Não há materiais bloqueados para liberar.
                           </Badge>
                         ) : null}
 
@@ -534,7 +549,7 @@ export default function SearchModal(props) {
                       </Col>
                       <Col xs="auto" className="text-center pt-2 pb-4">
                         <Button variant="success" onClick={submitForm}>
-                          Restringir
+                          Liberar/Importar
                         </Button>
                       </Col>
                     </Row>

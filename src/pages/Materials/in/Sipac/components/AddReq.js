@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { Button, Row, Col, Form, Badge } from 'react-bootstrap';
 
@@ -9,6 +9,13 @@ import { Formik } from 'formik'; // FormValidation
 
 export default function AddReq({ submitReq, handleClear }) {
   const inputRef = useRef();
+
+  useEffect(() => {
+    // Focus on inputRef
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const schema = yup.object().shape({
     newReq: yup

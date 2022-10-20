@@ -75,7 +75,7 @@ export default function Index() {
       },
       {
         Header: 'Autorizado por:',
-        accessor: 'authorizedBy',
+        accessor: 'authorizerUsername',
         width: 150,
         disableResizing: true,
         Cell: (props) => {
@@ -94,8 +94,14 @@ export default function Index() {
       },
       {
         Header: 'Retirado por:',
-        accessor: 'workerId',
-        width: 150,
+        accessor: 'removedBy',
+        width: 200,
+        disableResizing: true,
+      },
+      {
+        Header: 'Expedido por:',
+        accessor: 'userUsername',
+        width: 200,
         disableResizing: true,
         Cell: (props) => {
           const custom = String(props.value).replace(
@@ -106,18 +112,8 @@ export default function Index() {
         },
       },
       {
-        Header: 'Destino',
-        accessor: 'buildingId',
-        isVisible: window.innerWidth > 576,
-        // eslint-disable-next-line react/destructuring-assignment
-        Cell: (props) => {
-          const custom = String(props.value).replace(/([0-9]{2})/gm, '$1.');
-          return (
-            <span title={props.row.original.costUnitNome}>
-              {custom} {props.row.original.costUnitSigla}
-            </span>
-          );
-        },
+        Header: 'Local',
+        accessor: 'place',
       },
     ],
     []
@@ -139,7 +135,7 @@ export default function Index() {
   const initialState = {
     sortBy: [
       {
-        id: 'req',
+        id: 'createdAt',
         desc: true,
       },
     ],

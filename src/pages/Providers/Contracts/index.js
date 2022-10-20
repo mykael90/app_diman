@@ -14,9 +14,9 @@ export default function index() {
               <Nav.Link href="#1">
                 <Link
                   className="text-decoration-none"
-                  to="/materials/internal/listreserves"
+                  to="/providers/contracts/list"
                 >
-                  Relação de Reservas
+                  Listagem
                 </Link>
               </Nav.Link>
             </Nav.Item>
@@ -24,19 +24,9 @@ export default function index() {
               <Nav.Link href="#2">
                 <Link
                   className="text-decoration-none"
-                  to="/materials/internal/reserve"
+                  to="/providers/contracts/add"
                 >
-                  Reservar
-                </Link>
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="#3">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/internal/restrict"
-                >
-                  Restringir/Liberar
+                  Adicionar
                 </Link>
               </Nav.Link>
             </Nav.Item>

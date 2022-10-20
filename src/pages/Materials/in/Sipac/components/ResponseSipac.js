@@ -116,7 +116,7 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
                         onClick={(e) => handleStore(e, index)}
                         variant="success"
                       >
-                        Receber
+                        Receber Restrito
                       </Button>
 
                       <Dropdown.Toggle

@@ -3,15 +3,23 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FaTrashAlt } from 'react-icons/fa';
-import { Button, Row, Col, Form, Badge, Modal } from 'react-bootstrap';
+import {
+  Button,
+  Row,
+  Col,
+  Form,
+  Badge,
+  Modal,
+  Dropdown,
+  ButtonGroup,
+} from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
-import Select from 'react-select';
 import axios from '../../../../../services/axios';
 import { primaryDarkColor, body2Color } from '../../../../../config/colors';
 import Loading from '../../../../../components/Loading';
@@ -19,71 +27,11 @@ import Loading from '../../../../../components/Loading';
 export default function SearchModal(props) {
   const { show, handleCancelModal, handleClose, data } = props;
   const userId = useSelector((state) => state.auth.user.id);
-  const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [receiveFree, setReceiveFree] = useState(false);
 
-  // CALCULANDO O SALDO DE MATERIAL RESTRITO QUE PODE SER LIBERADO
-  let RestrictItems = [];
-  let ReleaseItems = [];
-
-  data.MaterialRestricts?.forEach((value) => {
-    RestrictItems = [...RestrictItems, ...value.MaterialRestrictItems];
-  });
-  data.MaterialReleases?.forEach((value) => {
-    ReleaseItems = [...ReleaseItems, ...value.MaterialReleaseItems];
-  });
-
-  const RestrictItemsSum = Array.from(
-    RestrictItems.reduce(
-      (m, { materialId, quantity }) =>
-        m.set(materialId, (m.get(materialId) || 0) + quantity),
-      new Map()
-    ),
-    ([materialId, quantity]) => ({ materialId, quantity })
-  );
-
-  const ReleaseItemsSum = Array.from(
-    ReleaseItems.reduce(
-      (m, { materialId, quantity }) =>
-        m.set(materialId, (m.get(materialId) || 0) + quantity),
-      new Map()
-    ),
-    ([materialId, quantity]) => ({ materialId, quantity })
-  );
-  // ires = item restricted
-  // irel = item released
-  const balanceItems = RestrictItemsSum.map((ires) => {
-    const balancedQuantity =
-      ires.quantity -
-      ReleaseItemsSum.reduce((ac, irel) => {
-        if (irel.materialId === ires.materialId) {
-          ac += irel.quantity;
-        }
-        return ac;
-      }, 0);
-    return {
-      materialId: ires.materialId,
-      balancedQuantity,
-      quantity: balancedQuantity,
-    };
-  });
-  // i1 = item 1
-  // i2 = item 2
-  // Colocando nome e unidade no vetor balanceItems
-  data.MaterialInItems?.forEach((i1) => {
-    balanceItems?.forEach((i2) => {
-      if (i1.materialId === i2.materialId) {
-        i2.name = i1.name;
-        i2.unit = i1.unit;
-        i2.specification = i1.specification;
-        i2.value = i1.value;
-        i2.balancedQuantity = i1.quantity - i2.balancedQuantity;
-        i2.quantity = i1.quantity - i2.quantity;
-      }
-    });
-  });
-
-  const handleStore = async (values, resetForm) => {
+  const handleStore = async (values, resetForm, free) => {
+    console.log(free);
     const formattedValues = {
       ...Object.fromEntries(
         Object.entries(values).filter(([_, v]) => v != null)
@@ -97,26 +45,46 @@ export default function SearchModal(props) {
     }); // LIMPANDO CHAVES `EMPTY STRINGS`
 
     formattedValues.userId = userId;
-    formattedValues.requiredBy = formattedValues.requiredBy?.value;
-    formattedValues.items.forEach((item) => {
+    formattedValues.MaterialInItems.forEach((item) => {
       delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
       item.value = item.value
         .replace(/\./g, '')
         .replace(/,/g, '.')
         .replace(/[^0-9\.]+/g, '');
     });
+    formattedValues.value = formattedValues.MaterialInItems.reduce(
+      (ac, item) => {
+        ac += Number(item.quantity) * Number(item.value);
+        return ac;
+      },
+      0
+    );
 
     try {
       setIsLoading(true);
 
-      // LIBERAÇÃO DO SALDO BLOQUEADO
-      await axios.post(`/materials/restrict/`, formattedValues);
+      const response = await axios.post(
+        `/materials/in/general`,
+        formattedValues
+      );
+
+      // DEIXA PARA USO COMUM DO ALMOXARIFADO SE FOR SINALIZADO PELO USUARIO NO RECEBIMENTO
+      if (free) {
+        const freeData = await response.data;
+        delete Object.assign(freeData, { items: freeData.MaterialInItems })
+          .MaterialInItems; // rename key
+        delete Object.assign(freeData, { materialInId: freeData.id }).id; // rename key
+        delete freeData.requiredBy;
+
+        await axios.post(`/materials/release/`, freeData);
+      }
 
       setIsLoading(false);
+      setReceiveFree(false);
       resetForm();
       handleClose();
 
-      toast.success(`Materiais restringidos com sucesso`);
+      toast.success(`Materiais retornados com sucesso`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -124,37 +92,21 @@ export default function SearchModal(props) {
         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
 
       setIsLoading(false);
+      setReceiveFree(false);
     }
   };
 
-  useEffect(() => {
-    async function getUsersData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/users/');
-        setUsers(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
-
-    getUsersData();
-  }, []);
-
   const handleQuantityChange = (e, balance, handleChange) => {
     if (Number(e.target.value) > Number(balance)) {
-      toast.error('A restrição não pode superar o saldo liberado do material');
+      toast.error(
+        'O retorno não pode superar a quantidade de saída do material'
+      );
       e.target.value = Number(balance);
       handleChange(e);
       return;
     }
-    if (e.target.value < 0) {
-      toast.error('A saída não pode ser negativa');
+    if (Number(e.target.value) < 0) {
+      toast.error('A entrada não pode ser negativa');
       e.target.value = 0;
       handleChange(e);
       return;
@@ -165,7 +117,7 @@ export default function SearchModal(props) {
   const initialSchema = yup.object().shape({
     obs: yup.string(),
     // eslint-disable-next-line react/forbid-prop-types
-    items: yup
+    MaterialInItems: yup
       .array()
       .of(
         yup.object().shape({
@@ -176,13 +128,24 @@ export default function SearchModal(props) {
       .min(1, 'A lista de materiais não pode ser vazia'),
   });
 
+  const dataItems = data.MaterialOutItems?.map((item) => ({
+    materialId: item.materialId,
+    name: item.name,
+    specification: item.specification,
+    unit: item.unit,
+    outQuantity: item.quantity,
+    quantity: 0,
+    value: item.value,
+  }));
+
   const initialValues = {
-    materialInId: data.id,
-    reqMaterial: data.req,
     reqMaintenance: data.reqMaintenance,
-    requiredBy: '',
+    req: data.reqMaterial,
+    requiredBy: data.authorizerUsername,
+    returnId: data.id,
+    materialIntypeId: 3,
     obs: '',
-    items: balanceItems.filter((item) => item.quantity > 0) ?? '',
+    MaterialInItems: dataItems,
   };
 
   return (
@@ -201,14 +164,14 @@ export default function SearchModal(props) {
               className="px-0 mx-0 py-2 text-center"
               style={{ background: primaryDarkColor, color: 'white' }}
             >
-              <span className="fs-5">COLOCAR MATERIAL PARA SALDO RESTRITO</span>
+              <span className="fs-5">RETORNO DE MATERIAIS</span>
             </Row>
             <Row className="px-0 pt-2">
               <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
                 initialValues={initialValues}
                 validationSchema={initialSchema}
                 onSubmit={(values, { resetForm }) => {
-                  handleStore(values, resetForm);
+                  handleStore(values, resetForm, receiveFree);
                 }}
               >
                 {({
@@ -242,7 +205,6 @@ export default function SearchModal(props) {
                           <Badge bg="danger">{errors.reqMaintenance}</Badge>
                         ) : null}
                       </Form.Group>
-
                       <Form.Group
                         as={Col}
                         xs={5}
@@ -253,33 +215,9 @@ export default function SearchModal(props) {
                         className="pb-3"
                       >
                         <Form.Label>RM:</Form.Label>
-                        <Form.Control
-                          type="tel"
-                          value={values.reqMaterial}
-                          readOnly
-                        />
-                        {touched.reqMaterial && !!errors.reqMaterial ? (
-                          <Badge bg="danger">{errors.reqMaterial}</Badge>
-                        ) : null}
-                      </Form.Group>
-
-                      <Form.Group as={Col} className="pb-3">
-                        <Form.Label>REQUERIDO POR:</Form.Label>
-                        <Select
-                          inputId="requiredBy"
-                          options={users.map((user) => ({
-                            value: user.id,
-                            label: user.name,
-                          }))}
-                          value={values.requiredBy}
-                          onChange={(selected) => {
-                            setFieldValue('requiredBy', selected);
-                          }}
-                          placeholder="Selecione o responsável"
-                          onBlur={handleBlur}
-                        />
-                        {touched.requiredBy && !!errors.requiredBy ? (
-                          <Badge bg="danger">{errors.requiredBy}</Badge>
+                        <Form.Control type="tel" value={values.req} readOnly />
+                        {touched.req && !!errors.req ? (
+                          <Badge bg="danger">{errors.req}</Badge>
                         ) : null}
                       </Form.Group>
                     </Row>
@@ -314,13 +252,13 @@ export default function SearchModal(props) {
                     >
                       <span className="fs-6">LISTA DE MATERIAIS</span>
                     </Row>
-                    <FieldArray name="items">
+                    <FieldArray name="MaterialInItems">
                       {(fieldArrayProps) => {
                         const { remove } = fieldArrayProps;
                         return (
                           <Row style={{ background: body2Color }}>
-                            {values.items.length > 0 &&
-                              values.items.map((item, index) => (
+                            {values.MaterialInItems.length > 0 &&
+                              values.MaterialInItems.map((item, index) => (
                                 <>
                                   <Row className="d-block d-sm-none">
                                     <Col className="fw-bold">
@@ -337,7 +275,7 @@ export default function SearchModal(props) {
                                       sm={4}
                                       md={3}
                                       lg={2}
-                                      controlId={`items[${index}].materialId`}
+                                      controlId={`MaterialInItems[${index}].materialId`}
                                       className="border-0 m-0 p-0"
                                     >
                                       {index === 0 ? (
@@ -359,7 +297,7 @@ export default function SearchModal(props) {
                                     </Form.Group>
                                     <Form.Group
                                       as={Col}
-                                      controlId={`items[${index}].name`}
+                                      controlId={`MaterialInItems[${index}].name`}
                                       className="border-0 m-0 p-0"
                                     >
                                       {index === 0 ? (
@@ -384,7 +322,7 @@ export default function SearchModal(props) {
                                       xs={12}
                                       sm={4}
                                       md={1}
-                                      controlId={`items[${index}].unit`}
+                                      controlId={`MaterialInItems[${index}].unit`}
                                       className="border-0 m-0 p-0"
                                     >
                                       {index === 0 ? (
@@ -409,21 +347,21 @@ export default function SearchModal(props) {
                                       xs={10}
                                       sm={4}
                                       md="auto"
-                                      controlId={`items[${index}].balancedQuantity`}
+                                      controlId={`MaterialInItems[${index}].outQuantity`}
                                       className="border-0 m-0 p-0"
                                       style={{ width: '80px' }}
                                     >
                                       {' '}
                                       {index === 0 ? (
                                         <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
-                                          LIBERADO
+                                          SAÍDA
                                         </Form.Label>
                                       ) : null}
                                       <Form.Control
                                         type="number"
                                         plaintext
                                         readOnly
-                                        value={item.balancedQuantity}
+                                        value={item.outQuantity}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         placeholder="SALDO"
@@ -436,13 +374,13 @@ export default function SearchModal(props) {
                                       xs={10}
                                       sm={4}
                                       md="auto"
-                                      controlId={`items[${index}].quantity`}
+                                      controlId={`MaterialInItems[${index}].quantity`}
                                       className="border-0 m-0 p-0"
                                       style={{ width: '80px' }}
                                     >
                                       {index === 0 ? (
                                         <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
-                                          RESTRINGIR
+                                          RETORNO
                                         </Form.Label>
                                       ) : null}
                                       <Form.Control
@@ -452,7 +390,7 @@ export default function SearchModal(props) {
                                         onChange={(e) =>
                                           handleQuantityChange(
                                             e,
-                                            item.balancedQuantity,
+                                            item.outQuantity,
                                             handleChange
                                           )
                                         }
@@ -503,15 +441,10 @@ export default function SearchModal(props) {
                     </FieldArray>
                     <Row className="pt-4">
                       <Col xs="auto">
-                        {values.items.length === 0 ? (
-                          <Badge bg="danger">
-                            Não há materiais liberados para restringir.
-                          </Badge>
-                        ) : null}
-
-                        {typeof errors.items === 'string' ? (
-                          <Badge bg="danger">{errors.items}</Badge>
-                        ) : touched.items && errors.items ? (
+                        {typeof errors.MaterialInItems === 'string' ? (
+                          <Badge bg="danger">{errors.MaterialInItems}</Badge>
+                        ) : touched.MaterialInItems &&
+                          errors.MaterialInItems ? (
                           <Badge bg="danger">
                             A quantidade de item não pode ser 0.
                           </Badge>
@@ -533,9 +466,31 @@ export default function SearchModal(props) {
                         </Button>
                       </Col>
                       <Col xs="auto" className="text-center pt-2 pb-4">
-                        <Button variant="success" onClick={submitForm}>
-                          Restringir
-                        </Button>
+                        <Dropdown as={ButtonGroup}>
+                          <Button
+                            onClick={(e) => submitForm(e)}
+                            variant="success"
+                          >
+                            Retornar Restrito
+                          </Button>
+
+                          <Dropdown.Toggle
+                            split
+                            variant="success"
+                            id="dropdown-split-basic"
+                          />
+
+                          <Dropdown.Menu>
+                            <Dropdown.Item
+                              onClick={(e) => {
+                                setReceiveFree(true);
+                                submitForm(e);
+                              }}
+                            >
+                              Repor Estoque
+                            </Dropdown.Item>
+                          </Dropdown.Menu>
+                        </Dropdown>
                       </Col>
                     </Row>
                   </Form>
