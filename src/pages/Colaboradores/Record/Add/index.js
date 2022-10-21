@@ -11,11 +11,12 @@ import { useSelector } from 'react-redux';
 
 import * as yup from 'yup'; // RulesValidation
 import { Formik, Field, ErrorMessage, FieldArray } from 'formik'; // FormValidation
+import { propTypes } from 'react-bootstrap/esm/Image';
+import { check } from 'prettier';
+import { kebabCase, set } from 'lodash';
 import axios from '../../../../services/axios';
 import { primaryDarkColor } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
-import { propTypes } from 'react-bootstrap/esm/Image';
-import { check } from 'prettier';
 
 export default function index({ submitReq }) {
   const [reqs, setReqs] = useState('');
@@ -35,11 +36,31 @@ export default function index({ submitReq }) {
       .required('Campo obrigatório'),
   });
 
-  async function handleStore(values, resetForm) {
+  function removeEmptyString(object) {
+    Object.entries(object).forEach(([key, value]) => {
+      if (value && typeof value === 'object') removeEmptyString(value);
+      if (
+        (value && typeof value === 'object' && !Object.keys(value).length) ||
+        value === null ||
+        value === undefined ||
+        value.length === 0
+      ) {
+        if (Array.isArray(object)) object.splice(key, 1);
+        else delete object[key];
+      }
+    });
+    return object;
+  }
+
+  const handleStore = async (values, resetForm) => {
     console.log(values);
+    const formattedValues = removeEmptyString(values);
     try {
-      const responseContact = await axios.post(`/workers/`, values);
-      //resetForm();
+      // setIsLoading(true);
+      await axios.post(`/workers/`, formattedValues);
+      // setIsLoading(false);
+      // resetForm();
+      toast.success('Colaborador Cadastrado Com Sucesso!');
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -47,10 +68,6 @@ export default function index({ submitReq }) {
         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
       setIsLoading(false);
     }
-  }
-
-  const contactPadrao = () => {
-    const [padrao, setpadrao] = useState(false);
   };
 
   const initialValues = {
@@ -69,7 +86,7 @@ export default function index({ submitReq }) {
         contacttypeId: '',
         contact: '',
         obs: '',
-        default: false,
+        default: '',
       },
     ],
     Addresses: {
@@ -130,7 +147,6 @@ export default function index({ submitReq }) {
             }}
           >
             {({
-              setFieldValue,
               submitForm,
               resetForm,
               handleChange,
@@ -140,7 +156,6 @@ export default function index({ submitReq }) {
               errors,
             }) => (
               <Form noValidate autoComplete="off">
-                {JSON.stringify(errors)}
                 <Row>
                   <Form.Group
                     as={Col}
@@ -342,12 +357,15 @@ export default function index({ submitReq }) {
                                 >
                                   <Form.Check
                                     type="switch"
-                                    onClick={() => {
-                                      contato.default == false
-                                        ? (contato.default = true)
-                                        : (contato.default = false);
-                                    }}
+                                    // onClick={() => {
+                                    //   contato.default == ''
+                                    //     ? (contato.default = true)
+                                    //     : (contato.default = false);
+                                    // }}
                                     label="Padrão"
+                                    onChange={handleChange}
+                                    onBlur={handleChange}
+                                    value={contato.default}
                                   />
                                 </Form.Group>
                                 {console.log(contato.default)}
