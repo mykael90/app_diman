@@ -63,11 +63,13 @@ export default function Index() {
     getData();
   }, []);
 
-  const handleUpdateUserReplacement = async (values) => {
+  const handleUpdateUserReplacement = async (e, values) => {
+    e.preventDefault();
     const { id } = values;
     const updateSeparation = {
       userReplacementId: userId,
     };
+    const btn = e.currentTarget;
 
     try {
       setIsLoading(true);
@@ -76,7 +78,9 @@ export default function Index() {
       await axios.put(`/materials/out/${id}`, updateSeparation);
 
       setIsLoading(false);
-      getData();
+      btn.class += 'd-none';
+      btn.remove();
+      // getData();
 
       toast.success(`Reposição informada com sucesso`);
     } catch (err) {
@@ -211,8 +215,8 @@ export default function Index() {
                     size="sm"
                     variant="outline-success"
                     className="border-0 m-0"
-                    onClick={() => {
-                      handleUpdateUserReplacement(row.original);
+                    onClick={(e) => {
+                      handleUpdateUserReplacement(e, row.original);
                     }}
                   >
                     <FaRedoAlt />
