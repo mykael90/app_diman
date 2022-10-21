@@ -3,9 +3,28 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import {
+  FaCommentDots,
+  FaInfo,
+  FaDirections,
+  FaPencilAlt,
+  FaRedoAlt,
+  FaSyncAlt,
+  FaRegEdit,
+  FaEdit,
+} from 'react-icons/fa';
 
-import { Container, Row, Card } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Card,
+  Col,
+  Button,
+  OverlayTrigger,
+  Tooltip,
+} from 'react-bootstrap';
 
 import axios from '../../../services/axios';
 import Loading from '../../../components/Loading';
@@ -14,28 +33,61 @@ import Loading from '../../../components/Loading';
 import TableGfilterNestedrow from '../components/TableGfilterNestedRow';
 import TableNestedrow from '../components/TableNestedRow';
 
+const renderTooltip = (props, message) => (
+  <Tooltip id="button-tooltip" {...props}>
+    {message}
+  </Tooltip>
+);
+
 export default function Index() {
+  const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
   const [reqs, setReqs] = useState([]);
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/out/');
-        setReqs(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
+  async function getData() {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/materials/out/');
+      setReqs(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
     }
+  }
 
+  useEffect(() => {
     getData();
   }, []);
+
+  const handleUpdateUserReplacement = async (values) => {
+    const { id } = values;
+    const updateSeparation = {
+      userReplacementId: userId,
+    };
+
+    try {
+      setIsLoading(true);
+
+      // FAZ A ATUALIZAÇÃO DA SEPARAÇÃO
+      await axios.put(`/materials/out/${id}`, updateSeparation);
+
+      setIsLoading(false);
+      getData();
+
+      toast.success(`Reposição informada com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
 
   const columns = React.useMemo(
     () => [
@@ -63,7 +115,7 @@ export default function Index() {
       {
         Header: 'Tipo',
         accessor: 'type',
-        width: 120,
+        width: 80,
         disableResizing: true,
       },
       {
@@ -103,8 +155,8 @@ export default function Index() {
         accessor: 'userUsername',
         width: 200,
         disableResizing: true,
-        Cell: (props) => {
-          const custom = String(props.value).replace(
+        Cell: ({ value }) => {
+          const custom = String(value).replace(
             /(^[a-z]*)\.([a-z]*).*/gm,
             '$1.$2'
           ); // deixar só os dois primeiros nomes
@@ -114,6 +166,80 @@ export default function Index() {
       {
         Header: 'Local',
         accessor: 'place',
+      },
+      {
+        Header: 'Ações',
+        id: 'actions',
+        width: 110,
+        disableResizing: true,
+        Cell: ({ value, row }) => (
+          <Row className="d-flex flex-nowrap">
+            <Col xs="auto" className="text-center m-0 p-0 px-1 ps-2">
+              {row.original.obs ? (
+                <>
+                  {' '}
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) => renderTooltip(props, row.original.obs)}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0"
+                    >
+                      <FaInfo />
+                    </Button>
+                  </OverlayTrigger>
+                </>
+              ) : null}
+            </Col>
+            <Col xs="auto" className="text-center m-0 p-0 px-1">
+              {row.original.userReplacementId ||
+              row.original.reqMaterial ? null : (
+                <OverlayTrigger
+                  placement="left"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={(props) =>
+                    renderTooltip(
+                      props,
+                      'Confirmar RM de reposição criada no SIPAC'
+                    )
+                  }
+                >
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    className="border-0 m-0"
+                    onClick={() => {
+                      handleUpdateUserReplacement(row.original);
+                    }}
+                  >
+                    <FaRedoAlt />
+                  </Button>
+                </OverlayTrigger>
+              )}
+            </Col>
+            <Col xs="auto" className="text-center m-0 p-0 px-1">
+              <OverlayTrigger
+                placement="left"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Editar saída')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  className="border-0 m-0"
+                  onClick={() => {
+                    alert('Funcionalidade em implantação...');
+                  }}
+                >
+                  <FaPencilAlt />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+          </Row>
+        ),
       },
     ],
     []

@@ -4,8 +4,26 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import {
+  FaCommentDots,
+  FaInfo,
+  FaDirections,
+  FaPencilAlt,
+  FaRedoAlt,
+  FaSyncAlt,
+  FaRegEdit,
+  FaEdit,
+} from 'react-icons/fa';
 
-import { Container, Row, Card } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Card,
+  Col,
+  Button,
+  OverlayTrigger,
+  Tooltip,
+} from 'react-bootstrap';
 
 import axios from '../../../services/axios';
 import Loading from '../../../components/Loading';
@@ -13,6 +31,12 @@ import Loading from '../../../components/Loading';
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../components/TableGfilterNestedRow';
 import TableNestedrow from '../components/TableNestedRow';
+
+const renderTooltip = (props, message) => (
+  <Tooltip id="button-tooltip" {...props}>
+    {message}
+  </Tooltip>
+);
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
@@ -129,6 +153,54 @@ export default function Index() {
             </span>
           ) : null;
         },
+      },
+      {
+        Header: 'Ações',
+        id: 'actions',
+        width: 70,
+        disableResizing: true,
+        Cell: ({ value, row }) => (
+          <Row className="d-flex flex-nowrap">
+            <Col xs="auto" className="text-center m-0 p-0 px-1 ps-2">
+              {row.original.obs ? (
+                <>
+                  {' '}
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) => renderTooltip(props, row.original.obs)}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0"
+                    >
+                      <FaInfo />
+                    </Button>
+                  </OverlayTrigger>
+                </>
+              ) : null}
+            </Col>
+            <Col xs="auto" className="text-center m-0 p-0 px-1">
+              <OverlayTrigger
+                placement="left"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Editar entrada')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  className="border-0 m-0"
+                  onClick={() => {
+                    alert('Funcionalidade em implantação...');
+                  }}
+                >
+                  <FaPencilAlt />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+          </Row>
+        ),
       },
     ],
     []
