@@ -157,7 +157,7 @@ export default function Index() {
       {
         Header: 'Expedido por:',
         accessor: 'userUsername',
-        width: 200,
+        width: 150,
         disableResizing: true,
         Cell: ({ value }) => {
           const custom = String(value).replace(
