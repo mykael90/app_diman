@@ -1,6 +1,7 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
-import { get } from 'lodash';
 import { toast } from 'react-toastify';
 
 import { Container, Row, Card } from 'react-bootstrap';
@@ -11,30 +12,28 @@ import Loading from '../../../../components/Loading';
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../../../Materials/components/TableGfilterNestedRow';
 
-import workers from '../../../../assets/JSON/workers.json';
-
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
-  const [materials, setMaterials] = useState([]);
+  const [workers, setWorkers] = useState([]);
 
-  // useEffect(() => {
-  //   async function getData() {
-  //     try {
-  //       setIsLoading(true);
-  //       const response = await axios.get('/materials/');
-  //       setMaterials(response.data);
-  //       setIsLoading(false);
-  //     } catch (err) {
-  //       // eslint-disable-next-line no-unused-expressions
-  //       err.response?.data?.errors
-  //         ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-  //         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-  //       setIsLoading(false);
-  //     }
-  //   }
+  useEffect(() => {
+    async function getWorkers() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`/workers`);
+        setWorkers(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
 
-  //   getData();
-  // }, []);
+    getWorkers();
+  }, []);
 
   const columns = React.useMemo(
     () => [
@@ -47,24 +46,23 @@ export default function Index() {
     []
   );
 
-  var employees = {
+  const employees = {
     colab: [],
   };
 
-  for (var i in workers.workers) {
-    var item = workers.workers[i];
-    var contato = '';
-
-    item.WorkersContact.map(function (item) {
-      if (item.default && item.contacttypeId == 1) {
+  for (const i in workers) {
+    const worker = workers[i];
+    let contato = '';
+    worker.WorkerContacts.map((item) => {
+      if (item.default && item.contacttypeId === 2) {
         contato = item.contact;
       }
     });
     employees.colab.push({
-      name: item.name,
-      cpf: item.cpf,
-      birthdate: item.birthdate,
-      email: item.email,
+      name: worker.name,
+      cpf: worker.cpf,
+      birthdate: worker.birthdate,
+      email: worker.email,
       contact: contato,
     });
   }
