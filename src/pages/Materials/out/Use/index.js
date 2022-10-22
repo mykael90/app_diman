@@ -65,8 +65,14 @@ export default function Index() {
       reqMaintenance: yup
         .string()
         .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
-      workerId: yup.object().required('Requerido'),
       authorizedBy: yup.object().required('Requerido'),
+      isAuthorizer: yup.boolean(),
+      workerId: yup.object().when(['isAuthorizer'], {
+        is: false,
+        then: (validate) => validate.required('Requerido'),
+        otherwise: (validate) => validate.notRequired(),
+      }),
+
       obs: yup.string(),
       // eslint-disable-next-line react/forbid-prop-types
       items: yup
@@ -111,8 +117,14 @@ export default function Index() {
         reqMaintenance: yup
           .string()
           .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
-        workerId: yup.object().required('Requerido'),
         authorizedBy: yup.object().required('Requerido'),
+        isAuthorizer: yup.boolean(),
+        workerId: yup.object().when(['isAuthorizer'], {
+          is: false,
+          then: (validate) => validate.required('Requerido'),
+          otherwise: (validate) => validate.notRequired(),
+        }),
+
         obs: yup.string(),
         // eslint-disable-next-line react/forbid-prop-types
         items: yup
@@ -349,6 +361,7 @@ export default function Index() {
   const initialValues = {
     reqMaintenance: '',
     authorizedBy: '',
+    isAuthorizer: false,
     workerId: '',
     propertyId: '',
     place: '',
@@ -395,6 +408,7 @@ export default function Index() {
                   data={reqInModal}
                 />
                 <br />
+                {JSON.stringify(values)}
                 <Row>
                   <Form.Group
                     as={Col}
@@ -533,7 +547,21 @@ export default function Index() {
                         // controlId="workerId"
                         className="pb-3"
                       >
-                        <Form.Label>RETIRADO POR:</Form.Label>
+                        <Col className="d-flex align-items-stretch">
+                          <Form.Label>RETIRADO POR: (Autorizador </Form.Label>
+                          <Form.Check
+                            name="isAuthorizer"
+                            type="checkbox"
+                            id="isAuthorizer"
+                            label=")"
+                            onChange={(e) => {
+                              handleChange(e);
+                              setFieldValue('workerId', '');
+                            }}
+                            className="mx-2 pb-2"
+                            checked={values.isAuthorizer}
+                          />
+                        </Col>
                         <Select
                           // id="workerId"
                           inputId="workerId"
@@ -552,6 +580,7 @@ export default function Index() {
                           }}
                           placeholder="Selecione o profissional"
                           onBlur={handleBlur}
+                          isDisabled={values.isAuthorizer}
                         />
                         {touched.workerId && !!errors.workerId ? (
                           <Badge bg="danger">{errors.workerId}</Badge>
