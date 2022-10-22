@@ -153,6 +153,9 @@ export default function Index() {
         accessor: 'removedBy',
         width: 200,
         disableResizing: true,
+        Cell: ({ value, row }) => (
+          <span>{value || row.original.authorizerUsername}</span>
+        ),
       },
       {
         Header: 'Expedido por:',

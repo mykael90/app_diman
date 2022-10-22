@@ -6,7 +6,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { FaShare, FaDolly, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaShare, FaDolly, FaCheck, FaTimes, FaInfo } from 'react-icons/fa';
 
 import {
   Container,
@@ -329,6 +329,26 @@ export default function Index({ reserves, getReservesData, userId }) {
         Cell: ({ value, row }) => (
           <Row>
             {' '}
+            <Col xs="auto" className="p-auto text-end">
+              {row.original.obs ? (
+                <>
+                  {' '}
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) => renderTooltip(props, row.original.obs)}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0"
+                    >
+                      <FaInfo />
+                    </Button>
+                  </OverlayTrigger>
+                </>
+              ) : null}
+            </Col>
             <Col className="p-auto text-end">
               {value}{' '}
               <OverlayTrigger
