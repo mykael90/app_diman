@@ -407,8 +407,6 @@ export default function Index() {
                   setFieldValue={setFieldValue}
                   data={reqInModal}
                 />
-                <br />
-                {JSON.stringify(values)}
                 <Row>
                   <Form.Group
                     as={Col}
