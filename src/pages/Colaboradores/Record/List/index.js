@@ -21,7 +21,6 @@ export default function Index() {
       try {
         setIsLoading(true);
         const response = await axios.get(`/workers/`);
-        console.log('RESPONSE: ', response.data);
 
         const employees = {
           colab: [],
@@ -45,7 +44,6 @@ export default function Index() {
         }
 
         const datasetFormated = [...employees.colab];
-        console.log('Formated: ', datasetFormated);
         setWorkersFormated(datasetFormated);
         setIsLoading(false);
       } catch (err) {
@@ -62,21 +60,21 @@ export default function Index() {
 
   const columns = React.useMemo(
     () => [
-      {
-        // Make an expander cell
-        Header: () => null, // No header
-        id: 'expander', // It needs an ID
-        width: 30,
-        disableResizing: true,
-        Cell: ({ row }) => (
-          // Use Cell to render an expander for each row.
-          // We can use the getToggleRowExpandedProps prop-getter
-          // to build the expander.
-          <span {...row.getToggleRowExpandedProps()}>
-            {row.isExpanded ? '▽' : '▷'}
-          </span>
-        ),
-      },
+      // {
+      //   // Make an expander cell
+      //   Header: () => null, // No header
+      //   id: 'expander', // It needs an ID
+      //   width: 30,
+      //   disableResizing: true,
+      //   Cell: ({ row }) => (
+      //     // Use Cell to render an expander for each row.
+      //     // We can use the getToggleRowExpandedProps prop-getter
+      //     // to build the expander.
+      //     <span {...row.getToggleRowExpandedProps()}>
+      //       {row.isExpanded ? '▽' : '▷'}
+      //     </span>
+      //   ),
+      // },
       { Header: 'Nome', accessor: 'name' },
       { Header: 'CPF', accessor: 'cpf' },
       { Header: 'Data de Nascimento', accessor: 'birthdate' },
