@@ -44,6 +44,16 @@ export default function index() {
               <Nav.Link href="#4">
                 <Link
                   className="text-decoration-none"
+                  to="/materials/reports/consumefrequency"
+                >
+                  Consumos
+                </Link>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="#5">
+                <Link
+                  className="text-decoration-none"
                   to="/materials/reports/maintenancebalanceoutput"
                 >
                   Balanço por Manutenção

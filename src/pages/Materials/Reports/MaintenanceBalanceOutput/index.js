@@ -4,9 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik'; // FormValidation
 import * as yup from 'yup'; // RulesValidation
-import Select from 'react-select';
 
-import { FaLock, FaLockOpen, FaSearch, FaChartLine } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 
 import {
   Container,
@@ -14,14 +13,9 @@ import {
   Row,
   Card,
   Button,
-  Dropdown,
-  OverlayTrigger,
-  Tooltip,
   Form,
   Badge,
 } from 'react-bootstrap';
-
-import TransactionsModal from './components/TransactionsModal';
 
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
@@ -33,8 +27,6 @@ import TableNestedrow from '../../components/TableNestedRow';
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [resultData, setResultData] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [materialIdModal, setMaterialIdModal] = useState('');
   const inputRef = useRef();
 
   const schema = yup.object().shape({
@@ -65,12 +57,6 @@ export default function Index() {
       inputRef.current.focus();
     }
   }, []);
-
-  const handleCloseModal = () => setShowModal(false);
-  const handleShowModal = (materialId) => {
-    setMaterialIdModal(materialId);
-    setShowModal(true);
-  };
 
   async function getData(values) {
     const formattedValues = { ...values };
@@ -324,12 +310,6 @@ export default function Index() {
       {' '}
       <Loading isLoading={isLoading} />
       <Container>
-        <TransactionsModal // modal p/ pesquisa de materiais
-          handleClose={handleCloseModal}
-          show={showModal}
-          materialId={materialIdModal}
-        />
-
         <Row className="text-center py-3">
           <Card.Title>Balanço de Saída por Requisição de Manutenção</Card.Title>
           <Card.Text>
@@ -339,7 +319,7 @@ export default function Index() {
         </Row>
 
         <Row>
-          <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
+          <Formik
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values) => {
@@ -355,7 +335,7 @@ export default function Index() {
               errors,
             }) => (
               <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
-                <Row className="align-items-end">
+                <Row className="align-items-top">
                   <Form.Group
                     as={Col}
                     xs={12}
@@ -398,7 +378,7 @@ export default function Index() {
                       <Badge bg="danger">{errors.endDate}</Badge>
                     ) : null}
                   </Form.Group>
-                  <Col xs="12" sm="auto" className="pb-1">
+                  <Col xs="12" sm="auto" className="mt-3 align-self-end">
                     <Form.Check
                       name="deficit"
                       type="checkbox"
@@ -409,7 +389,7 @@ export default function Index() {
                       defaultChecked
                     />
                   </Col>
-                  <Col xs="12" sm="auto" className="mt-2">
+                  <Col xs="12" sm="auto" className="align-self-end">
                     <Button type="submit" variant="outline-primary">
                       <FaSearch /> Consultar
                     </Button>
