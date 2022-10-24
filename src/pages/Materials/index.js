@@ -30,6 +30,7 @@ import Output from './Reports/Output';
 import Inventory from './Reports/Inventory';
 import MaintenanceBalanceOutput from './Reports/MaintenanceBalanceOutput';
 import ConsumeFrequency from './Reports/ConsumeFrequency';
+import ProvisionFrequency from './Reports/ProvisionFrequency';
 
 import Record from './Record';
 import List from './Record/List';
@@ -95,6 +96,7 @@ export default function MaterialsRoutes() {
           path="maintenancebalanceoutput"
           element={<MaintenanceBalanceOutput />}
         />{' '}
+        <Route path="provisionfrequency" element={<ProvisionFrequency />} />{' '}
         <Route path="consumefrequency" element={<ConsumeFrequency />} />{' '}
         <Route path="inventory" element={<Inventory />} />{' '}
         <Route path="Input" element={<Input />} />{' '}
