@@ -40,6 +40,16 @@ export default function index() {
                 </Link>
               </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="#4">
+                <Link
+                  className="text-decoration-none"
+                  to="/materials/internal/initialQuantity"
+                >
+                  Definir Saldo
+                </Link>
+              </Nav.Link>
+            </Nav.Item>
           </Nav>
         </Container>
       </Card.Header>
