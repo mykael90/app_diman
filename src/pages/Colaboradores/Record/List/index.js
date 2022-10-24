@@ -14,14 +14,39 @@ import TableGfilterNestedrow from '../../../Materials/components/TableGfilterNes
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
-  const [workers, setWorkers] = useState([]);
+  const [workersFormated, setWorkersFormated] = useState([]);
 
   useEffect(() => {
     async function getWorkers() {
       try {
         setIsLoading(true);
-        const response = await axios.get(`/workers`);
-        setWorkers(response.data);
+        const response = await axios.get(`/workers/`);
+        console.log('RESPONSE: ', response.data);
+
+        const employees = {
+          colab: [],
+        };
+
+        for (const i in response.data) {
+          const worker = response.data[i];
+          let contato = '';
+          worker.WorkerContacts.forEach((item) => {
+            if (item.default && item.contacttypeId === 2) {
+              contato = item.contact;
+            }
+          });
+          employees.colab.push({
+            name: worker.name,
+            cpf: worker.cpf,
+            birthdate: worker.birthdate,
+            email: worker.email,
+            contact: contato,
+          });
+        }
+
+        const datasetFormated = [...employees.colab];
+        console.log('Formated: ', datasetFormated);
+        setWorkersFormated(datasetFormated);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -37,6 +62,21 @@ export default function Index() {
 
   const columns = React.useMemo(
     () => [
+      {
+        // Make an expander cell
+        Header: () => null, // No header
+        id: 'expander', // It needs an ID
+        width: 30,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          // Use Cell to render an expander for each row.
+          // We can use the getToggleRowExpandedProps prop-getter
+          // to build the expander.
+          <span {...row.getToggleRowExpandedProps()}>
+            {row.isExpanded ? '▽' : '▷'}
+          </span>
+        ),
+      },
       { Header: 'Nome', accessor: 'name' },
       { Header: 'CPF', accessor: 'cpf' },
       { Header: 'Data de Nascimento', accessor: 'birthdate' },
@@ -46,29 +86,7 @@ export default function Index() {
     []
   );
 
-  const employees = {
-    colab: [],
-  };
-
-  for (const i in workers) {
-    const worker = workers[i];
-    let contato = '';
-    worker.WorkerContacts.map((item) => {
-      if (item.default && item.contacttypeId === 2) {
-        contato = item.contact;
-      }
-    });
-    employees.colab.push({
-      name: worker.name,
-      cpf: worker.cpf,
-      birthdate: worker.birthdate,
-      email: worker.email,
-      contact: contato,
-    });
-  }
-
-  const datasetFormated = [...employees.colab];
-  const data = React.useMemo(() => datasetFormated, []);
+  const data = React.useMemo(() => workersFormated, [workersFormated]);
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -124,8 +142,7 @@ export default function Index() {
   const renderRowSubComponent = React.useCallback(
     ({ row }) => (
       <>
-        <span className="fw-bold">Especificação:</span>{' '}
-        {row.original.specification}
+        <span className="fw-bold">Especificação:</span> {row.original}
       </>
     ),
     []
