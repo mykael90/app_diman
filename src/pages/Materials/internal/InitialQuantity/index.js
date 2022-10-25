@@ -2,6 +2,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import { FaLock, FaLockOpen, FaSearch, FaPlus } from 'react-icons/fa';
@@ -32,6 +33,81 @@ const renderTooltip = (props, message) => (
     {message}
   </Tooltip>
 );
+
+// Create an editable cell renderer
+function EditableCell({
+  value: initialValue,
+  row: { index, original },
+  column: { id },
+  updateMyData, // This is a custom function that we supplied to our table instance
+  handleUpdateDatabase, // nao ta funcionando, diz que nao é funcao, vou jogar a atualização aqui pra dentro
+}) {
+  // We need to keep and update the state of the cell normally
+  const [value, setValue] = React.useState(initialValue);
+  const userId = useSelector((state) => state.auth.user.id);
+
+  // fiz aqui pq referenciando com handleUpdateDatabase nao deu certo
+  const handleUpdateInitialQuantity = async (e, values, actualBalance) => {
+    e.preventDefault();
+    console.log(userId);
+    const { materialId } = values;
+    const updateInitialQuantity = {
+      userIdInitialQuantity: userId,
+      dateInitialQuantity: new Date().toISOString(),
+      initialQuantity: Number(actualBalance) - Number(values.balance),
+    };
+
+    try {
+      // FAZ A ATUALIZAÇÃO DA SEPARAÇÃO
+      await axios.put(
+        `/materials/inventory/${materialId}`,
+        updateInitialQuantity
+      );
+
+      // getData();
+
+      toast.success(`Saldo inicial atualizado com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+    }
+  };
+
+  const onChange = (e) => {
+    setValue(e.target.value);
+  };
+
+  // We'll only update the external data when the input is blurred
+  const onBlur = (e) => {
+    if (value) {
+      handleUpdateInitialQuantity(e, original, value);
+      updateMyData(index, id, value);
+    }
+  };
+
+  // If the initialValue is changed external, sync it up with our state
+  React.useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  return (
+    <div>
+      {original.dateInitialQuantity ? (
+        <span>(registrado)</span>
+      ) : (
+        <Form.Control
+          type="number"
+          size="sm"
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+      )}{' '}
+    </div>
+  );
+}
 
 // trigger to custom filter
 function DefaultColumnFilter() {
@@ -148,15 +224,50 @@ const FilterForTotal = ({
   );
 
 export default function Index() {
+  const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [materialIdModal, setMaterialIdModal] = useState('');
+  const [skipPageReset, setSkipPageReset] = React.useState(false);
 
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = (materialId) => {
     setMaterialIdModal(materialId);
     setShowModal(true);
+  };
+
+  const handleUpdateDatabase = async (e, values, actualBalance) => {
+    e.preventDefault();
+    console.log('aqui');
+    const { materialId } = values;
+    const updateInitialQuantity = {
+      userIdInitialQuantity: userId,
+      dateInitialQuantity: new Date().toISOString(),
+      initialQuantity: Number(actualBalance) - Number(values.balance),
+    };
+
+    try {
+      setIsLoading(true);
+
+      // FAZ A ATUALIZAÇÃO DA SEPARAÇÃO
+      await axios.put(
+        `/materials/inventory/${materialId}`,
+        updateInitialQuantity
+      );
+
+      setIsLoading(false);
+      // getData();
+
+      toast.success(`Saldo inicial atualizado com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -179,6 +290,38 @@ export default function Index() {
 
     getData();
   }, []);
+
+  // When our cell renderer calls updateMyData, we'll use
+  // the rowIndex, columnId and new value to update the
+  // original data
+  const updateMyData = (rowIndex, columnId, value) => {
+    // We also turn on the flag to not reset the page
+    setSkipPageReset(true);
+    setData((old) =>
+      old.map((row, index) => {
+        if (index === rowIndex) {
+          const date = new Date()
+            .toISOString()
+            .split('T')[0]
+            .replace(/^(\d{4})-(\d{1,2})-(\d{1,2})$/, '$3/$2/$1');
+          const time = new Date().toISOString().split('T')[1].substring(0, 5);
+          return {
+            ...old[rowIndex],
+            initialQuantity: Number(value) - Number(old[rowIndex].balance),
+            dateInitialQuantity: `${date} ${time}`,
+          };
+        }
+        return row;
+      })
+    );
+  };
+
+  // After data chagnes, we turn the flag back off
+  // so that if data actually changes when we're not
+  // editing it, the page is reset
+  React.useEffect(() => {
+    setSkipPageReset(false);
+  }, [data]);
 
   const columns = React.useMemo(
     () => [
@@ -235,6 +378,25 @@ export default function Index() {
         disableResizing: true,
         disableFilters: true,
       },
+      {
+        Header: () => (
+          // FORMAT HEADER
+          <div className="p-auto text-center">Saldo Inicial</div>
+        ),
+        accessor: 'initialQuantity',
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
+        disableFilters: true,
+      },
+      {
+        Header: 'Definição Saldo',
+        accessor: 'dateInitialQuantity',
+        width: 100,
+        disableSortBy: true,
+        disableResizing: true,
+        disableFilters: true,
+      },
 
       {
         Header: () => (
@@ -258,6 +420,7 @@ export default function Index() {
         disableResizing: true,
         disableSortBy: true,
         disableFilters: true,
+        isVisible: false,
       },
       {
         // Make an expander cell
@@ -269,24 +432,8 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableFilters: true,
-        Cell: ({ row }) => (
-          <Col className="d-flex">
-            <Form.Control
-              id={`s_${row.values.materialId}`}
-              size="sm"
-              type="number"
-              // onChange={(e) => handleQuantityChange(e, row)}
-            />
-            <Button
-              onClick={() => alert('Funcionalidade em desenvolvimento')}
-              variant="outline-success"
-              size="sm"
-              className="border-0"
-            >
-              <FaPlus size={18} />
-            </Button>
-          </Col>
-        ),
+        Cell: (value, row, column, updateMyData, handleUpdateDatabase) =>
+          EditableCell(value, row, column, updateMyData, handleUpdateDatabase),
       },
     ],
     []
@@ -313,7 +460,7 @@ export default function Index() {
     //   },
     // ],
     // filters: [{ id: 'totalInventory', value: 1 }],
-    pageSize: 20,
+    pageSize: 30,
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),
@@ -404,6 +551,7 @@ export default function Index() {
           initialState={initialState}
           filterTypes={filterTypes}
           renderRowSubComponent={renderRowSubComponent}
+          updateMyData={updateMyData}
         />
       </Container>
     </>
