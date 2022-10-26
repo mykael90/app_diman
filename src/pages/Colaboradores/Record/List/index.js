@@ -4,13 +4,14 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-import { Container, Row, Card } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../../../Materials/components/TableGfilterNestedRow';
+import TableNestedrow from '../../../Materials/components/TableNestedRow';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,29 +23,30 @@ export default function Index() {
         setIsLoading(true);
         const response = await axios.get(`/workers/`);
 
-        const employees = {
-          colab: [],
-        };
+        // const employees = {
+        //   colab: [],
+        // };
 
-        for (const i in response.data) {
-          const worker = response.data[i];
-          let contato = '';
-          worker.WorkerContacts.forEach((item) => {
-            if (item.default && item.contacttypeId === 2) {
-              contato = item.contact;
-            }
-          });
-          employees.colab.push({
-            name: worker.name,
-            cpf: worker.cpf,
-            birthdate: worker.birthdate,
-            email: worker.email,
-            contact: contato,
-          });
-        }
+        // for (const i in response.data) {
+        //   const worker = response.data[i];
+        //   let contato = '';
+        //   worker.WorkerContacts.forEach((item) => {
+        //     if (item.default && item.contacttypeId === 2) {
+        //       contato = item.contact;
+        //     }
+        //   });
+        //   employees.colab.push({
+        //     name: worker.name,
+        //     cpf: worker.cpf,
+        //     birthdate: worker.birthdate,
+        //     email: worker.email,
+        //     contact: contato,
+        //     contracts: worker.WorkerContracts,
+        //   });
+        // }
 
-        const datasetFormated = [...employees.colab];
-        setWorkersFormated(datasetFormated);
+        // const datasetFormated = [...employees.colab];
+        setWorkersFormated(response.data);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -60,27 +62,190 @@ export default function Index() {
 
   const columns = React.useMemo(
     () => [
-      // {
-      //   // Make an expander cell
-      //   Header: () => null, // No header
-      //   id: 'expander', // It needs an ID
-      //   width: 30,
-      //   disableResizing: true,
-      //   Cell: ({ row }) => (
-      //     // Use Cell to render an expander for each row.
-      //     // We can use the getToggleRowExpandedProps prop-getter
-      //     // to build the expander.
-      //     <span {...row.getToggleRowExpandedProps()}>
-      //       {row.isExpanded ? '▽' : '▷'}
-      //     </span>
-      //   ),
-      // },
+      {
+        // Make an expander cell
+        Header: () => null, // No header
+        id: 'expander', // It needs an ID
+        width: 30,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          // Use Cell to render an expander for each row.
+          // We can use the getToggleRowExpandedProps prop-getter
+          // to build the expander.
+          <span {...row.getToggleRowExpandedProps()}>
+            {row.isExpanded ? '▽' : '▷'}
+          </span>
+        ),
+      },
       { Header: 'Nome', accessor: 'name' },
       { Header: 'CPF', accessor: 'cpf' },
       { Header: 'Data de Nascimento', accessor: 'birthdate' },
       { Header: 'Email', accessor: 'email' },
-      { Header: 'Contato', accessor: 'contact' },
+      {
+        Header: 'Contato',
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContacts.findIndex(
+            (value) => value.default
+          );
+          return originalRow.WorkerContacts[index]?.contact;
+        },
+      },
+      {
+        // Make an expander cell
+        Header: 'Ações', // No header
+        id: 'actions', // It needs an ID
+        width: 100,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          // Use Cell to render an expander for each row.
+          // We can use the getToggleRowExpandedProps prop-getter
+          // to build the expander.
+          <Button>Editar</Button>
+        ),
+      },
     ],
+    []
+  );
+
+  // Create a function that will render our row sub components
+  const renderRowSubComponent = React.useCallback(
+    ({ row }) => (
+      <Row>
+        <Col>
+          <span>{JSON.stringify(row.original)}</span>
+          <Row>
+            <Col className="bg-primary">
+              {row.original.WorkerContracts.start}
+            </Col>
+          </Row>
+          {/* <TableNestedrow
+            style={{ padding: 0, margin: 0 }}
+            columns={[
+              {
+                Header: 'Contrato',
+                accessor: 'contractId',
+                width: 125,
+                disableResizing: true,
+              },
+              {
+                Header: 'JobId',
+                accessor: 'workerJobtypeId',
+                width: 100,
+                disableResizing: true,
+              },
+              {
+                Header: 'Início',
+                accessor: 'start',
+                width: 100,
+                disableResizing: true,
+              },
+              {
+                Header: 'Fim',
+                accessor: 'end',
+                width: 100,
+                disableResizing: true,
+                // eslint-disable-next-line react/destructuring-assignment
+              },
+              {
+                Header: 'Lotado em',
+                accessor: 'located',
+                width: 100,
+                disableResizing: true,
+                // eslint-disable-next-line react/destructuring-assignment
+                Cell: ({ value, row }) => (
+                  <>
+                    <span className="bg-primary" style={{ color: ' red' }}>
+                      O valor é {value}
+                    </span>
+                    <Button>botao</Button>
+                  </>
+                ),
+              },
+            ]}
+            data={row.original.WorkerContracts}
+            defaultColumn={{
+              // Let's set up our default Filter UI
+              // Filter: DefaultColumnFilter,
+              minWidth: 30,
+              width: 50,
+              maxWidth: 800,
+            }}
+            initialState={{
+              sortBy: [
+                {
+                  id: 'name',
+                  asc: true,
+                },
+              ],
+              hiddenColumns: columns
+                .filter((col) => col.isVisible === false)
+                .map((col) => col.accessor),
+            }}
+            filterTypes={filterTypes}
+          /> */}
+        </Col>
+
+        <Col>
+          <TableNestedrow
+            style={{ padding: 0, margin: 0 }}
+            columns={[
+              {
+                Header: 'Contrato',
+                accessor: 'contractId',
+                width: 125,
+                disableResizing: true,
+              },
+              {
+                Header: 'JobId',
+                accessor: 'workerJobtypeId',
+                width: 100,
+                disableResizing: true,
+              },
+              {
+                Header: 'Início',
+                accessor: 'start',
+                width: 100,
+                disableResizing: true,
+              },
+              {
+                Header: 'Fim',
+                accessor: 'end',
+                width: 100,
+                disableResizing: true,
+                // eslint-disable-next-line react/destructuring-assignment
+              },
+              {
+                Header: 'Lotado em',
+                accessor: 'located',
+                width: 100,
+                disableResizing: true,
+                // eslint-disable-next-line react/destructuring-assignment
+              },
+            ]}
+            data={row.original.WorkerContracts}
+            defaultColumn={{
+              // Let's set up our default Filter UI
+              // Filter: DefaultColumnFilter,
+              minWidth: 30,
+              width: 50,
+              maxWidth: 800,
+            }}
+            initialState={{
+              sortBy: [
+                {
+                  id: 'name',
+                  asc: true,
+                },
+              ],
+              hiddenColumns: columns
+                .filter((col) => col.isVisible === false)
+                .map((col) => col.accessor),
+            }}
+            filterTypes={filterTypes}
+          />
+        </Col>
+      </Row>
+    ),
     []
   );
 
@@ -133,16 +298,6 @@ export default function Index() {
         return rows;
       },
     }),
-    []
-  );
-
-  // Create a function that will render our row sub components
-  const renderRowSubComponent = React.useCallback(
-    ({ row }) => (
-      <>
-        <span className="fw-bold">Especificação:</span> {row.original}
-      </>
-    ),
     []
   );
 

@@ -55,11 +55,12 @@ export default function index({ submitReq }) {
   const handleStore = async (values, resetForm) => {
     console.log(values);
     const formattedValues = removeEmptyString(values);
+    console.log(formattedValues);
     try {
       // setIsLoading(true);
-      await axios.post(`/workers/`, formattedValues);
+      // await axios.post(`/workers/`, formattedValues);
       // setIsLoading(false);
-      // resetForm();
+      resetForm();
       toast.success('Colaborador Cadastrado Com Sucesso!');
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
@@ -147,7 +148,7 @@ export default function index({ submitReq }) {
             }}
           >
             {({
-              submitForm,
+              handleSubmit,
               resetForm,
               handleChange,
               handleBlur,
@@ -155,7 +156,7 @@ export default function index({ submitReq }) {
               touched,
               errors,
             }) => (
-              <Form noValidate autoComplete="off">
+              <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Row>
                   <Form.Group
                     as={Col}
@@ -357,11 +358,6 @@ export default function index({ submitReq }) {
                                 >
                                   <Form.Check
                                     type="switch"
-                                    // onClick={() => {
-                                    //   contato.default == ''
-                                    //     ? (contato.default = true)
-                                    //     : (contato.default = false);
-                                    // }}
                                     label="Padrão"
                                     onChange={handleChange}
                                     onBlur={handleChange}
@@ -438,18 +434,9 @@ export default function index({ submitReq }) {
                       type="text"
                       value={values.Addresses.zipcode}
                       onChange={handleChange}
-                      // isInvalid={touched.cpf && !!errors.cpf}
-                      // isValid={touched.cpf && !errors.cpf}
                       placeholder="Digite o CEP"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.cpf}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -463,18 +450,9 @@ export default function index({ submitReq }) {
                       type="text"
                       value={values.Addresses.street}
                       onChange={handleChange}
-                      // isInvalid={touched.rg && !!errors.rg}
-                      // isValid={touched.rg && !errors.rg}
                       placeholder="Digite o Logradouro"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.rg}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -488,18 +466,9 @@ export default function index({ submitReq }) {
                       type="number"
                       value={values.Addresses.number}
                       onChange={handleChange}
-                      // isInvalid={touched.birthdate && !!errors.birthdate}
-                      // isValid={touched.birthdate && !errors.birthdate}
                       placeholder="Digite o Número"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.birthdate}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -513,18 +482,9 @@ export default function index({ submitReq }) {
                       type="text"
                       value={values.Addresses.district}
                       onChange={handleChange}
-                      // isInvalid={touched.cpf && !!errors.cpf}
-                      // isValid={touched.cpf && !errors.cpf}
                       placeholder="Digite o Bairro"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.cpf}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -538,18 +498,9 @@ export default function index({ submitReq }) {
                       type="text"
                       value={values.Addresses.city}
                       onChange={handleChange}
-                      // isInvalid={touched.rg && !!errors.rg}
-                      // isValid={touched.rg && !errors.rg}
                       placeholder="Digite a Cidade"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.rg}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -563,18 +514,9 @@ export default function index({ submitReq }) {
                       type="text"
                       value={values.Addresses.country}
                       onChange={handleChange}
-                      // isInvalid={touched.birthdate && !!errors.birthdate}
-                      // isValid={touched.birthdate && !errors.birthdate}
                       placeholder="Selecione o País"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.birthdate}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -587,18 +529,9 @@ export default function index({ submitReq }) {
                       type="text"
                       value={values.Addresses.complement}
                       onChange={handleChange}
-                      // isInvalid={touched.name && !!errors.name}
-                      // isValid={touched.name && !errors.name}
                       placeholder="Digite o Complemento"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.name}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -611,18 +544,9 @@ export default function index({ submitReq }) {
                       type="text"
                       value={values.Addresses.WorkerAddress.title}
                       onChange={handleChange}
-                      // isInvalid={touched.name && !!errors.name}
-                      // isValid={touched.name && !errors.name}
                       placeholder="Digite o Titulo do Endereço"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.name}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                 </Row>
                 <Row
@@ -654,13 +578,6 @@ export default function index({ submitReq }) {
                         </option>
                       ))}
                     </Form.Select>
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.rg}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -684,13 +601,6 @@ export default function index({ submitReq }) {
                         </option>
                       ))}
                     </Form.Select>
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.rg}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                   <Form.Group
                     as={Col}
@@ -705,18 +615,9 @@ export default function index({ submitReq }) {
                       dateFormat="YYYY-MM-DD"
                       value={values.WorkerContracts.start}
                       onChange={handleChange}
-                      // isInvalid={touched.birthdate && !!errors.birthdate}
-                      // isValid={touched.birthdate && !errors.birthdate}
                       placeholder="Digite o inicio do contrato"
                       onBlur={handleBlur}
                     />
-                    {/* <Form.Control.Feedback
-                      tooltip
-                      type="invalid"
-                      style={{ position: 'static' }}
-                    >
-                      {errors.birthdate}
-                    </Form.Control.Feedback> */}
                   </Form.Group>
                 </Row>
                 <hr />
@@ -732,7 +633,7 @@ export default function index({ submitReq }) {
                     </Button>
                   </Col>
                   <Col xs="auto" className="text-center">
-                    <Button variant="success" onClick={submitForm}>
+                    <Button variant="success" type="submit">
                       Cadastrar
                     </Button>
                   </Col>
