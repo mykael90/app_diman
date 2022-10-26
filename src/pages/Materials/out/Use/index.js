@@ -54,6 +54,18 @@ const formatGroupLabel = (data) => (
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
+  const [initialValues, setInitialValues] = useState({
+    reqMaintenance: '',
+    authorizedBy: '',
+    isAuthorizer: false,
+    workerId: '',
+    propertyId: '',
+    place: '',
+    buildingId: '',
+    reqMaterial: '',
+    obs: '',
+    items: [],
+  });
   const [users, setUsers] = useState([]);
   const [workers, setWorkers] = useState([]);
   const [properties, setProperties] = useState([]);
@@ -278,7 +290,7 @@ export default function Index() {
     formattedValues.propertyId = formattedValues.propertyId?.value;
     formattedValues.buildingId = formattedValues.buildingId?.value;
     formattedValues.items.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      Object.assign(item, { MaterialId: item.materialId }); // rename key
     });
 
     Object.assign(formattedValues, {
@@ -300,6 +312,18 @@ export default function Index() {
       setOpenCollapse(false);
       resetForm();
       initialSchema();
+      setInitialValues({
+        reqMaintenance: '',
+        authorizedBy: '',
+        isAuthorizer: false,
+        workerId: '',
+        propertyId: '',
+        place: '',
+        buildingId: '',
+        reqMaterial: '',
+        obs: '',
+        items: [],
+      });
       getMaterialsData();
 
       toast.success(`Saída de material realizada com sucesso`);
@@ -358,18 +382,6 @@ export default function Index() {
     setSchema(newSchema);
   };
 
-  const initialValues = {
-    reqMaintenance: '',
-    authorizedBy: '',
-    isAuthorizer: false,
-    workerId: '',
-    propertyId: '',
-    place: '',
-    buildingId: '',
-    reqMaterial: '',
-    obs: '',
-    items: [],
-  };
   return (
     <>
       <Loading isLoading={isLoading} />
@@ -387,6 +399,7 @@ export default function Index() {
             onSubmit={(values, { resetForm }) => {
               handleStore(values, resetForm);
             }}
+            enableReinitialize
           >
             {({
               submitForm,
@@ -722,13 +735,13 @@ export default function Index() {
                               handleClose={handleCloseModalSearch}
                               show={showModalSearch}
                               push={push}
-                              hiddenItems={values.items.map(
+                              hiddenItems={values.items?.map(
                                 (item) => item.materialId
                               )}
                               inventoryData={inventoryData}
                             />
 
-                            {values.items.length > 0 &&
+                            {values.items?.length > 0 &&
                               values.items.map((item, index) => (
                                 <>
                                   <Row className="d-block d-sm-none">
@@ -955,6 +968,18 @@ export default function Index() {
                           onClick={() => {
                             resetForm();
                             initialSchema();
+                            setInitialValues({
+                              reqMaintenance: '',
+                              authorizedBy: '',
+                              isAuthorizer: false,
+                              workerId: '',
+                              propertyId: '',
+                              place: '',
+                              buildingId: '',
+                              reqMaterial: '',
+                              obs: '',
+                              items: [],
+                            });
                             setOpenCollapse(false);
                           }}
                         >
@@ -991,6 +1016,8 @@ export default function Index() {
                 reserves={reserves}
                 getReservesData={getReservesData}
                 userId={userId}
+                setInitialValues={setInitialValues}
+                setOpenCollapse={setOpenCollapse}
               />
             </Card.Body>
           </Accordion.Collapse>
