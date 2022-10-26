@@ -243,10 +243,6 @@ export default function Index({
 
     formattedValues.MaterialReserveItems.forEach((item) => {
       Object.assign(item, { MaterialId: item.materialId }); // rename key
-      item.value = item.value
-        .replace(/\./g, '')
-        .replace(/,/g, '.')
-        .replace(/[^0-9\.]+/g, '');
     });
 
     Object.assign(formattedValues, {
