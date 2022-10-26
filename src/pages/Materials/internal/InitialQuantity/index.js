@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { FaLock, FaLockOpen, FaSearch, FaPlus } from 'react-icons/fa';
+import { FaLock, FaLockOpen, FaSearch, FaPencilAlt } from 'react-icons/fa';
 
 import {
   Container,
@@ -75,16 +75,36 @@ function EditableCell({
     }
   };
 
+  const handleUpdateAsk = (e, values) => {
+    e.preventDefault();
+    console.log(e);
+    console.log(e.currentTarget);
+    console.log(e.currentTarget.nextSibling);
+    // if (userId !== values.userId)
+    //   return toast.error(
+    //     `Reserva só pode ser cancelada pelo usuário que a criou.`
+    //   );
+    const form = e.currentTarget.nextSibling.firstChild;
+    form.className = form.className.replace('d-none', 'd-block');
+    e.currentTarget.className += ' d-none';
+    return true;
+
+    // e.currentTarget.remove();
+  };
+
   const onChange = (e) => {
+    e.preventDefault();
     setValue(e.target.value);
   };
 
   // We'll only update the external data when the input is blurred
   const onBlur = (e) => {
+    e.preventDefault();
     if (value) {
       handleUpdateInitialQuantity(e, original, value);
       updateMyData(index, id, value);
     }
+    e.currentTarget.className += ' d-none';
   };
 
   // If the initialValue is changed external, sync it up with our state
@@ -93,19 +113,36 @@ function EditableCell({
   }, [initialValue]);
 
   return (
-    <div>
-      {original.dateInitialQuantity ? (
-        <span>(registrado)</span>
-      ) : (
+    <>
+      {' '}
+      <OverlayTrigger
+        placement="left"
+        delay={{ show: 250, hide: 400 }}
+        overlay={(props) => renderTooltip(props, 'Editar saldo')}
+      >
+        <Button
+          size="sm"
+          variant="outline-danger"
+          className={`border-0 m-0 ${
+            original.dateInitialQuantity ? '' : 'd-none'
+          }
+              `}
+          onClick={handleUpdateAsk}
+        >
+          <FaPencilAlt />
+        </Button>
+      </OverlayTrigger>
+      <Form onSubmit={onBlur}>
         <Form.Control
           type="number"
           size="sm"
           value={value}
           onChange={onChange}
-          onBlur={onBlur}
+          // onBlur={onBlur}
+          className={original.dateInitialQuantity ? 'd-none' : ''}
         />
-      )}{' '}
-    </div>
+      </Form>
+    </>
   );
 }
 
@@ -409,6 +446,7 @@ export default function Index() {
         filterValue: 1,
         disableSortBy: true,
         disableFilters: true,
+        isVisible: false,
       },
       {
         Header: () => (
@@ -423,10 +461,28 @@ export default function Index() {
         isVisible: false,
       },
       {
+        Header: () => (
+          // FORMAT HEADER
+          <div className="p-auto text-center">Saldo Sisman</div>
+        ),
+        id: 'balancePlusInitital',
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
+        disableFilters: true,
+        isVisible: false,
+        Cell: ({ value, row }) => (
+          <span>
+            {Number(row.original.balance) +
+              Number(row.original.initialQuantity)}
+          </span>
+        ),
+      },
+      {
         // Make an expander cell
         Header: () => (
           // FORMAT HEADER
-          <div className="p-auto text-center">Saldo Real</div>
+          <div className="p-auto text-center">Informar Saldo Real</div>
         ),
         id: 'actualBalance',
         width: 120,
