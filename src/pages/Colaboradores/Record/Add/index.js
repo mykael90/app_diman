@@ -53,13 +53,12 @@ export default function index({ submitReq }) {
   }
 
   const handleStore = async (values, resetForm) => {
-    console.log(values);
-    const formattedValues = removeEmptyString(values);
-    console.log(formattedValues);
+    const formattedValues = JSON.parse(JSON.stringify(values));
+    removeEmptyString(formattedValues);
     try {
-      // setIsLoading(true);
-      // await axios.post(`/workers/`, formattedValues);
-      // setIsLoading(false);
+      setIsLoading(true);
+      await axios.post(`/workers/`, formattedValues);
+      setIsLoading(false);
       resetForm();
       toast.success('Colaborador Cadastrado Com Sucesso!');
     } catch (err) {
@@ -364,7 +363,6 @@ export default function index({ submitReq }) {
                                     value={contato.default}
                                   />
                                 </Form.Group>
-                                {console.log(contato.default)}
                                 <Col sm>
                                   {values.WorkerContacts.length <= 1 ? (
                                     <Button
