@@ -111,7 +111,11 @@ export default function Index() {
     () => [
       {
         // Make an expander cell
-        Header: () => null, // No header
+        Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+          <span {...getToggleAllRowsExpandedProps()}>
+            {isAllRowsExpanded ? '▽' : '▷'}
+          </span>
+        ),
         id: 'expander', // It needs an ID
         width: 30,
         disableResizing: true,
