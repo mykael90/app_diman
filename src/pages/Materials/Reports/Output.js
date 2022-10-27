@@ -14,6 +14,8 @@ import {
   FaSyncAlt,
   FaRegEdit,
   FaEdit,
+  FaExclamationTriangle,
+  FaExclamation,
 } from 'react-icons/fa';
 
 import {
@@ -63,6 +65,16 @@ export default function Index() {
     getData();
   }, []);
 
+  const handleAskUpdateUserReplacement = (e, values) => {
+    e.preventDefault();
+    const exclamation = e.currentTarget.nextSibling;
+    exclamation.className = exclamation.className.replace('d-none', 'd-inline');
+    e.currentTarget.className += ' d-none';
+    return true;
+
+    // e.currentTarget.remove();
+  };
+
   const handleUpdateUserReplacement = async (e, values) => {
     e.preventDefault();
     const { id } = values;
@@ -93,6 +105,8 @@ export default function Index() {
     }
   };
 
+  const data = React.useMemo(() => reqs, [reqs]);
+
   const columns = React.useMemo(
     () => [
       {
@@ -115,6 +129,26 @@ export default function Index() {
         accessor: 'reqMaintenance',
         width: 120,
         disableResizing: true,
+        Cell: ({ value, row }) => (
+          <div>
+            {value}{' '}
+            {row.original.MaterialReturned.length ? (
+              <OverlayTrigger
+                placement="right"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Houve retorno')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-warning"
+                  className="border-0 m-0"
+                >
+                  <FaExclamationTriangle />
+                </Button>
+              </OverlayTrigger>
+            ) : null}
+          </div>
+        ),
       },
       {
         Header: 'Tipo',
@@ -204,27 +238,47 @@ export default function Index() {
             <Col xs="auto" className="text-center m-0 p-0 px-1">
               {row.original.userReplacementId ||
               row.original.reqMaterial ? null : (
-                <OverlayTrigger
-                  placement="left"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={(props) =>
-                    renderTooltip(
-                      props,
-                      'Confirmar RM de reposição criada no SIPAC'
-                    )
-                  }
-                >
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    className="border-0 m-0"
-                    onClick={(e) => {
-                      handleUpdateUserReplacement(e, row.original);
-                    }}
+                <>
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) =>
+                      renderTooltip(
+                        props,
+                        'Informar RM de reposição criada no SIPAC'
+                      )
+                    }
                   >
-                    <FaRedoAlt />
-                  </Button>
-                </OverlayTrigger>
+                    <Button
+                      size="sm"
+                      variant="outline-success"
+                      className="border-0 m-0"
+                      onClick={(e) => {
+                        handleAskUpdateUserReplacement(e);
+                      }}
+                    >
+                      <FaRedoAlt />
+                    </Button>
+                  </OverlayTrigger>
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) =>
+                      renderTooltip(props, 'Confirmar informação de RM criada!')
+                    }
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0 d-none"
+                      onClick={(e) => {
+                        handleUpdateUserReplacement(e, row.original);
+                      }}
+                    >
+                      <FaExclamation />
+                    </Button>
+                  </OverlayTrigger>
+                </>
               )}
             </Col>
             <Col xs="auto" className="text-center m-0 p-0 px-1">
@@ -252,7 +306,260 @@ export default function Index() {
     []
   );
 
-  const data = React.useMemo(() => reqs, [reqs]);
+  const renderRowSubSubComponent = React.useCallback(
+    ({ row }) => (
+      <>
+        <span className="fw-bold">Especificação:</span>{' '}
+        {row.original.specification}
+      </>
+    ),
+    []
+  );
+
+  const renderRowSubSub1Component = React.useCallback(
+    ({ row }) => (
+      <TableNestedrow
+        style={{ padding: 0, margin: 0 }}
+        columns={[
+          {
+            // Make an expander cell
+            Header: () => null, // No header
+            id: 'expander', // It needs an ID
+            width: 30,
+            disableResizing: true,
+            Cell: ({ row }) => (
+              // Use Cell to render an expander for each row.
+              // We can use the getToggleRowExpandedProps prop-getter
+              // to build the expander.
+              <span {...row.getToggleRowExpandedProps()}>
+                {row.isExpanded ? '▽' : '▷'}
+              </span>
+            ),
+          },
+          {
+            Header: 'ID',
+            accessor: 'materialId',
+            width: 125,
+            disableResizing: true,
+            isVisible: window.innerWidth > 576,
+          },
+          { Header: 'Denominação', accessor: 'name' },
+          {
+            Header: 'Unidade',
+            accessor: 'unit',
+            width: 100,
+            disableResizing: true,
+          },
+          {
+            Header: 'Qtd',
+            accessor: 'quantity',
+            width: 100,
+            disableResizing: true,
+          },
+          {
+            Header: 'Valor',
+            accessor: 'value',
+            width: 100,
+            disableResizing: true,
+            // eslint-disable-next-line react/destructuring-assignment
+          },
+        ]}
+        data={row.original.MaterialInItems}
+        defaultColumn={{
+          // Let's set up our default Filter UI
+          // Filter: DefaultColumnFilter,
+          minWidth: 30,
+          width: 50,
+          maxWidth: 800,
+        }}
+        initialState={{
+          sortBy: [
+            {
+              id: 'name',
+              asc: true,
+            },
+          ],
+          hiddenColumns: columns
+            .filter((col) => col.isVisible === false)
+            .map((col) => col.accessor),
+        }}
+        filterTypes={filterTypes}
+        renderRowSubComponent={renderRowSubSubComponent}
+      />
+    ),
+    []
+  );
+
+  // Create a function that will render our row sub components
+  const renderRowSubComponent = React.useCallback(
+    ({ row }) => (
+      <>
+        <TableNestedrow
+          style={{ padding: 0, margin: 0 }}
+          columns={[
+            {
+              // Make an expander cell
+              Header: () => null, // No header
+              id: 'expander', // It needs an ID
+              width: 30,
+              disableResizing: true,
+              Cell: ({ row }) => (
+                // Use Cell to render an expander for each row.
+                // We can use the getToggleRowExpandedProps prop-getter
+                // to build the expander.
+                <span {...row.getToggleRowExpandedProps()}>
+                  {row.isExpanded ? '▽' : '▷'}
+                </span>
+              ),
+            },
+            {
+              Header: 'ID',
+              accessor: 'materialId',
+              width: 125,
+              disableResizing: true,
+              isVisible: window.innerWidth > 576,
+            },
+            { Header: 'Denominação', accessor: 'name' },
+            {
+              Header: 'Unidade',
+              accessor: 'unit',
+              width: 100,
+              disableResizing: true,
+            },
+            {
+              Header: 'Qtd',
+              accessor: 'quantity',
+              width: 100,
+              disableResizing: true,
+            },
+            {
+              Header: 'Valor',
+              accessor: 'value',
+              width: 100,
+              disableResizing: true,
+              // eslint-disable-next-line react/destructuring-assignment
+            },
+          ]}
+          data={row.original.MaterialOutItems}
+          defaultColumn={{
+            // Let's set up our default Filter UI
+            // Filter: DefaultColumnFilter,
+            minWidth: 30,
+            width: 50,
+            maxWidth: 800,
+          }}
+          initialState={{
+            sortBy: [
+              {
+                id: 'name',
+                asc: true,
+              },
+            ],
+            hiddenColumns: columns
+              .filter((col) => col.isVisible === false)
+              .map((col) => col.accessor),
+          }}
+          filterTypes={filterTypes}
+          renderRowSubComponent={renderRowSubSubComponent}
+        />
+
+        {row.original.MaterialReturned.length ? (
+          <>
+            <br />
+            <Row>
+              <Col className="text-center">
+                <span className="text-center fw-bold">RETORNOS:</span>
+              </Col>
+            </Row>
+            <TableNestedrow
+              style={{ padding: 0, margin: 0 }}
+              columns={[
+                {
+                  // Make an expander cell
+                  Header: () => null, // No header
+                  id: 'expander', // It needs an ID
+                  width: 30,
+                  disableResizing: true,
+                  Cell: ({ row }) => (
+                    // Use Cell to render an expander for each row.
+                    // We can use the getToggleRowExpandedProps prop-getter
+                    // to build the expander.
+                    <span {...row.getToggleRowExpandedProps()}>
+                      {row.isExpanded ? '▽' : '▷'}
+                    </span>
+                  ),
+                },
+                {
+                  Header: 'Retorno em:',
+                  accessor: 'createdAtBr',
+                  width: 160,
+                  disableResizing: true,
+                },
+                {
+                  Header: 'Valor',
+                  accessor: 'valueBr',
+                  width: 120,
+                  disableResizing: true,
+                },
+                // {
+                //   Header: 'Receb. por:',
+                //   accessor: 'receivedBy',
+                //   width: 150,
+                //   disableResizing: true,
+                //   Cell: (props) => {
+                //     const custom = String(props.value).replace(
+                //       /(^[a-z]*)\.([a-z]*).*/gm,
+                //       '$1.$2'
+                //     ); // deixar só os dois primeiros nomes
+                //     return <span> {custom}</span>;
+                //   },
+                // },
+                // {
+                //   Header: 'Unidade de Custo',
+                //   accessor: 'costUnit',
+                //   isVisible: window.innerWidth > 576,
+                //   // eslint-disable-next-line react/destructuring-assignment
+                //   Cell: (props) => {
+                //     const custom = String(props.value).replace(
+                //       /([0-9]{2})/gm,
+                //       '$1.'
+                //     );
+                //     return props.value ? (
+                //       <span title={props.row.original.costUnitNome}>
+                //         {custom} {props.row.original.costUnitSigla}
+                //       </span>
+                //     ) : null;
+                //   },
+                // },
+              ]}
+              data={row.original.MaterialReturned}
+              defaultColumn={{
+                // Let's set up our default Filter UI
+                // Filter: DefaultColumnFilter,
+                minWidth: 30,
+                width: 50,
+                maxWidth: 800,
+              }}
+              initialState={{
+                sortBy: [
+                  {
+                    id: 'name',
+                    asc: true,
+                  },
+                ],
+                hiddenColumns: columns
+                  .filter((col) => col.isVisible === false)
+                  .map((col) => col.accessor),
+              }}
+              filterTypes={filterTypes}
+              renderRowSubComponent={renderRowSubSub1Component}
+            />
+          </>
+        ) : null}
+      </>
+    ),
+    []
+  );
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -302,91 +609,6 @@ export default function Index() {
         return rows;
       },
     }),
-    []
-  );
-
-  const renderRowSubSubComponent = React.useCallback(
-    ({ row }) => (
-      <>
-        <span className="fw-bold">Especificação:</span>{' '}
-        {row.original.specification}
-      </>
-    ),
-    []
-  );
-
-  // Create a function that will render our row sub components
-  const renderRowSubComponent = React.useCallback(
-    ({ row }) => (
-      <TableNestedrow
-        style={{ padding: 0, margin: 0 }}
-        columns={[
-          {
-            // Make an expander cell
-            Header: () => null, // No header
-            id: 'expander', // It needs an ID
-            width: 30,
-            disableResizing: true,
-            Cell: ({ row }) => (
-              // Use Cell to render an expander for each row.
-              // We can use the getToggleRowExpandedProps prop-getter
-              // to build the expander.
-              <span {...row.getToggleRowExpandedProps()}>
-                {row.isExpanded ? '▽' : '▷'}
-              </span>
-            ),
-          },
-          {
-            Header: 'ID',
-            accessor: 'materialId',
-            width: 125,
-            disableResizing: true,
-            isVisible: window.innerWidth > 576,
-          },
-          { Header: 'Denominação', accessor: 'name' },
-          {
-            Header: 'Unidade',
-            accessor: 'unit',
-            width: 100,
-            disableResizing: true,
-          },
-          {
-            Header: 'Qtd',
-            accessor: 'quantity',
-            width: 100,
-            disableResizing: true,
-          },
-          {
-            Header: 'Valor',
-            accessor: 'value',
-            width: 100,
-            disableResizing: true,
-            // eslint-disable-next-line react/destructuring-assignment
-          },
-        ]}
-        data={row.original.MaterialOutItems}
-        defaultColumn={{
-          // Let's set up our default Filter UI
-          // Filter: DefaultColumnFilter,
-          minWidth: 30,
-          width: 50,
-          maxWidth: 800,
-        }}
-        initialState={{
-          sortBy: [
-            {
-              id: 'name',
-              asc: true,
-            },
-          ],
-          hiddenColumns: columns
-            .filter((col) => col.isVisible === false)
-            .map((col) => col.accessor),
-        }}
-        filterTypes={filterTypes}
-        renderRowSubComponent={renderRowSubSubComponent}
-      />
-    ),
     []
   );
 
