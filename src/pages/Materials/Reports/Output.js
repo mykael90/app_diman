@@ -14,6 +14,7 @@ import {
   FaSyncAlt,
   FaRegEdit,
   FaEdit,
+  FaExclamationTriangle,
 } from 'react-icons/fa';
 
 import {
@@ -115,6 +116,26 @@ export default function Index() {
         accessor: 'reqMaintenance',
         width: 120,
         disableResizing: true,
+        Cell: ({ value, row }) => (
+          <div>
+            {value}{' '}
+            {row.original.MaterialReturned.length ? (
+              <OverlayTrigger
+                placement="right"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Houve retorno')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-warning"
+                  className="border-0 m-0"
+                >
+                  <FaExclamationTriangle />
+                </Button>
+              </OverlayTrigger>
+            ) : null}
+          </div>
+        ),
       },
       {
         Header: 'Tipo',
