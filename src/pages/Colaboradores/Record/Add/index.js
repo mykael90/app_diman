@@ -55,9 +55,11 @@ export default function index({ submitReq }) {
   const handleStore = async (values, resetForm) => {
     const formattedValues = JSON.parse(JSON.stringify(values));
     removeEmptyString(formattedValues);
+    formattedValues.cpf = formattedValues.cpf.replace(/[^0-9]+/gi, '');
+    formattedValues.rg = formattedValues.rg.replace(/[^0-9]+/gi, '');
     try {
       setIsLoading(true);
-      await axios.post(`/workers/`, formattedValues);
+      // await axios.post(`/workers/`, formattedValues);
       setIsLoading(false);
       resetForm();
       toast.success('Colaborador Cadastrado Com Sucesso!');
