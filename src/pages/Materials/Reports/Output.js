@@ -94,6 +94,8 @@ export default function Index() {
     }
   };
 
+  const data = React.useMemo(() => reqs, [reqs]);
+
   const columns = React.useMemo(
     () => [
       {
@@ -273,69 +275,6 @@ export default function Index() {
     []
   );
 
-  const data = React.useMemo(() => reqs, [reqs]);
-
-  const defaultColumn = React.useMemo(
-    () => ({
-      // Let's set up our default Filter UI
-      // Filter: DefaultColumnFilter,
-      minWidth: 30,
-      width: 120,
-      maxWidth: 800,
-    }),
-    []
-  );
-
-  const initialState = {
-    sortBy: [
-      {
-        id: 'createdAt',
-        desc: true,
-      },
-    ],
-    pageSize: 50,
-    hiddenColumns: columns
-      .filter((col) => col.isVisible === false)
-      .map((col) => col.accessor),
-  };
-
-  const filterTypes = React.useMemo(
-    () => ({
-      // Override the default text filter to use
-      // "startWith"
-      text: (rows, ids, filterValue) => {
-        rows = rows.filter((row) =>
-          ids.some((id) => {
-            const rowValue = row.values[id];
-            const arrayFilter = String(filterValue).split(' ');
-
-            return arrayFilter.reduce((res, cur) => {
-              // res -> response; cur -> currency (atual)
-              res =
-                res &&
-                String(rowValue)
-                  .toLowerCase()
-                  .includes(String(cur).toLowerCase());
-              return res;
-            }, true);
-          })
-        );
-        return rows;
-      },
-    }),
-    []
-  );
-
-  const renderRowSubSubComponent = React.useCallback(
-    ({ row }) => (
-      <>
-        <span className="fw-bold">Especificação:</span>{' '}
-        {row.original.specification}
-      </>
-    ),
-    []
-  );
-
   // Create a function that will render our row sub components
   const renderRowSubComponent = React.useCallback(
     ({ row }) => (
@@ -408,6 +347,67 @@ export default function Index() {
         renderRowSubComponent={renderRowSubSubComponent}
       />
     ),
+    []
+  );
+
+  const renderRowSubSubComponent = React.useCallback(
+    ({ row }) => (
+      <>
+        <span className="fw-bold">Especificação:</span>{' '}
+        {row.original.specification}
+      </>
+    ),
+    []
+  );
+
+  const defaultColumn = React.useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      // Filter: DefaultColumnFilter,
+      minWidth: 30,
+      width: 120,
+      maxWidth: 800,
+    }),
+    []
+  );
+
+  const initialState = {
+    sortBy: [
+      {
+        id: 'createdAt',
+        desc: true,
+      },
+    ],
+    pageSize: 50,
+    hiddenColumns: columns
+      .filter((col) => col.isVisible === false)
+      .map((col) => col.accessor),
+  };
+
+  const filterTypes = React.useMemo(
+    () => ({
+      // Override the default text filter to use
+      // "startWith"
+      text: (rows, ids, filterValue) => {
+        rows = rows.filter((row) =>
+          ids.some((id) => {
+            const rowValue = row.values[id];
+            const arrayFilter = String(filterValue).split(' ');
+
+            return arrayFilter.reduce((res, cur) => {
+              // res -> response; cur -> currency (atual)
+              res =
+                res &&
+                String(rowValue)
+                  .toLowerCase()
+                  .includes(String(cur).toLowerCase());
+              return res;
+            }, true);
+          })
+        );
+        return rows;
+      },
+    }),
     []
   );
 
