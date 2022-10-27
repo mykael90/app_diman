@@ -275,8 +275,17 @@ export default function Index() {
     []
   );
 
-  // Create a function that will render our row sub components
-  const renderRowSubComponent = React.useCallback(
+  const renderRowSubSubComponent = React.useCallback(
+    ({ row }) => (
+      <>
+        <span className="fw-bold">Especificação:</span>{' '}
+        {row.original.specification}
+      </>
+    ),
+    []
+  );
+
+  const renderRowSubSub1Component = React.useCallback(
     ({ row }) => (
       <TableNestedrow
         style={{ padding: 0, margin: 0 }}
@@ -324,7 +333,7 @@ export default function Index() {
             // eslint-disable-next-line react/destructuring-assignment
           },
         ]}
-        data={row.original.MaterialOutItems}
+        data={row.original.MaterialInItems}
         defaultColumn={{
           // Let's set up our default Filter UI
           // Filter: DefaultColumnFilter,
@@ -350,11 +359,172 @@ export default function Index() {
     []
   );
 
-  const renderRowSubSubComponent = React.useCallback(
+  // Create a function that will render our row sub components
+  const renderRowSubComponent = React.useCallback(
     ({ row }) => (
       <>
-        <span className="fw-bold">Especificação:</span>{' '}
-        {row.original.specification}
+        <TableNestedrow
+          style={{ padding: 0, margin: 0 }}
+          columns={[
+            {
+              // Make an expander cell
+              Header: () => null, // No header
+              id: 'expander', // It needs an ID
+              width: 30,
+              disableResizing: true,
+              Cell: ({ row }) => (
+                // Use Cell to render an expander for each row.
+                // We can use the getToggleRowExpandedProps prop-getter
+                // to build the expander.
+                <span {...row.getToggleRowExpandedProps()}>
+                  {row.isExpanded ? '▽' : '▷'}
+                </span>
+              ),
+            },
+            {
+              Header: 'ID',
+              accessor: 'materialId',
+              width: 125,
+              disableResizing: true,
+              isVisible: window.innerWidth > 576,
+            },
+            { Header: 'Denominação', accessor: 'name' },
+            {
+              Header: 'Unidade',
+              accessor: 'unit',
+              width: 100,
+              disableResizing: true,
+            },
+            {
+              Header: 'Qtd',
+              accessor: 'quantity',
+              width: 100,
+              disableResizing: true,
+            },
+            {
+              Header: 'Valor',
+              accessor: 'value',
+              width: 100,
+              disableResizing: true,
+              // eslint-disable-next-line react/destructuring-assignment
+            },
+          ]}
+          data={row.original.MaterialOutItems}
+          defaultColumn={{
+            // Let's set up our default Filter UI
+            // Filter: DefaultColumnFilter,
+            minWidth: 30,
+            width: 50,
+            maxWidth: 800,
+          }}
+          initialState={{
+            sortBy: [
+              {
+                id: 'name',
+                asc: true,
+              },
+            ],
+            hiddenColumns: columns
+              .filter((col) => col.isVisible === false)
+              .map((col) => col.accessor),
+          }}
+          filterTypes={filterTypes}
+          renderRowSubComponent={renderRowSubSubComponent}
+        />
+
+        {row.original.MaterialReturned.length ? (
+          <>
+            <br />
+            <Row>
+              <Col className="text-center">
+                <span className="text-center fw-bold">RETORNOS:</span>
+              </Col>
+            </Row>
+            <TableNestedrow
+              style={{ padding: 0, margin: 0 }}
+              columns={[
+                {
+                  // Make an expander cell
+                  Header: () => null, // No header
+                  id: 'expander', // It needs an ID
+                  width: 30,
+                  disableResizing: true,
+                  Cell: ({ row }) => (
+                    // Use Cell to render an expander for each row.
+                    // We can use the getToggleRowExpandedProps prop-getter
+                    // to build the expander.
+                    <span {...row.getToggleRowExpandedProps()}>
+                      {row.isExpanded ? '▽' : '▷'}
+                    </span>
+                  ),
+                },
+                {
+                  Header: 'Retorno em:',
+                  accessor: 'createdAtBr',
+                  width: 160,
+                  disableResizing: true,
+                },
+                {
+                  Header: 'Valor',
+                  accessor: 'valueBr',
+                  width: 120,
+                  disableResizing: true,
+                },
+                // {
+                //   Header: 'Receb. por:',
+                //   accessor: 'receivedBy',
+                //   width: 150,
+                //   disableResizing: true,
+                //   Cell: (props) => {
+                //     const custom = String(props.value).replace(
+                //       /(^[a-z]*)\.([a-z]*).*/gm,
+                //       '$1.$2'
+                //     ); // deixar só os dois primeiros nomes
+                //     return <span> {custom}</span>;
+                //   },
+                // },
+                // {
+                //   Header: 'Unidade de Custo',
+                //   accessor: 'costUnit',
+                //   isVisible: window.innerWidth > 576,
+                //   // eslint-disable-next-line react/destructuring-assignment
+                //   Cell: (props) => {
+                //     const custom = String(props.value).replace(
+                //       /([0-9]{2})/gm,
+                //       '$1.'
+                //     );
+                //     return props.value ? (
+                //       <span title={props.row.original.costUnitNome}>
+                //         {custom} {props.row.original.costUnitSigla}
+                //       </span>
+                //     ) : null;
+                //   },
+                // },
+              ]}
+              data={row.original.MaterialReturned}
+              defaultColumn={{
+                // Let's set up our default Filter UI
+                // Filter: DefaultColumnFilter,
+                minWidth: 30,
+                width: 50,
+                maxWidth: 800,
+              }}
+              initialState={{
+                sortBy: [
+                  {
+                    id: 'name',
+                    asc: true,
+                  },
+                ],
+                hiddenColumns: columns
+                  .filter((col) => col.isVisible === false)
+                  .map((col) => col.accessor),
+              }}
+              filterTypes={filterTypes}
+              renderRowSubComponent={renderRowSubSub1Component}
+            />
+          </>
+        ) : null}
       </>
     ),
     []
