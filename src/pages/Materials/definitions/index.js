@@ -14,9 +14,9 @@ export default function index() {
               <Nav.Link href="#1">
                 <Link
                   className="text-decoration-none"
-                  to="/materials/definitions/terminology"
+                  to="/materials/definitions/proccessflow"
                 >
-                  Terminologia
+                  Fluxo de processo
                 </Link>
               </Nav.Link>
             </Nav.Item>
@@ -24,16 +24,16 @@ export default function index() {
               <Nav.Link href="#2">
                 <Link
                   className="text-decoration-none"
-                  to="/materials/definitions/proccessflow"
+                  to="/materials/definitions/terminology"
                 >
-                  Fluxo de processo
+                  Terminologia
                 </Link>
               </Nav.Link>
             </Nav.Item>
           </Nav>
         </Container>
       </Card.Header>
-      <Container>
+      <Container fluid>
         <Card.Body>
           <Outlet />
         </Card.Body>

@@ -1,9 +1,11 @@
 import React from 'react';
+import { Container } from 'react-bootstrap';
+import { ReactComponent as MaterialsFlow } from '../../../../assets/img/materials/definitions/MaterialsFlow.svg';
 
 export default function index() {
   return (
-    <div style={{ height: '600px', lineHeight: '600px', textAlign: 'center' }}>
-      Módulo de fluxo de processo em desenvolvimento
-    </div>
+    <Container fluid>
+      <MaterialsFlow style={{ padding: 0, margin: 0 }} />
+    </Container>
   );
 }
