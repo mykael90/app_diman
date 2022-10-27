@@ -39,6 +39,7 @@ const formatGroupLabel = (data) => (
 
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
+  const userName = useSelector((state) => state.auth.user.name);
   const [inventoryData, setinventoryData] = useState([]);
   const [users, setUsers] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -259,12 +260,12 @@ export default function Index() {
 
   const initialValues = {
     reqMaintenance: '',
-    authorizedBy: '',
+    intendedUse: new Date().toISOString().split('T')[0],
+    authorizedBy: { value: userId, label: userName },
     workerId: '',
     place: '',
     reqMaterial: '',
     obs: '',
-    intendedUse: '',
     MaterialReserveItems: [],
   };
   return (
