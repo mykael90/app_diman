@@ -40,6 +40,36 @@ export default function index() {
                 </Link>
               </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="#4">
+                <Link
+                  className="text-decoration-none"
+                  to="/materials/reports/provisionfrequency"
+                >
+                  Provisões
+                </Link>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="#5">
+                <Link
+                  className="text-decoration-none"
+                  to="/materials/reports/consumefrequency"
+                >
+                  Consumos
+                </Link>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="#6">
+                <Link
+                  className="text-decoration-none"
+                  to="/materials/reports/maintenancebalanceoutput"
+                >
+                  Balanço por Manutenção
+                </Link>
+              </Nav.Link>
+            </Nav.Item>
           </Nav>
         </Container>
       </Card.Header>

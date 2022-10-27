@@ -71,6 +71,8 @@ export default function TableGfilterNestedRowHiddenRows({
   filterTypes,
   initialState,
   renderRowSubComponent,
+  updateMyData,
+  skipPageReset,
 }) {
   const {
     getTableProps,
@@ -101,6 +103,13 @@ export default function TableGfilterNestedRowHiddenRows({
       globalFilter: 'text',
       filterTypes,
       initialState,
+      autoResetPage: !skipPageReset,
+      // updateMyData isn't part of the API, but
+      // anything we put into these options will
+      // automatically be available on the instance.
+      // That way we can call this function from our
+      // cell renderer!
+      updateMyData,
     },
     useFilters,
     useGlobalFilter,

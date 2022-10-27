@@ -367,7 +367,7 @@ export default function Index() {
                       : 'inherit',
                 }}
               >
-                {value}{' '}
+                {value.toFixed(2)}{' '}
                 <OverlayTrigger
                   placement="right"
                   delay={{ show: 250, hide: 400 }}
@@ -412,7 +412,7 @@ export default function Index() {
                       : 'inherit',
                 }}
               >
-                {value}{' '}
+                {value.toFixed(2)}{' '}
                 <OverlayTrigger
                   placement="right"
                   delay={{ show: 250, hide: 400 }}

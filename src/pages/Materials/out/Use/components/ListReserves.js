@@ -6,7 +6,14 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { FaShare, FaDolly, FaCheck, FaTimes } from 'react-icons/fa';
+import {
+  FaShare,
+  FaDolly,
+  FaCheck,
+  FaTimes,
+  FaInfo,
+  FaRegCopy,
+} from 'react-icons/fa';
 
 import {
   Container,
@@ -34,8 +41,10 @@ const renderTooltip = (props, message) => (
 const handleStoreAsk = (e) => {
   e.preventDefault();
   const check = e.currentTarget.nextSibling;
-  const times = check.nextSibling;
+  const copyIcon = check.nextSibling;
+  const times = copyIcon.nextSibling;
   check.className = check.className.replace('d-none', 'd-block');
+  copyIcon.className = copyIcon.className.replace('d-none', 'd-block');
   times.className = times.className.replace('d-none', 'd-block');
   console.log(e.currentTarget.className);
   e.currentTarget.className += ' d-none';
@@ -43,7 +52,13 @@ const handleStoreAsk = (e) => {
   // e.currentTarget.remove();
 };
 
-export default function Index({ reserves, getReservesData, userId }) {
+export default function Index({
+  reserves,
+  getReservesData,
+  userId,
+  setInitialValues,
+  setOpenCollapse,
+}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpdateSeparetedAt = async (values) => {
@@ -166,7 +181,7 @@ export default function Index({ reserves, getReservesData, userId }) {
     }).id; // id de saída gerado automaticamente, se deixar vai usar o id da reserva
 
     formattedValues.MaterialReserveItems.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      Object.assign(item, { MaterialId: item.materialId }); // rename key
       item.value = item.value
         .replace(/\./g, '')
         .replace(/,/g, '.')
@@ -203,6 +218,60 @@ export default function Index({ reserves, getReservesData, userId }) {
       getReservesData();
 
       toast.info(`Cancelamento de reserva realizado`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
+  const handleImportReserve = async (values) => {
+    const formattedValues = {
+      ...Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      ),
+    }; // LIMPANDO CHAVES NULL E UNDEFINED
+
+    delete Object.assign(formattedValues, {
+      materialReserveId: formattedValues.id,
+    }).id; // id de saída gerado automaticamente, se deixar vai usar o id da reserva
+
+    delete formattedValues.created_at;
+    delete formattedValues.createdAtBr;
+    delete formattedValues.userId;
+    delete formattedValues.UserId;
+
+    formattedValues.MaterialReserveItems.forEach((item) => {
+      Object.assign(item, { MaterialId: item.materialId }); // rename key
+      item.value = item.value
+        .replace(/\./g, '')
+        .replace(/,/g, '.')
+        .replace(/[^0-9\.]+/g, '');
+    });
+
+    Object.assign(formattedValues, {
+      items: formattedValues.MaterialReserveItems,
+    });
+
+    formattedValues.workerId = {
+      label: formattedValues.workerName,
+      value: formattedValues.workerId,
+    };
+
+    formattedValues.authorizedBy = {
+      label: formattedValues.authorizerName,
+      value: formattedValues.authorizerId,
+    };
+
+    console.log(formattedValues);
+
+    try {
+      setOpenCollapse(true);
+      setInitialValues(formattedValues);
+
+      toast.info(`Reserva importada para formulário`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       err.response?.data?.errors
@@ -329,6 +398,26 @@ export default function Index({ reserves, getReservesData, userId }) {
         Cell: ({ value, row }) => (
           <Row>
             {' '}
+            <Col xs="auto" className="p-auto text-end">
+              {row.original.obs ? (
+                <>
+                  {' '}
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) => renderTooltip(props, row.original.obs)}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0"
+                    >
+                      <FaInfo />
+                    </Button>
+                  </OverlayTrigger>
+                </>
+              ) : null}
+            </Col>
             <Col className="p-auto text-end">
               {value}{' '}
               <OverlayTrigger
@@ -359,6 +448,25 @@ export default function Index({ reserves, getReservesData, userId }) {
                   }}
                 >
                   <FaCheck />
+                </Button>
+              </OverlayTrigger>
+              <OverlayTrigger
+                placement="top"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) =>
+                  renderTooltip(props, 'Importar reserva e cancelar')
+                }
+              >
+                <Button
+                  size="sm"
+                  variant="outline-info"
+                  className="border-0 mt-2 d-none"
+                  onClick={() => {
+                    handleImportReserve(row.original);
+                    handleCancelReserve(row.original);
+                  }}
+                >
+                  <FaRegCopy />
                 </Button>
               </OverlayTrigger>
               <OverlayTrigger

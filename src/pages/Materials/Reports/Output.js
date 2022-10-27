@@ -3,9 +3,30 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import {
+  FaCommentDots,
+  FaInfo,
+  FaDirections,
+  FaPencilAlt,
+  FaRedoAlt,
+  FaSyncAlt,
+  FaRegEdit,
+  FaEdit,
+  FaExclamationTriangle,
+  FaExclamation,
+} from 'react-icons/fa';
 
-import { Container, Row, Card } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Card,
+  Col,
+  Button,
+  OverlayTrigger,
+  Tooltip,
+} from 'react-bootstrap';
 
 import axios from '../../../services/axios';
 import Loading from '../../../components/Loading';
@@ -14,28 +35,77 @@ import Loading from '../../../components/Loading';
 import TableGfilterNestedrow from '../components/TableGfilterNestedRow';
 import TableNestedrow from '../components/TableNestedRow';
 
+const renderTooltip = (props, message) => (
+  <Tooltip id="button-tooltip" {...props}>
+    {message}
+  </Tooltip>
+);
+
 export default function Index() {
+  const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
   const [reqs, setReqs] = useState([]);
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/out/');
-        setReqs(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
+  async function getData() {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/materials/out/');
+      setReqs(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
     }
+  }
 
+  useEffect(() => {
     getData();
   }, []);
+
+  const handleAskUpdateUserReplacement = (e, values) => {
+    e.preventDefault();
+    const exclamation = e.currentTarget.nextSibling;
+    exclamation.className = exclamation.className.replace('d-none', 'd-inline');
+    e.currentTarget.className += ' d-none';
+    return true;
+
+    // e.currentTarget.remove();
+  };
+
+  const handleUpdateUserReplacement = async (e, values) => {
+    e.preventDefault();
+    const { id } = values;
+    const updateSeparation = {
+      userReplacementId: userId,
+    };
+    const btn = e.currentTarget;
+
+    try {
+      setIsLoading(true);
+
+      // FAZ A ATUALIZAÇÃO DA SEPARAÇÃO
+      await axios.put(`/materials/out/${id}`, updateSeparation);
+
+      setIsLoading(false);
+      btn.class += 'd-none';
+      btn.remove();
+      // getData();
+
+      toast.success(`Reposição informada com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
+
+  const data = React.useMemo(() => reqs, [reqs]);
 
   const columns = React.useMemo(
     () => [
@@ -59,11 +129,31 @@ export default function Index() {
         accessor: 'reqMaintenance',
         width: 120,
         disableResizing: true,
+        Cell: ({ value, row }) => (
+          <div>
+            {value}{' '}
+            {row.original.MaterialReturned.length ? (
+              <OverlayTrigger
+                placement="right"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Houve retorno')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-warning"
+                  className="border-0 m-0"
+                >
+                  <FaExclamationTriangle />
+                </Button>
+              </OverlayTrigger>
+            ) : null}
+          </div>
+        ),
       },
       {
         Header: 'Tipo',
         accessor: 'type',
-        width: 120,
+        width: 80,
         disableResizing: true,
       },
       {
@@ -97,14 +187,17 @@ export default function Index() {
         accessor: 'removedBy',
         width: 200,
         disableResizing: true,
+        Cell: ({ value, row }) => (
+          <span>{value || row.original.authorizerUsername}</span>
+        ),
       },
       {
         Header: 'Expedido por:',
         accessor: 'userUsername',
-        width: 200,
+        width: 150,
         disableResizing: true,
-        Cell: (props) => {
-          const custom = String(props.value).replace(
+        Cell: ({ value }) => {
+          const custom = String(value).replace(
             /(^[a-z]*)\.([a-z]*).*/gm,
             '$1.$2'
           ); // deixar só os dois primeiros nomes
@@ -115,59 +208,101 @@ export default function Index() {
         Header: 'Local',
         accessor: 'place',
       },
-    ],
-    []
-  );
-
-  const data = React.useMemo(() => reqs, [reqs]);
-
-  const defaultColumn = React.useMemo(
-    () => ({
-      // Let's set up our default Filter UI
-      // Filter: DefaultColumnFilter,
-      minWidth: 30,
-      width: 120,
-      maxWidth: 800,
-    }),
-    []
-  );
-
-  const initialState = {
-    sortBy: [
       {
-        id: 'createdAt',
-        desc: true,
+        Header: 'Ações',
+        id: 'actions',
+        width: 110,
+        disableResizing: true,
+        Cell: ({ value, row }) => (
+          <Row className="d-flex flex-nowrap">
+            <Col xs="auto" className="text-center m-0 p-0 px-1 ps-2">
+              {row.original.obs ? (
+                <>
+                  {' '}
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) => renderTooltip(props, row.original.obs)}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0"
+                    >
+                      <FaInfo />
+                    </Button>
+                  </OverlayTrigger>
+                </>
+              ) : null}
+            </Col>
+            <Col xs="auto" className="text-center m-0 p-0 px-1">
+              {row.original.userReplacementId ||
+              row.original.reqMaterial ? null : (
+                <>
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) =>
+                      renderTooltip(
+                        props,
+                        'Informar RM de reposição criada no SIPAC'
+                      )
+                    }
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-success"
+                      className="border-0 m-0"
+                      onClick={(e) => {
+                        handleAskUpdateUserReplacement(e);
+                      }}
+                    >
+                      <FaRedoAlt />
+                    </Button>
+                  </OverlayTrigger>
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) =>
+                      renderTooltip(props, 'Confirmar informação de RM criada!')
+                    }
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0 d-none"
+                      onClick={(e) => {
+                        handleUpdateUserReplacement(e, row.original);
+                      }}
+                    >
+                      <FaExclamation />
+                    </Button>
+                  </OverlayTrigger>
+                </>
+              )}
+            </Col>
+            <Col xs="auto" className="text-center m-0 p-0 px-1">
+              <OverlayTrigger
+                placement="left"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Editar saída')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  className="border-0 m-0"
+                  onClick={() => {
+                    alert('Funcionalidade em implantação...');
+                  }}
+                >
+                  <FaPencilAlt />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+          </Row>
+        ),
       },
     ],
-    hiddenColumns: columns
-      .filter((col) => col.isVisible === false)
-      .map((col) => col.accessor),
-  };
-
-  const filterTypes = React.useMemo(
-    () => ({
-      // Override the default text filter to use
-      // "startWith"
-      text: (rows, ids, filterValue) => {
-        rows = rows.filter((row) =>
-          ids.some((id) => {
-            const rowValue = row.values[id];
-            const arrayFilter = String(filterValue).split(' ');
-
-            return arrayFilter.reduce((res, cur) => {
-              // res -> response; cur -> currency (atual)
-              res =
-                res &&
-                String(rowValue)
-                  .toLowerCase()
-                  .includes(String(cur).toLowerCase());
-              return res;
-            }, true);
-          })
-        );
-        return rows;
-      },
-    }),
     []
   );
 
@@ -181,8 +316,7 @@ export default function Index() {
     []
   );
 
-  // Create a function that will render our row sub components
-  const renderRowSubComponent = React.useCallback(
+  const renderRowSubSub1Component = React.useCallback(
     ({ row }) => (
       <TableNestedrow
         style={{ padding: 0, margin: 0 }}
@@ -230,7 +364,7 @@ export default function Index() {
             // eslint-disable-next-line react/destructuring-assignment
           },
         ]}
-        data={row.original.MaterialOutItems}
+        data={row.original.MaterialInItems}
         defaultColumn={{
           // Let's set up our default Filter UI
           // Filter: DefaultColumnFilter,
@@ -253,6 +387,228 @@ export default function Index() {
         renderRowSubComponent={renderRowSubSubComponent}
       />
     ),
+    []
+  );
+
+  // Create a function that will render our row sub components
+  const renderRowSubComponent = React.useCallback(
+    ({ row }) => (
+      <>
+        <TableNestedrow
+          style={{ padding: 0, margin: 0 }}
+          columns={[
+            {
+              // Make an expander cell
+              Header: () => null, // No header
+              id: 'expander', // It needs an ID
+              width: 30,
+              disableResizing: true,
+              Cell: ({ row }) => (
+                // Use Cell to render an expander for each row.
+                // We can use the getToggleRowExpandedProps prop-getter
+                // to build the expander.
+                <span {...row.getToggleRowExpandedProps()}>
+                  {row.isExpanded ? '▽' : '▷'}
+                </span>
+              ),
+            },
+            {
+              Header: 'ID',
+              accessor: 'materialId',
+              width: 125,
+              disableResizing: true,
+              isVisible: window.innerWidth > 576,
+            },
+            { Header: 'Denominação', accessor: 'name' },
+            {
+              Header: 'Unidade',
+              accessor: 'unit',
+              width: 100,
+              disableResizing: true,
+            },
+            {
+              Header: 'Qtd',
+              accessor: 'quantity',
+              width: 100,
+              disableResizing: true,
+            },
+            {
+              Header: 'Valor',
+              accessor: 'value',
+              width: 100,
+              disableResizing: true,
+              // eslint-disable-next-line react/destructuring-assignment
+            },
+          ]}
+          data={row.original.MaterialOutItems}
+          defaultColumn={{
+            // Let's set up our default Filter UI
+            // Filter: DefaultColumnFilter,
+            minWidth: 30,
+            width: 50,
+            maxWidth: 800,
+          }}
+          initialState={{
+            sortBy: [
+              {
+                id: 'name',
+                asc: true,
+              },
+            ],
+            hiddenColumns: columns
+              .filter((col) => col.isVisible === false)
+              .map((col) => col.accessor),
+          }}
+          filterTypes={filterTypes}
+          renderRowSubComponent={renderRowSubSubComponent}
+        />
+
+        {row.original.MaterialReturned.length ? (
+          <>
+            <br />
+            <Row>
+              <Col className="text-center">
+                <span className="text-center fw-bold">RETORNOS:</span>
+              </Col>
+            </Row>
+            <TableNestedrow
+              style={{ padding: 0, margin: 0 }}
+              columns={[
+                {
+                  // Make an expander cell
+                  Header: () => null, // No header
+                  id: 'expander', // It needs an ID
+                  width: 30,
+                  disableResizing: true,
+                  Cell: ({ row }) => (
+                    // Use Cell to render an expander for each row.
+                    // We can use the getToggleRowExpandedProps prop-getter
+                    // to build the expander.
+                    <span {...row.getToggleRowExpandedProps()}>
+                      {row.isExpanded ? '▽' : '▷'}
+                    </span>
+                  ),
+                },
+                {
+                  Header: 'Retorno em:',
+                  accessor: 'createdAtBr',
+                  width: 160,
+                  disableResizing: true,
+                },
+                {
+                  Header: 'Valor',
+                  accessor: 'valueBr',
+                  width: 120,
+                  disableResizing: true,
+                },
+                // {
+                //   Header: 'Receb. por:',
+                //   accessor: 'receivedBy',
+                //   width: 150,
+                //   disableResizing: true,
+                //   Cell: (props) => {
+                //     const custom = String(props.value).replace(
+                //       /(^[a-z]*)\.([a-z]*).*/gm,
+                //       '$1.$2'
+                //     ); // deixar só os dois primeiros nomes
+                //     return <span> {custom}</span>;
+                //   },
+                // },
+                // {
+                //   Header: 'Unidade de Custo',
+                //   accessor: 'costUnit',
+                //   isVisible: window.innerWidth > 576,
+                //   // eslint-disable-next-line react/destructuring-assignment
+                //   Cell: (props) => {
+                //     const custom = String(props.value).replace(
+                //       /([0-9]{2})/gm,
+                //       '$1.'
+                //     );
+                //     return props.value ? (
+                //       <span title={props.row.original.costUnitNome}>
+                //         {custom} {props.row.original.costUnitSigla}
+                //       </span>
+                //     ) : null;
+                //   },
+                // },
+              ]}
+              data={row.original.MaterialReturned}
+              defaultColumn={{
+                // Let's set up our default Filter UI
+                // Filter: DefaultColumnFilter,
+                minWidth: 30,
+                width: 50,
+                maxWidth: 800,
+              }}
+              initialState={{
+                sortBy: [
+                  {
+                    id: 'name',
+                    asc: true,
+                  },
+                ],
+                hiddenColumns: columns
+                  .filter((col) => col.isVisible === false)
+                  .map((col) => col.accessor),
+              }}
+              filterTypes={filterTypes}
+              renderRowSubComponent={renderRowSubSub1Component}
+            />
+          </>
+        ) : null}
+      </>
+    ),
+    []
+  );
+
+  const defaultColumn = React.useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      // Filter: DefaultColumnFilter,
+      minWidth: 30,
+      width: 120,
+      maxWidth: 800,
+    }),
+    []
+  );
+
+  const initialState = {
+    sortBy: [
+      {
+        id: 'createdAt',
+        desc: true,
+      },
+    ],
+    pageSize: 50,
+    hiddenColumns: columns
+      .filter((col) => col.isVisible === false)
+      .map((col) => col.accessor),
+  };
+
+  const filterTypes = React.useMemo(
+    () => ({
+      // Override the default text filter to use
+      // "startWith"
+      text: (rows, ids, filterValue) => {
+        rows = rows.filter((row) =>
+          ids.some((id) => {
+            const rowValue = row.values[id];
+            const arrayFilter = String(filterValue).split(' ');
+
+            return arrayFilter.reduce((res, cur) => {
+              // res -> response; cur -> currency (atual)
+              res =
+                res &&
+                String(rowValue)
+                  .toLowerCase()
+                  .includes(String(cur).toLowerCase());
+              return res;
+            }, true);
+          })
+        );
+        return rows;
+      },
+    }),
     []
   );
 

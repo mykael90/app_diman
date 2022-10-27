@@ -54,6 +54,18 @@ const formatGroupLabel = (data) => (
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
+  const [initialValues, setInitialValues] = useState({
+    reqMaintenance: '',
+    authorizedBy: '',
+    isAuthorizer: false,
+    workerId: '',
+    propertyId: '',
+    place: '',
+    buildingId: '',
+    reqMaterial: '',
+    obs: '',
+    items: [],
+  });
   const [users, setUsers] = useState([]);
   const [workers, setWorkers] = useState([]);
   const [properties, setProperties] = useState([]);
@@ -65,8 +77,14 @@ export default function Index() {
       reqMaintenance: yup
         .string()
         .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
-      workerId: yup.object().required('Requerido'),
       authorizedBy: yup.object().required('Requerido'),
+      isAuthorizer: yup.boolean(),
+      workerId: yup.object().when(['isAuthorizer'], {
+        is: false,
+        then: (validate) => validate.required('Requerido'),
+        otherwise: (validate) => validate.notRequired(),
+      }),
+
       obs: yup.string(),
       // eslint-disable-next-line react/forbid-prop-types
       items: yup
@@ -111,8 +129,14 @@ export default function Index() {
         reqMaintenance: yup
           .string()
           .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
-        workerId: yup.object().required('Requerido'),
         authorizedBy: yup.object().required('Requerido'),
+        isAuthorizer: yup.boolean(),
+        workerId: yup.object().when(['isAuthorizer'], {
+          is: false,
+          then: (validate) => validate.required('Requerido'),
+          otherwise: (validate) => validate.notRequired(),
+        }),
+
         obs: yup.string(),
         // eslint-disable-next-line react/forbid-prop-types
         items: yup
@@ -266,7 +290,7 @@ export default function Index() {
     formattedValues.propertyId = formattedValues.propertyId?.value;
     formattedValues.buildingId = formattedValues.buildingId?.value;
     formattedValues.items.forEach((item) => {
-      delete Object.assign(item, { MaterialId: item.materialId }).materialId; // rename key
+      Object.assign(item, { MaterialId: item.materialId }); // rename key
     });
 
     Object.assign(formattedValues, {
@@ -288,6 +312,18 @@ export default function Index() {
       setOpenCollapse(false);
       resetForm();
       initialSchema();
+      setInitialValues({
+        reqMaintenance: '',
+        authorizedBy: '',
+        isAuthorizer: false,
+        workerId: '',
+        propertyId: '',
+        place: '',
+        buildingId: '',
+        reqMaterial: '',
+        obs: '',
+        items: [],
+      });
       getMaterialsData();
 
       toast.success(`Saída de material realizada com sucesso`);
@@ -346,17 +382,6 @@ export default function Index() {
     setSchema(newSchema);
   };
 
-  const initialValues = {
-    reqMaintenance: '',
-    authorizedBy: '',
-    workerId: '',
-    propertyId: '',
-    place: '',
-    buildingId: '',
-    reqMaterial: '',
-    obs: '',
-    items: [],
-  };
   return (
     <>
       <Loading isLoading={isLoading} />
@@ -374,6 +399,7 @@ export default function Index() {
             onSubmit={(values, { resetForm }) => {
               handleStore(values, resetForm);
             }}
+            enableReinitialize
           >
             {({
               submitForm,
@@ -394,7 +420,6 @@ export default function Index() {
                   setFieldValue={setFieldValue}
                   data={reqInModal}
                 />
-                <br />
                 <Row>
                   <Form.Group
                     as={Col}
@@ -533,7 +558,21 @@ export default function Index() {
                         // controlId="workerId"
                         className="pb-3"
                       >
-                        <Form.Label>RETIRADO POR:</Form.Label>
+                        <Col className="d-flex align-items-stretch">
+                          <Form.Label>RETIRADO POR: (Autorizador </Form.Label>
+                          <Form.Check
+                            name="isAuthorizer"
+                            type="checkbox"
+                            id="isAuthorizer"
+                            label=")"
+                            onChange={(e) => {
+                              handleChange(e);
+                              setFieldValue('workerId', '');
+                            }}
+                            className="mx-2 pb-2"
+                            checked={values.isAuthorizer}
+                          />
+                        </Col>
                         <Select
                           // id="workerId"
                           inputId="workerId"
@@ -552,6 +591,7 @@ export default function Index() {
                           }}
                           placeholder="Selecione o profissional"
                           onBlur={handleBlur}
+                          isDisabled={values.isAuthorizer}
                         />
                         {touched.workerId && !!errors.workerId ? (
                           <Badge bg="danger">{errors.workerId}</Badge>
@@ -695,13 +735,13 @@ export default function Index() {
                               handleClose={handleCloseModalSearch}
                               show={showModalSearch}
                               push={push}
-                              hiddenItems={values.items.map(
+                              hiddenItems={values.items?.map(
                                 (item) => item.materialId
                               )}
                               inventoryData={inventoryData}
                             />
 
-                            {values.items.length > 0 &&
+                            {values.items?.length > 0 &&
                               values.items.map((item, index) => (
                                 <>
                                   <Row className="d-block d-sm-none">
@@ -928,6 +968,18 @@ export default function Index() {
                           onClick={() => {
                             resetForm();
                             initialSchema();
+                            setInitialValues({
+                              reqMaintenance: '',
+                              authorizedBy: '',
+                              isAuthorizer: false,
+                              workerId: '',
+                              propertyId: '',
+                              place: '',
+                              buildingId: '',
+                              reqMaterial: '',
+                              obs: '',
+                              items: [],
+                            });
                             setOpenCollapse(false);
                           }}
                         >
@@ -964,6 +1016,8 @@ export default function Index() {
                 reserves={reserves}
                 getReservesData={getReservesData}
                 userId={userId}
+                setInitialValues={setInitialValues}
+                setOpenCollapse={setOpenCollapse}
               />
             </Card.Body>
           </Accordion.Collapse>

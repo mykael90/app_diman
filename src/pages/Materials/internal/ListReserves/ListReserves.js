@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaExclamation, FaDolly, FaTimes } from 'react-icons/fa';
+import { FaExclamation, FaInfo, FaTimes } from 'react-icons/fa';
 
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
@@ -326,6 +326,38 @@ export default function Index() {
         width: 150,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: 'Obs',
+        id: 'obs',
+        width: 40,
+        disableResizing: true,
+        disableSortBy: true,
+        Cell: ({ value, row }) => (
+          <Row>
+            {' '}
+            <Col xs="auto" className="p-auto text-end">
+              {row.original.obs ? (
+                <>
+                  {' '}
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) => renderTooltip(props, row.original.obs)}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0"
+                    >
+                      <FaInfo />
+                    </Button>
+                  </OverlayTrigger>
+                </>
+              ) : null}
+            </Col>
+          </Row>
+        ),
       },
     ],
     []

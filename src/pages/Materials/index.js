@@ -21,6 +21,7 @@ import Loan from './out/Loan';
 
 import Internal from './internal';
 import Restrict from './internal/Restrict';
+import InitialQuantity from './internal/InitialQuantity';
 import Reserve from './internal/Reserve';
 import ListReserves from './internal/ListReserves/ListReserves';
 
@@ -28,6 +29,9 @@ import Reports from './Reports';
 import Input from './Reports/Input';
 import Output from './Reports/Output';
 import Inventory from './Reports/Inventory';
+import MaintenanceBalanceOutput from './Reports/MaintenanceBalanceOutput';
+import ConsumeFrequency from './Reports/ConsumeFrequency';
+import ProvisionFrequency from './Reports/ProvisionFrequency';
 
 import Record from './Record';
 import List from './Record/List';
@@ -80,6 +84,7 @@ export default function MaterialsRoutes() {
 
         <Route path="internal" element={<Internal />}>
           <Route path="restrict" element={<Restrict />} />{' '}
+          <Route path="initialquantity" element={<InitialQuantity />} />{' '}
         </Route>
       </Route>
 
@@ -89,6 +94,12 @@ export default function MaterialsRoutes() {
       </Route>
 
       <Route path="reports" element={<Reports />}>
+        <Route
+          path="maintenancebalanceoutput"
+          element={<MaintenanceBalanceOutput />}
+        />{' '}
+        <Route path="provisionfrequency" element={<ProvisionFrequency />} />{' '}
+        <Route path="consumefrequency" element={<ConsumeFrequency />} />{' '}
         <Route path="inventory" element={<Inventory />} />{' '}
         <Route path="Input" element={<Input />} />{' '}
         <Route path="output" element={<Output />} />{' '}
