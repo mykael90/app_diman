@@ -15,6 +15,7 @@ import {
   FaRegEdit,
   FaEdit,
   FaExclamationTriangle,
+  FaExclamation,
 } from 'react-icons/fa';
 
 import {
@@ -63,6 +64,16 @@ export default function Index() {
   useEffect(() => {
     getData();
   }, []);
+
+  const handleAskUpdateUserReplacement = (e, values) => {
+    e.preventDefault();
+    const exclamation = e.currentTarget.nextSibling;
+    exclamation.className = exclamation.className.replace('d-none', 'd-inline');
+    e.currentTarget.className += ' d-none';
+    return true;
+
+    // e.currentTarget.remove();
+  };
 
   const handleUpdateUserReplacement = async (e, values) => {
     e.preventDefault();
@@ -227,27 +238,47 @@ export default function Index() {
             <Col xs="auto" className="text-center m-0 p-0 px-1">
               {row.original.userReplacementId ||
               row.original.reqMaterial ? null : (
-                <OverlayTrigger
-                  placement="left"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={(props) =>
-                    renderTooltip(
-                      props,
-                      'Confirmar RM de reposição criada no SIPAC'
-                    )
-                  }
-                >
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    className="border-0 m-0"
-                    onClick={(e) => {
-                      handleUpdateUserReplacement(e, row.original);
-                    }}
+                <>
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) =>
+                      renderTooltip(
+                        props,
+                        'Informar RM de reposição criada no SIPAC'
+                      )
+                    }
                   >
-                    <FaRedoAlt />
-                  </Button>
-                </OverlayTrigger>
+                    <Button
+                      size="sm"
+                      variant="outline-success"
+                      className="border-0 m-0"
+                      onClick={(e) => {
+                        handleAskUpdateUserReplacement(e);
+                      }}
+                    >
+                      <FaRedoAlt />
+                    </Button>
+                  </OverlayTrigger>
+                  <OverlayTrigger
+                    placement="left"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) =>
+                      renderTooltip(props, 'Confirmar informação de RM criada!')
+                    }
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline-warning"
+                      className="border-0 m-0 d-none"
+                      onClick={(e) => {
+                        handleUpdateUserReplacement(e, row.original);
+                      }}
+                    >
+                      <FaExclamation />
+                    </Button>
+                  </OverlayTrigger>
+                </>
               )}
             </Col>
             <Col xs="auto" className="text-center m-0 p-0 px-1">
