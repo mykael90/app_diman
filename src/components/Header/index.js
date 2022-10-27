@@ -129,7 +129,9 @@ export default function Header() {
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#10"
-                  onClick={() => navigate('/materials/definitions/terminology')}
+                  onClick={() =>
+                    navigate('/materials/definitions/proccessflow')
+                  }
                 >
                   Definições
                 </NavDropdown.Item>
