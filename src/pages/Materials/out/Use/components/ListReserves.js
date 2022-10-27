@@ -240,6 +240,8 @@ export default function Index({
 
     delete formattedValues.created_at;
     delete formattedValues.createdAtBr;
+    delete formattedValues.userId;
+    delete formattedValues.UserId;
 
     formattedValues.MaterialReserveItems.forEach((item) => {
       Object.assign(item, { MaterialId: item.materialId }); // rename key
