@@ -5,7 +5,7 @@ import { ReactComponent as MaterialsFlow } from '../../../../assets/img/material
 export default function index() {
   return (
     <Container fluid>
-      <MaterialsFlow style={{ padding: 0, margin: 0 }} />
+      <MaterialsFlow />
     </Container>
   );
 }

@@ -34,7 +34,7 @@ export default function index() {
         </Container>
       </Card.Header>
       <Container fluid>
-        <Card.Body>
+        <Card.Body className="ps-0">
           <Outlet />
         </Card.Body>
       </Container>
