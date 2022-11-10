@@ -100,7 +100,7 @@ export default function Index() {
       },
       {
         Header: 'Valor',
-        accessor: 'value',
+        accessor: 'valueBr',
         width: 120,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
@@ -120,7 +120,7 @@ export default function Index() {
       },
       {
         Header: 'Retira em:',
-        accessor: 'createdAt',
+        accessor: 'createdAtBr',
         width: 120,
         disableResizing: true,
       },
@@ -138,18 +138,8 @@ export default function Index() {
         },
       },
       {
-        Header: 'Destino',
-        accessor: 'buildingId',
-        isVisible: window.innerWidth > 576,
-        // eslint-disable-next-line react/destructuring-assignment
-        Cell: (props) => {
-          const custom = String(props.value).replace(/([0-9]{2})/gm, '$1.');
-          return (
-            <span title={props.row.original.costUnitNome}>
-              {custom} {props.row.original.costUnitSigla}
-            </span>
-          );
-        },
+        Header: 'Local',
+        accessor: 'place',
       },
       {
         Header: () => null,

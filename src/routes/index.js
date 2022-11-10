@@ -21,6 +21,8 @@ import Page404 from '../pages/Page404';
 import Providers from '../pages/Providers';
 import Unauthorized from '../components/Unauthorized';
 
+import Test from '../pages/Materials/Reports/Output/components/EditModal';
+
 const ROLES = {
   adm: 100,
   adm_materials: 200,
@@ -63,6 +65,8 @@ export default function RoutesPages() {
       >
         <Route exact path="/materials/*" element={<Materials />} />
       </Route>
+
+      <Route exact path="/test/*" element={<Test />} />
 
       {/* catch all */}
       <Route path="*" element={<Page404 />} />

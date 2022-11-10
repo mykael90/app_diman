@@ -31,6 +31,8 @@ import {
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
+import EditModal from './components/EditModal';
+
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../../components/TableGfilterNestedRow';
 import TableNestedrow from '../../components/TableNestedRow';
@@ -45,6 +47,8 @@ export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
   const [reqs, setReqs] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [dataModal, setDataModal] = useState('');
 
   async function getData() {
     try {
@@ -60,6 +64,16 @@ export default function Index() {
       setIsLoading(false);
     }
   }
+
+  const handleCloseEditModal = () => setShowEditModal(false);
+  const handleSaveEditModal = () => {
+    setShowEditModal(false);
+    getData();
+  };
+  const handleShowEditModal = (data) => {
+    setDataModal(data);
+    setShowEditModal(true);
+  };
 
   useEffect(() => {
     getData();
@@ -162,7 +176,7 @@ export default function Index() {
       },
       {
         Header: 'Valor',
-        accessor: 'value',
+        accessor: 'valueBr',
         width: 120,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
@@ -182,7 +196,7 @@ export default function Index() {
       },
       {
         Header: 'Retira em:',
-        accessor: 'createdAt',
+        accessor: 'createdAtBr',
         width: 120,
         disableResizing: true,
       },
@@ -296,7 +310,15 @@ export default function Index() {
                   variant="outline-danger"
                   className="border-0 m-0"
                   onClick={() => {
-                    alert('Funcionalidade em implantação...');
+                    if (
+                      userId !== row.original.authorizedBy &&
+                      userId !== row.original.userId
+                    ) {
+                      return toast.error(
+                        `Reserva só pode ser editada pelo expedidor ou autorizador.`
+                      );
+                    }
+                    return handleShowEditModal(row.original);
                   }}
                 >
                   <FaPencilAlt />
@@ -620,6 +642,12 @@ export default function Index() {
     <>
       <Loading isLoading={isLoading} />
       <Container>
+        <EditModal // modal p/ pesquisa de materiais
+          handleClose={handleCloseEditModal}
+          show={showEditModal}
+          data={dataModal}
+          handleSave={handleSaveEditModal}
+        />
         <Row className="text-center py-3">
           <Card.Title>Relatório de Saída: Materiais</Card.Title>
           <Card.Text>
