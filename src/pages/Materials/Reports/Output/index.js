@@ -28,12 +28,12 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 
-import axios from '../../../services/axios';
-import Loading from '../../../components/Loading';
+import axios from '../../../../services/axios';
+import Loading from '../../../../components/Loading';
 
 // import generic table from material's components with global filter and nested row
-import TableGfilterNestedrow from '../components/TableGfilterNestedRow';
-import TableNestedrow from '../components/TableNestedRow';
+import TableGfilterNestedrow from '../../components/TableGfilterNestedRow';
+import TableNestedrow from '../../components/TableNestedRow';
 
 const renderTooltip = (props, message) => (
   <Tooltip id="button-tooltip" {...props}>
