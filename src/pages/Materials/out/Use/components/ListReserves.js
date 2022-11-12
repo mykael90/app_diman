@@ -302,17 +302,19 @@ export default function Index({
         disableResizing: true,
       },
       {
-        Header: 'Previsão:',
+        Header: 'Previsão',
         accessor: 'intendedUseBr',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
-        Header: 'Reserva para:',
+        Header: 'Reserva para',
         accessor: 'workerName',
+        disableSortBy: true,
       },
       {
-        Header: 'Autorização:',
+        Header: 'Autorização',
         accessor: 'authorizerUsername',
         width: 180,
         disableResizing: true,
@@ -323,9 +325,10 @@ export default function Index({
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableSortBy: true,
       },
       {
-        Header: 'Reservado por:',
+        Header: 'Reservado por',
         accessor: 'userUsername',
         width: 180,
         disableResizing: true,
@@ -336,9 +339,10 @@ export default function Index({
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableSortBy: true,
       },
       {
-        Header: 'Separação:',
+        Header: 'Separação',
         accessor: 'separatedAtBr',
         width: 120,
         disableResizing: true,
@@ -370,6 +374,7 @@ export default function Index({
             </Col>
           </Row>
         ),
+        disableSortBy: true,
       },
       {
         Header: 'Valor',
@@ -377,6 +382,7 @@ export default function Index({
         width: 120,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
+        disableSortBy: true,
       },
       {
         Header: 'Local',
@@ -384,6 +390,7 @@ export default function Index({
         width: 150,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
+        disableSortBy: true,
       },
       {
         Header: () => null,
@@ -503,12 +510,12 @@ export default function Index({
   );
 
   const initialState = {
-    sortBy: [
-      {
-        id: 'req',
-        desc: true,
-      },
-    ],
+    // sortBy: [
+    //   {
+    //     id: 'req',
+    //     desc: true,
+    //   },
+    // ],
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),

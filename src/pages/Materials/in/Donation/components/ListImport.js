@@ -184,20 +184,22 @@ export default function Index(props) {
         disableFilters: true,
         Cell: ({ row }) => (
           <Col className="d-flex">
-            <Form.Control
-              id={`s_${row.values.id}`}
-              size="sm"
-              type="number"
-              onChange={(e) => handleQuantityChange(e, row)}
-            />
-            <Button
-              onClick={(e) => handlePushItem(e, row)}
-              variant="outline-success"
-              size="sm"
-              className="border-0"
-            >
-              <FaPlus size={18} />
-            </Button>
+            <Form className="d-flex" onSubmit={(e) => handlePushItem(e, row)}>
+              <Form.Control
+                id={`s_${row.values.id}`}
+                size="sm"
+                type="number"
+                onChange={(e) => handleQuantityChange(e, row)}
+              />
+              <Button
+                type="submit"
+                variant="outline-success"
+                size="sm"
+                className="border-0"
+              >
+                <FaPlus size={18} />
+              </Button>
+            </Form>
           </Col>
         ),
       },

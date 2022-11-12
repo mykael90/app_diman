@@ -463,13 +463,14 @@ export default function EditModal({ show, handleClose, data, handleSave }) {
                       rows={5}
                       type="text"
                       value={values.obs}
-                      onChange={(e) => {
-                        setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
-                      }}
+                      onChange={handleChange}
                       isInvalid={touched.obs && !!errors.obs}
                       // isValid={touched.obs && !errors.obs}
                       placeholder="Observações gerais"
-                      onBlur={handleBlur}
+                      onBlur={(e) => {
+                        setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
+                        handleBlur(e);
+                      }}
                     />
                     <Form.Control.Feedback
                       tooltip

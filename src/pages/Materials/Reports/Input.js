@@ -146,7 +146,7 @@ export default function Index() {
         Cell: ({ value }) => <div className="p-auto text-center">{value}</div>,
       },
       {
-        Header: () => <div className="p-auto text-center">Almoxarife</div>,
+        Header: () => <div className="p-auto text-center">Conferente</div>,
         accessor: 'receivedBy',
         width: 150,
         disableResizing: true,

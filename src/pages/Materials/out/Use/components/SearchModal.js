@@ -11,7 +11,7 @@ export default function SearchModal(props) {
     <Modal
       show={show}
       onHide={handleClose}
-      backdrop="static"
+      // backdrop="static"
       keyboard={false}
       size="xl"
     >
