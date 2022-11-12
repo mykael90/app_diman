@@ -308,13 +308,14 @@ export default function Index() {
                       rows={2}
                       type="text"
                       value={values.obs}
-                      onChange={(e) => {
-                        setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
-                      }}
+                      onChange={handleChange}
                       isInvalid={touched.obs && !!errors.obs}
                       // isValid={touched.obs && !errors.obs}
                       placeholder="Conferente | Entrega parcial? | Placa de carro | Nome de motorista"
-                      onBlur={handleBlur}
+                      onBlur={(e) => {
+                        setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
+                        handleBlur(e);
+                      }}
                     />
                     <Form.Control.Feedback
                       tooltip

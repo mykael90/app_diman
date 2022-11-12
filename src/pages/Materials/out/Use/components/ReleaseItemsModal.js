@@ -311,7 +311,10 @@ export default function SearchModal(props) {
                           isInvalid={touched.obs && !!errors.obs}
                           // isValid={touched.obs && !errors.obs}
                           placeholder="Observações gerais"
-                          onBlur={handleBlur}
+                          onBlur={(e) => {
+                            setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
+                            handleBlur(e);
+                          }}
                         />
                         <Form.Control.Feedback
                           tooltip
@@ -470,7 +473,7 @@ export default function SearchModal(props) {
                                             item.balancedQuantity,
                                             handleChange
                                           )
-                                        }                                       
+                                        }
                                         onBlur={handleBlur}
                                         placeholder="QTD"
                                         size="sm"
