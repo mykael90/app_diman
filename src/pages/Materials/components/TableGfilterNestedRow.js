@@ -134,20 +134,43 @@ export default function TableGfilterNestedrow({
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  <th
+                    className="text-center align-middle"
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                  >
                     {column.render('Header')}
                     {column.canSort ? (
                       <span>
                         {' '}
-                        <FaSort />
                         {column.isSorted ? (
                           column.isSortedDesc ? (
-                            <FaSortAlphaUp />
+                            <Button
+                              title="Ordenado decrescente"
+                              size="sm"
+                              variant="outline-primary"
+                              className="border-0"
+                            >
+                              <FaSortAlphaUp />
+                            </Button>
                           ) : (
-                            <FaSortAlphaDown />
+                            <Button
+                              title="Ordenado crescente"
+                              size="sm"
+                              variant="outline-primary"
+                              className="border-0"
+                            >
+                              <FaSortAlphaDown />
+                            </Button>
                           )
                         ) : (
-                          ''
+                          <Button
+                            title="Clique para ordenar"
+                            size="sm"
+                            variant="outline-primary"
+                            className="border-0"
+                          >
+                            <FaSort />
+                          </Button>
                         )}
                       </span>
                     ) : null}
@@ -164,7 +187,7 @@ export default function TableGfilterNestedrow({
                   <tr {...row.getRowProps()}>
                     {row.cells.map((cell) => (
                       <td
-                        className="py-3"
+                        className="py-3 text-center align-middle"
                         style={{
                           verticalAlign: 'middle',
                         }}

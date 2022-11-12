@@ -166,7 +166,12 @@ export default function Index(props) {
         filter: filterDifferentThan,
         Filter: FilterForId,
       },
-      { Header: 'Denominação', accessor: 'name', disableFilters: true },
+      {
+        Header: 'Denominação',
+        accessor: 'name',
+        disableFilters: true,
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
+      },
       {
         Header: 'Unidade',
         accessor: 'unit',
@@ -206,20 +211,23 @@ export default function Index(props) {
         disableFilters: true,
         Cell: ({ row }) => (
           <Col className="d-flex">
-            <Form.Control
-              id={`s_${row.values.materialId}`}
-              size="sm"
-              type="number"
-              onChange={(e) => handleQuantityChange(e, row)}
-            />
-            <Button
-              onClick={(e) => handlePushItem(e, row)}
-              variant="outline-success"
-              size="sm"
-              className="border-0"
-            >
-              <FaPlus size={18} />
-            </Button>
+            <Form className="d-flex" onSubmit={(e) => handlePushItem(e, row)}>
+              <Form.Control
+                id={`s_${row.values.materialId}`}
+                size="sm"
+                type="number"
+                onChange={(e) => handleQuantityChange(e, row)}
+                style={{ width: '75px' }}
+              />
+              <Button
+                type="submit"
+                variant="outline-success"
+                size="sm"
+                className="border-0"
+              >
+                <FaPlus size={18} />
+              </Button>
+            </Form>
           </Col>
         ),
       },
@@ -296,7 +304,7 @@ export default function Index(props) {
       <Row className="text-center py-3">
         <Card.Title>Materiais Cadastrados</Card.Title>
         <Card.Text>
-          Referências extraídas via SIPAC (grupos: 3024, 3026).
+          Referências extraídas via SIPAC (grupos: 3024, 3026, 3028 e 3042).
         </Card.Text>
       </Row>
       <TableGfilterNestedRowHiddenRows

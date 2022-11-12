@@ -87,33 +87,42 @@ export default function Index() {
         accessor: 'reqMaintenance',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: 'Nº RM',
         accessor: 'req',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
-        Header: 'Tipo',
+        Header: () => <div className="p-auto text-center">Tipo</div>,
         accessor: 'type',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
+        Cell: ({ value }) => <div className="p-auto text-center">{value}</div>,
       },
       {
         Header: 'Valor',
         accessor: 'value',
         width: 120,
         disableResizing: true,
+        Cell: ({ value }) => <div className="p-auto text-end">{value}</div>,
       },
       {
-        Header: 'Pedido em:',
+        Header: () => <div className="p-auto text-center">Data de pedido</div>,
         accessor: 'registerDate',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
+        Cell: ({ value }) => <div className="p-auto text-center">{value}</div>,
       },
       {
-        Header: 'Pedido por:',
+        Header: () => (
+          <div className="p-auto text-center">Usuário resp. pedido</div>
+        ),
         accessor: 'requiredBy',
         width: 150,
         disableResizing: true,
@@ -122,17 +131,22 @@ export default function Index() {
             /(^[a-z]*)\.([a-z]*).*/gm,
             '$1.$2'
           ); // deixar só os dois primeiros nomes
-          return <span> {custom}</span>;
+          return <div className="p-auto text-center"> {custom}</div>;
         },
+        disableSortBy: true,
       },
       {
-        Header: 'Receb. em:',
+        Header: () => (
+          <div className="p-auto text-center">Data de recebimento</div>
+        ),
         accessor: 'createdAt',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
+        Cell: ({ value }) => <div className="p-auto text-center">{value}</div>,
       },
       {
-        Header: 'Receb. por:',
+        Header: () => <div className="p-auto text-center">Almoxarife</div>,
         accessor: 'receivedBy',
         width: 150,
         disableResizing: true,
@@ -143,9 +157,13 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableSortBy: true,
+        Cell: ({ value }) => <div className="p-auto text-center">{value}</div>,
       },
       {
-        Header: 'Unidade de Custo',
+        Header: () => (
+          <div className="p-auto text-center">Unidade de custo</div>
+        ),
         accessor: 'costUnit',
         isVisible: window.innerWidth > 576,
         // eslint-disable-next-line react/destructuring-assignment
@@ -157,9 +175,10 @@ export default function Index() {
             </span>
           ) : null;
         },
+        disableSortBy: true,
       },
       {
-        Header: 'Ações',
+        Header: () => <div className="p-auto text-center">Ações</div>,
         id: 'actions',
         width: 70,
         disableResizing: true,
@@ -176,7 +195,7 @@ export default function Index() {
                   >
                     <Button
                       size="sm"
-                      variant="outline-warning"
+                      variant="outline-info"
                       className="border-0 m-0"
                     >
                       <FaInfo />
@@ -193,7 +212,7 @@ export default function Index() {
               >
                 <Button
                   size="sm"
-                  variant="outline-danger"
+                  variant="outline-secondary"
                   className="border-0 m-0"
                   onClick={() => {
                     alert('Funcionalidade em implantação...');
@@ -226,7 +245,7 @@ export default function Index() {
   const initialState = {
     sortBy: [
       {
-        id: 'createdAt',
+        id: 'id',
         desc: true,
       },
     ],

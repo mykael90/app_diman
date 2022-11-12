@@ -137,6 +137,7 @@ export default function Index() {
       {
         Header: 'Profissional',
         accessor: 'workerName',
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
       },
       {
         Header: 'Responsável',

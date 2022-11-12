@@ -167,12 +167,14 @@ export default function Index() {
             ) : null}
           </div>
         ),
+        disableSortBy: true,
       },
       {
         Header: 'Tipo',
         accessor: 'type',
         width: 80,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: 'Valor',
@@ -182,7 +184,7 @@ export default function Index() {
         // eslint-disable-next-line react/destructuring-assignment
       },
       {
-        Header: 'Autorizado por:',
+        Header: 'Autorização',
         accessor: 'authorizerUsername',
         width: 150,
         disableResizing: true,
@@ -193,24 +195,27 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableSortBy: true,
       },
       {
-        Header: 'Retira em:',
+        Header: 'Retira',
         accessor: 'createdAtBr',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
-        Header: 'Retirado por:',
+        Header: 'Profissional',
         accessor: 'removedBy',
         width: 200,
         disableResizing: true,
         Cell: ({ value, row }) => (
           <span>{value || row.original.authorizerUsername}</span>
         ),
+        disableSortBy: true,
       },
       {
-        Header: 'Expedido por:',
+        Header: 'Expedição',
         accessor: 'userUsername',
         width: 150,
         disableResizing: true,
@@ -221,10 +226,12 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableSortBy: true,
       },
       {
         Header: 'Local',
         accessor: 'place',
+        disableSortBy: true,
       },
       {
         Header: 'Ações',
@@ -244,7 +251,7 @@ export default function Index() {
                   >
                     <Button
                       size="sm"
-                      variant="outline-warning"
+                      variant="outline-info"
                       className="border-0 m-0"
                     >
                       <FaInfo />
@@ -307,7 +314,7 @@ export default function Index() {
               >
                 <Button
                   size="sm"
-                  variant="outline-danger"
+                  variant="outline-secondary"
                   className="border-0 m-0"
                   onClick={() => {
                     if (
@@ -315,7 +322,7 @@ export default function Index() {
                       userId !== row.original.userId
                     ) {
                       return toast.error(
-                        `Reserva só pode ser editada pelo expedidor ou autorizador.`
+                        `Saída só pode ser editada pelo expedidor ou autorizador.`
                       );
                     }
                     return handleShowEditModal(row.original);
@@ -401,7 +408,7 @@ export default function Index() {
         initialState={{
           sortBy: [
             {
-              id: 'name',
+              id: 'id',
               asc: true,
             },
           ],

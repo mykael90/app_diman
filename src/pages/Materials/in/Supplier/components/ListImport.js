@@ -162,7 +162,12 @@ export default function Index(props) {
         filter: filterDifferentThan,
         Filter: FilterForId,
       },
-      { Header: 'Denominação', accessor: 'name', disableFilters: true },
+      {
+        Header: 'Denominação',
+        accessor: 'name',
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
+        disableFilters: true,
+      },
       {
         Header: 'Unidade',
         accessor: 'unit',
@@ -269,7 +274,7 @@ export default function Index(props) {
       <Row className="text-center py-3">
         <Card.Title>Materiais Cadastrados</Card.Title>
         <Card.Text>
-          Referências extraídas via SIPAC (grupos: 3024, 3026).
+          Referências extraídas via SIPAC (grupos: 3024, 3026, 3028 e 3042).
         </Card.Text>
       </Row>
       <TableGfilterNestedRowHiddenRows

@@ -58,7 +58,11 @@ export default function Index() {
         disableResizing: true,
         isVisible: window.innerWidth > 576,
       },
-      { Header: 'Denominação', accessor: 'name' },
+      {
+        Header: 'Denominação',
+        accessor: 'name',
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
+      },
       {
         Header: 'Unidade',
         accessor: 'unit',
@@ -142,7 +146,7 @@ export default function Index() {
         <Row className="text-center py-3">
           <Card.Title>Materiais Cadastrados</Card.Title>
           <Card.Text>
-            Referências extraídas via SIPAC (grupos: 3024, 3026).
+            Referências extraídas via SIPAC (grupos: 3024, 3026, 3028 e 3042).
           </Card.Text>
         </Row>
 

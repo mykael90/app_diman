@@ -143,7 +143,10 @@ export default function TableGfilterNestedRowHiddenRows({
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  <th
+                    className="text-center align-middle"
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                  >
                     {column.render('Header')}
                     <div className="text-center">
                       {column.canFilter ? column.render('Filter') : null}
@@ -196,7 +199,7 @@ export default function TableGfilterNestedRowHiddenRows({
                   <tr {...row.getRowProps()}>
                     {row.cells.map((cell) => (
                       <td
-                        className="py-3"
+                        className="text-center py-3"
                         style={{
                           verticalAlign: 'middle',
                         }}

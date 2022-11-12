@@ -7,12 +7,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaExclamation, FaInfo, FaTimes } from 'react-icons/fa';
+import { FaExclamation, FaInfo, FaTimes, FaPencilAlt } from 'react-icons/fa';
 
-import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  Button,
+  OverlayTrigger,
+  Tooltip,
+  Badge,
+} from 'react-bootstrap';
 
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
+
+import EditModal from './components/EditModal';
 
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedrow from '../../components/TableGfilterNestedRow';
@@ -29,6 +38,8 @@ export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [reserves, setReserves] = useState([]);
   const inputRef = useRef();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [dataModal, setDataModal] = useState('');
 
   async function getReservesData() {
     try {
@@ -44,6 +55,16 @@ export default function Index() {
       setIsLoading(false);
     }
   }
+
+  const handleCloseEditModal = () => setShowEditModal(false);
+  const handleSaveEditModal = () => {
+    setShowEditModal(false);
+    getReservesData();
+  };
+  const handleShowEditModal = (data) => {
+    setDataModal(data);
+    setShowEditModal(true);
+  };
 
   useEffect(() => {
     // Focus on inputRef
@@ -182,15 +203,17 @@ export default function Index() {
         accessor: 'reqMaintenance',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
-        Header: 'Previsão:',
+        Header: 'Previsão',
         accessor: 'intendedUseBr',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
-        Header: 'Reservado por:',
+        Header: 'Reservado por',
         accessor: 'userUsername',
         width: 140,
         disableResizing: true,
@@ -201,13 +224,15 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableSortBy: true,
       },
       {
-        Header: 'Reserva para:',
+        Header: 'Reserva para',
         accessor: 'workerName',
+        disableSortBy: true,
       },
       {
-        Header: 'Autorização:',
+        Header: 'Autorização',
         accessor: 'authorizerUsername',
         width: 140,
         disableResizing: true,
@@ -218,101 +243,9 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
-      },
-      {
-        Header: 'Separação:',
-        accessor: 'separatedAtBr',
-        width: 100,
-        disableResizing: true,
-        Cell: ({ value, row }) => (
-          <Row>
-            <Col className="p-auto text-center">
-              {value ? <span>{value}</span> : <span>(não)</span>}
-            </Col>
-          </Row>
-        ),
-      },
-      {
-        Header: 'Utilizada:',
-        accessor: 'withdrawnAtBr',
-        width: 100,
-        disableResizing: true,
-        Cell: ({ value, row }) => (
-          <Row>
-            <Col className="p-auto text-center">
-              {value ? (
-                <span>{value}</span>
-              ) : (
-                <span>
-                  {row.original?.canceledAtBr ? '(cancelada)' : '(não)'}
-                </span>
-              )}
-            </Col>
-          </Row>
-        ),
+        disableSortBy: true,
       },
 
-      {
-        Header: 'Cancelada:',
-        accessor: 'canceledAtBr',
-        width: 100,
-        disableResizing: true,
-        Cell: ({ value, row }) => (
-          <Row>
-            <Col className="p-auto text-center">
-              {value ? (
-                <span>{value}</span>
-              ) : (
-                <>
-                  {' '}
-                  {row.original?.withdrawnAtBr ? (
-                    '(utilizada)'
-                  ) : (
-                    <>
-                      <OverlayTrigger
-                        placement="top"
-                        delay={{ show: 250, hide: 400 }}
-                        overlay={(props) =>
-                          renderTooltip(props, 'Cancelar reserva')
-                        }
-                      >
-                        <Button
-                          size="sm"
-                          variant="outline-danger"
-                          className="border-0"
-                          onClick={(e) => {
-                            handleCancelAsk(e, row.original);
-                          }}
-                        >
-                          <FaTimes />
-                        </Button>
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        placement="top"
-                        delay={{ show: 250, hide: 400 }}
-                        overlay={(props) =>
-                          renderTooltip(props, 'Confirmar ação')
-                        }
-                      >
-                        <Button
-                          size="sm"
-                          variant="outline-warning"
-                          className="border-0 d-none"
-                          onClick={() => {
-                            handleCancelReserve(row.original);
-                          }}
-                        >
-                          <FaExclamation />
-                        </Button>
-                      </OverlayTrigger>
-                    </>
-                  )}{' '}
-                </>
-              )}
-            </Col>
-          </Row>
-        ),
-      },
       {
         Header: 'Valor',
         accessor: 'valueBr',
@@ -326,28 +259,67 @@ export default function Index() {
         width: 150,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
+        disableSortBy: true,
       },
       {
-        Header: 'Obs',
-        id: 'obs',
-        width: 40,
+        Header: 'Status',
+        id: 'status',
+        width: 140,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          <Row>
+            <Col className="p-auto text-center">
+              {row.original?.withdrawnAtBr ? (
+                <>
+                  <Badge bg="success">UTILIZADA</Badge>
+                  {row.original?.withdrawnAtBr}
+                </>
+              ) : (
+                <>
+                  {row.original?.canceledAtBr ? (
+                    <>
+                      <Badge bg="danger">CANCELADA</Badge>
+                      {row.original?.canceledAtBr}
+                    </>
+                  ) : (
+                    <>
+                      {' '}
+                      {row.original?.separatedAtBr ? (
+                        <>
+                          <Badge bg="primary">SEPARADA</Badge>
+                          {row.original?.separatedAtBr}
+                        </>
+                      ) : (
+                        <Badge bg="secondary">EM ESPERA</Badge>
+                      )}{' '}
+                    </>
+                  )}{' '}
+                </>
+              )}
+            </Col>
+          </Row>
+        ),
+      },
+      {
+        Header: 'Ações',
+        id: 'actions',
+        width: 110,
         disableResizing: true,
         disableSortBy: true,
-        Cell: ({ value, row }) => (
-          <Row>
-            {' '}
-            <Col xs="auto" className="p-auto text-end">
+        Cell: ({ row }) => (
+          <Row className="d-flex flex-nowrap">
+            <Col xs="auto" className="text-center m-0 p-0 px-1 ps-2">
               {row.original.obs ? (
                 <>
                   {' '}
                   <OverlayTrigger
-                    placement="left"
+                    placement="top"
                     delay={{ show: 250, hide: 400 }}
                     overlay={(props) => renderTooltip(props, row.original.obs)}
                   >
                     <Button
                       size="sm"
-                      variant="outline-warning"
+                      variant="outline-info"
                       className="border-0 m-0"
                     >
                       <FaInfo />
@@ -355,6 +327,78 @@ export default function Index() {
                   </OverlayTrigger>
                 </>
               ) : null}
+            </Col>
+            <Col xs="auto" className="text-center m-0 p-0 px-1">
+              <OverlayTrigger
+                placement="top"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Editar reserva')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-secondary"
+                  className="border-0 m-0"
+                  onClick={() => {
+                    if (
+                      userId !== row.original.authorizedBy &&
+                      userId !== row.original.userId
+                    ) {
+                      return toast.error(
+                        `Reserva só pode ser editada pelo criador ou autorizador.`
+                      );
+                    }
+                    return handleShowEditModal(row.original);
+                  }}
+                  hidden={
+                    row.original?.withdrawnAtBr ||
+                    row.original?.separatedAtBr ||
+                    row.original?.canceledAtBr
+                  }
+                >
+                  <FaPencilAlt />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+            <Col xs="auto" className="text-center m-0 p-0 px-1">
+              <>
+                <OverlayTrigger
+                  placement="top"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={(props) => renderTooltip(props, 'Cancelar reserva')}
+                >
+                  <Button
+                    size="sm"
+                    variant="outline-danger"
+                    className="border-0"
+                    onClick={(e) => {
+                      handleCancelAsk(e, row.original);
+                    }}
+                    hidden={
+                      row.original?.withdrawnAtBr ||
+                      row.original?.separatedAtBr ||
+                      row.original?.canceledAtBr
+                    }
+                  >
+                    <FaTimes />
+                  </Button>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="top"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={(props) => renderTooltip(props, 'Confirmar ação')}
+                >
+                  <Button
+                    size="sm"
+                    variant="outline-warning"
+                    className="border-0 d-none"
+                    onClick={() => {
+                      handleCancelReserve(row.original);
+                    }}
+                  >
+                    <FaExclamation />
+                  </Button>
+                </OverlayTrigger>
+              </>
             </Col>
           </Row>
         ),
@@ -485,12 +529,12 @@ export default function Index() {
           maxWidth: 800,
         }}
         initialState={{
-          sortBy: [
-            {
-              id: 'name',
-              asc: true,
-            },
-          ],
+          // sortBy: [
+          //   {
+          //     id: 'name',
+          //     asc: true,
+          //   },
+          // ],
           hiddenColumns: columns
             .filter((col) => col.isVisible === false)
             .map((col) => col.accessor),
@@ -505,6 +549,12 @@ export default function Index() {
   return (
     <>
       <Loading isLoading={isLoading} />
+      <EditModal // modal p/ pesquisa de materiais
+        handleClose={handleCloseEditModal}
+        show={showEditModal}
+        data={dataModal}
+        handleSave={handleSaveEditModal}
+      />
 
       <TableGfilterNestedrow
         columns={columns}

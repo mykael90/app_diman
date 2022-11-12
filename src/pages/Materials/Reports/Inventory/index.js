@@ -231,6 +231,7 @@ export default function Index() {
             disableFilters: true,
             Cell: ({ value, row }) => (
               <div
+                className="text-start"
                 style={{
                   color:
                     row.original.freeInventory == 0

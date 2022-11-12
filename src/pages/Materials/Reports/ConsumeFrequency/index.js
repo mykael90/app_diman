@@ -199,6 +199,7 @@ export default function Index() {
       {
         Header: 'Denominação',
         accessor: 'name',
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
       },
       {
         Header: 'Unidade',
@@ -286,7 +287,7 @@ export default function Index() {
         width: 150,
         disableResizing: true,
         Cell: ({ value }) => (
-          <div className="text-center">
+          <div className="text-end">
             <Row>
               <Col>R$ {value.replace('.', ',')}</Col>
             </Row>

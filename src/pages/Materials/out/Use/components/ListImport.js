@@ -92,16 +92,15 @@ export default function Index(props) {
     });
   }
 
-// Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
-function filterGreaterThan(rows, id, filterValue) {
-  console.log(filterValue)
-  return rows.filter((row) => {
-    const rowValue = Number(row.values[id]);
-    if (filterValue===1) return rowValue !== 0; //fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
-    return true;
-  });
-}
-
+  // Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
+  function filterGreaterThan(rows, id, filterValue) {
+    console.log(filterValue);
+    return rows.filter((row) => {
+      const rowValue = Number(row.values[id]);
+      if (filterValue === 1) return rowValue !== 0; // fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
+      return true;
+    });
+  }
 
   const FilterForTotal = ({
     column: { filterValue, preFilteredRows, setFilter, id },
@@ -167,7 +166,12 @@ function filterGreaterThan(rows, id, filterValue) {
         filter: filterDifferentThan,
         Filter: FilterForId,
       },
-      { Header: 'Denominação', accessor: 'name', disableFilters: true },
+      {
+        Header: 'Denominação',
+        accessor: 'name',
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
+        disableFilters: true,
+      },
       {
         Header: 'Unidade',
         accessor: 'unit',
@@ -297,7 +301,7 @@ function filterGreaterThan(rows, id, filterValue) {
       <Row className="text-center py-3">
         <Card.Title>Materiais Cadastrados</Card.Title>
         <Card.Text>
-          Referências extraídas via SIPAC (grupos: 3024, 3026).
+          Referências extraídas via SIPAC (grupos: 3024, 3026, 3028 e 3042).
         </Card.Text>
       </Row>
       <TableGfilterNestedRowHiddenRows

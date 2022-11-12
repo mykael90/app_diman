@@ -405,6 +405,7 @@ export default function Index() {
       {
         Header: 'Denominação',
         accessor: 'name',
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
         disableFilters: true,
       },
       {
