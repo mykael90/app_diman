@@ -5,7 +5,13 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { FaLock, FaLockOpen, FaSearch, FaPencilAlt } from 'react-icons/fa';
+import {
+  FaLock,
+  FaLockOpen,
+  FaSearch,
+  FaPencilAlt,
+  FaCheck,
+} from 'react-icons/fa';
 
 import {
   Container,
@@ -85,7 +91,9 @@ function EditableCell({
     //     `Reserva só pode ser cancelada pelo usuário que a criou.`
     //   );
     const form = e.currentTarget.nextSibling.firstChild;
+    const btn = e.currentTarget.nextSibling.firstChild.nextSibling;
     form.className = form.className.replace('d-none', 'd-block');
+    btn.className = btn.className.replace('d-none', 'd-block');
     e.currentTarget.className += ' d-none';
     return true;
 
@@ -132,7 +140,7 @@ function EditableCell({
           <FaPencilAlt />
         </Button>
       </OverlayTrigger>
-      <Form onSubmit={onBlur}>
+      <Form className="d-flex" onSubmit={onBlur}>
         <Form.Control
           type="number"
           size="sm"
@@ -140,7 +148,18 @@ function EditableCell({
           onChange={onChange}
           // onBlur={onBlur}
           className={original.dateInitialQuantity ? 'd-none' : ''}
+          style={{ width: '75px' }}
         />
+        <Button
+          type="submit"
+          variant="outline-success"
+          size="sm"
+          className={
+            original.dateInitialQuantity ? 'd-none border-0' : 'border-0'
+          }
+        >
+          <FaCheck size={18} />
+        </Button>
       </Form>
     </>
   );
