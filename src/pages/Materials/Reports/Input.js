@@ -23,6 +23,7 @@ import {
   Button,
   OverlayTrigger,
   Tooltip,
+  Badge,
 } from 'react-bootstrap';
 
 import axios from '../../../services/axios';
@@ -102,7 +103,20 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
-        Cell: ({ value }) => <div className="p-auto text-center">{value}</div>,
+        Cell: ({ value }) => {
+          switch (value) {
+            case 'RM AUTO':
+              return <Badge bg="success">{value}</Badge>;
+            case 'RETORNO':
+              return <Badge bg="secondary">{value}</Badge>;
+            case 'FORNECEDOR':
+              return <Badge bg="warning">{value}</Badge>;
+            case 'DOACAO':
+              return <Badge bg="info">{value}</Badge>;
+            default:
+              return <Badge>{value}</Badge>;
+          }
+        },
       },
       {
         Header: 'Valor',
