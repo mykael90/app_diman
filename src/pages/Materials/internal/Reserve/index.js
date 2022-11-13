@@ -344,7 +344,7 @@ export default function Index() {
                 <Row>
                   <Form.Group
                     as={Col}
-                    xs={5}
+                    xs={9}
                     sm={5}
                     md={3}
                     lg={2}
