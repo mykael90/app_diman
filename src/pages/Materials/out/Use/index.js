@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useSelector } from 'react-redux';
-import { FaTrashAlt, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaTrashAlt, FaPlus, FaSearch, FaSync } from 'react-icons/fa';
 import {
   Button,
   Row,
@@ -1014,6 +1014,14 @@ export default function Index() {
             Reservas <Badge bg="secondary">{reserves.length}</Badge>
             <span className="visually-hidden">número de reservas</span>
           </CustomToggle>
+          <Button
+            onClick={() => getReservesData()}
+            variant="outline-success"
+            // size="sm"
+            className="ms-1 border-0"
+          >
+            <FaSync size={18} />
+          </Button>
 
           <Accordion.Collapse eventKey="1">
             <Card.Body>
