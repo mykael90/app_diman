@@ -37,6 +37,18 @@ const formatGroupLabel = (data) => (
   </Col>
 );
 
+const filterOptions = (row, filterValue) => {
+  const arrayFilter = String(filterValue).split(' ');
+
+  return arrayFilter.reduce((res, cur) => {
+    // res -> response; cur -> currency (atual)
+    res =
+      res &&
+      String(row.label).toLowerCase().includes(String(cur).toLowerCase());
+    return res;
+  }, true);
+};
+
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const userName = useSelector((state) => state.auth.user.name);
@@ -611,6 +623,7 @@ export default function Index() {
                                     setFieldValue('searchMaterial', '')
                                   }
                                   escapeClearsValue
+                                  filterOption={filterOptions}
                                 />
                               </Col>
                             </Row>
@@ -632,7 +645,7 @@ export default function Index() {
                                 values.MaterialReserveItems.map(
                                   (item, index) => (
                                     <>
-                                      <Row className="d-block d-sm-none">
+                                      <Row className="d-block d-lg-none">
                                         <Col className="fw-bold">
                                           Item nº {index + 1}
                                         </Col>
@@ -644,14 +657,12 @@ export default function Index() {
                                         <Form.Group
                                           as={Col}
                                           xs={12}
-                                          sm={4}
-                                          md={3}
                                           lg={2}
                                           controlId={`MaterialReserveItems[${index}].materialId`}
                                           className="border-0 m-0 p-0"
                                         >
                                           {index === 0 ? (
-                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block">
+                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-none d-md-none d-lg-block">
                                               CODIGO
                                             </Form.Label>
                                           ) : null}
@@ -673,7 +684,7 @@ export default function Index() {
                                           className="border-0 m-0 p-0"
                                         >
                                           {index === 0 ? (
-                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block">
+                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block">
                                               DESCRIÇÃO
                                             </Form.Label>
                                           ) : null}
@@ -692,13 +703,12 @@ export default function Index() {
                                         <Form.Group
                                           as={Col}
                                           xs={12}
-                                          sm={4}
-                                          md={1}
+                                          lg={1}
                                           controlId={`MaterialReserveItems[${index}].unit`}
                                           className="border-0 m-0 p-0"
                                         >
                                           {index === 0 ? (
-                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block">
+                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block">
                                               UND
                                             </Form.Label>
                                           ) : null}
@@ -717,8 +727,7 @@ export default function Index() {
                                         <Form.Group
                                           as={Col}
                                           xs={12}
-                                          sm={4}
-                                          md={1}
+                                          lg={1}
                                           controlId={`MaterialReserveItems[${index}].balancedQuantity`}
                                           className="d-none"
                                         >
@@ -736,8 +745,7 @@ export default function Index() {
                                         <Form.Group
                                           as={Col}
                                           xs={12}
-                                          sm={4}
-                                          md={1}
+                                          lg={1}
                                           controlId={`MaterialReserveItems[${index}].value`}
                                           className="d-none"
                                         >
@@ -752,10 +760,11 @@ export default function Index() {
                                             className="p-0 m-0 ps-2"
                                           />
                                         </Form.Group>
+
                                         <Col
                                           xs={12}
-                                          sm={4}
-                                          md={2}
+                                          md={12}
+                                          lg={2}
                                           className="d-flex justify-content-between"
                                         >
                                           <Form.Group
@@ -768,7 +777,7 @@ export default function Index() {
                                             style={{ width: '70px' }}
                                           >
                                             {index === 0 ? (
-                                              <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-block text-center">
+                                              <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block text-center">
                                                 QTD
                                               </Form.Label>
                                             ) : null}
@@ -802,7 +811,7 @@ export default function Index() {
                                                   className="d-flex"
                                                 >
                                                   <div
-                                                    className="d-none d-sm-block"
+                                                    className="d-none d-lg-block"
                                                     style={{
                                                       width: '6px',
                                                       height: '34px',
