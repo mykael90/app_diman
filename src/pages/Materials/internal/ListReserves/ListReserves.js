@@ -7,7 +7,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaExclamation, FaInfo, FaTimes, FaPencilAlt } from 'react-icons/fa';
+import {
+  FaExclamation,
+  FaInfo,
+  FaTimes,
+  FaPencilAlt,
+  FaLock,
+  FaLockOpen,
+  FaSearch,
+} from 'react-icons/fa';
 
 import {
   Row,
@@ -16,6 +24,7 @@ import {
   OverlayTrigger,
   Tooltip,
   Badge,
+  Dropdown,
 } from 'react-bootstrap';
 
 import axios from '../../../../services/axios';
@@ -24,7 +33,7 @@ import Loading from '../../../../components/Loading';
 import EditModal from './components/EditModal';
 
 // import generic table from material's components with global filter and nested row
-import TableGfilterNestedrow from '../../components/TableGfilterNestedRow';
+import TableGfilterNestedRowHiddenRows from '../../components/TableGfilterNestedRowHiddenRows';
 import TableNestedrow from '../../components/TableNestedRow';
 
 const renderTooltip = (props, message) => (
@@ -32,6 +41,173 @@ const renderTooltip = (props, message) => (
     {message}
   </Tooltip>
 );
+
+// trigger to custom filter
+function DefaultColumnFilter() {
+  return <> teste </>;
+} // as colunas padrao nao aplicam filtro
+
+// This is a custom filter UI for selecting
+// a unique option from a list
+function SelectColumnFilterStatus({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  const options = React.useMemo(
+    () => ['EM ESPERA', 'SEPARADA', 'UTILIZADA', 'CANCELADA'],
+    []
+  );
+
+  // Render a multi-select box
+  return (
+    <Col>
+      <OverlayTrigger
+        placement="left"
+        delay={{ show: 250, hide: 400 }}
+        overlay={(props) => renderTooltip(props, 'Filtragem por status')}
+      >
+        <Dropdown>
+          <Dropdown.Toggle
+            variant="outline-primary"
+            size="sm"
+            id="dropdown-group"
+            className="border-0"
+          >
+            <FaSearch /> {filterValue}
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <Dropdown.Item
+              onClick={() => {
+                setFilter('');
+              }}
+            >
+              Remover Filtro
+            </Dropdown.Item>
+            {options.map((option, i) => (
+              <Dropdown.Item
+                key={i}
+                onClick={() => {
+                  setFilter(option || undefined);
+                }}
+              >
+                {option}{' '}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      </OverlayTrigger>
+    </Col>
+  );
+}
+function SelectColumnFilter({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  console.log(1);
+  const options = React.useMemo(() => {
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id].toString().substring(0, 4));
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
+
+  // Render a multi-select box
+  return (
+    <Col>
+      <OverlayTrigger
+        placement="left"
+        delay={{ show: 250, hide: 400 }}
+        overlay={(props) =>
+          renderTooltip(props, 'Filtragem por grupo de material')
+        }
+      >
+        <Dropdown>
+          <Dropdown.Toggle
+            variant="outline-primary"
+            size="sm"
+            id="dropdown-group"
+            className="border-0"
+          >
+            <FaSearch /> {filterValue}
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <Dropdown.Item
+              onClick={() => {
+                setFilter('');
+              }}
+            >
+              Remover Filtro
+            </Dropdown.Item>
+            {options.map((option, i) => (
+              <Dropdown.Item
+                key={i}
+                onClick={() => {
+                  setFilter(option || undefined);
+                }}
+              >
+                {option}{' '}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      </OverlayTrigger>
+    </Col>
+  );
+}
+
+// Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
+function filterGreaterThan(rows, id, filterValue) {
+  console.log(filterValue);
+  return rows.filter((row) => {
+    const rowValue = Number(row.values[id]);
+    if (filterValue === 1) return rowValue !== 0; // fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
+    return true;
+  });
+}
+
+const FilterForTotal = ({
+  column: { filterValue, preFilteredRows, setFilter, id },
+}) =>
+  React.useMemo(
+    () => (
+      <div>
+        {filterValue === 1 ? (
+          <OverlayTrigger
+            placement="top"
+            delay={{ show: 250, hide: 400 }}
+            overlay={(props) =>
+              renderTooltip(props, 'Clique para mostrar materiais sem saldo')
+            }
+          >
+            <Button size="sm" variant="outline-primary" className="border-0">
+              <FaLock cursor="pointer" onClick={() => setFilter(0)} />
+            </Button>
+          </OverlayTrigger>
+        ) : (
+          <OverlayTrigger
+            placement="bottom"
+            delay={{ show: 250, hide: 400 }}
+            overlay={(props) =>
+              renderTooltip(
+                props,
+                'Clique para não mostrar materiais sem saldo'
+              )
+            }
+          >
+            <Button size="sm" variant="outline-primary" className="border-0">
+              <FaLockOpen cursor="pointer" onClick={() => setFilter(1)} />
+            </Button>
+          </OverlayTrigger>
+        )}
+      </div>
+    ),
+    [filterValue, setFilter]
+  );
 
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
@@ -204,6 +380,7 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Previsão',
@@ -211,6 +388,7 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Reservado por',
@@ -225,11 +403,13 @@ export default function Index() {
           return <span> {custom}</span>;
         },
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Reserva para',
         accessor: 'workerName',
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Autorização',
@@ -244,6 +424,7 @@ export default function Index() {
           return <span> {custom}</span>;
         },
         disableSortBy: true,
+        disableFilters: true,
       },
 
       {
@@ -252,6 +433,7 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
+        disableFilters: true,
       },
       {
         Header: 'Local',
@@ -260,6 +442,7 @@ export default function Index() {
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Status',
@@ -299,6 +482,9 @@ export default function Index() {
             </Col>
           </Row>
         ),
+        defaultCanFilter: true,
+        Filter: SelectColumnFilterStatus,
+        filter: 'groupStatus',
       },
       {
         Header: 'Ações',
@@ -412,7 +598,7 @@ export default function Index() {
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
-      // Filter: DefaultColumnFilter,
+      Filter: DefaultColumnFilter, // coloca filtro para todas as colunas
       minWidth: 30,
       width: 120,
       maxWidth: 800,
@@ -427,6 +613,8 @@ export default function Index() {
         desc: true,
       },
     ],
+    filters: [{ id: 'status', value: 'EM ESPERA' }],
+    pageSize: 20,
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),
@@ -453,6 +641,32 @@ export default function Index() {
             }, true);
           })
         );
+        return rows;
+      },
+
+      groupStatus: (rows, ids, filterValue) => {
+        rows = rows.filter((row) => {
+          switch (filterValue) {
+            case 'EM ESPERA':
+              return (
+                !row.original.canceledAt &&
+                !row.original.withdrawnAt &&
+                !row.original.separatedAt
+              );
+            case 'SEPARADA':
+              return (
+                !row.original.withdrawnAt &&
+                !row.original.canceledAt &&
+                row.original.separatedAt
+              );
+            case 'UTILIZADA':
+              return row.original.withdrawnAt;
+            case 'CANCELADA':
+              return row.original.canceledAt;
+            default:
+              return row;
+          }
+        });
         return rows;
       },
     }),
@@ -556,7 +770,7 @@ export default function Index() {
         handleSave={handleSaveEditModal}
       />
 
-      <TableGfilterNestedrow
+      <TableGfilterNestedRowHiddenRows
         columns={columns}
         data={data}
         defaultColumn={defaultColumn}

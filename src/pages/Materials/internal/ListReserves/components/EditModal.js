@@ -35,8 +35,6 @@ export default function EditModal({ show, handleClose, data, handleSave }) {
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef();
 
-  console.log(data);
-
   const {
     id,
     reqMaintenance,
