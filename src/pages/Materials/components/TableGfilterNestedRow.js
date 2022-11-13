@@ -129,7 +129,7 @@ export default function TableGfilterNestedrow({
       </Row>
 
       <Row className="pt-3">
-        <Table bordered hover size="sm" {...getTableProps()} responsive="sm">
+        <Table bordered hover size="sm" {...getTableProps()} responsive="md">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>

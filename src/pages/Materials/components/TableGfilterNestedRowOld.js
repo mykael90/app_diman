@@ -137,7 +137,7 @@ export default function TableGfilterNestedrow({
           hover
           size="sm"
           {...getTableProps()}
-          responsive="sm"
+          responsive="md"
         >
           <thead>
             {headerGroups.map((headerGroup) => (

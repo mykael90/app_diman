@@ -138,7 +138,7 @@ export default function TableGfilterNestedRowHiddenRows({
       </Row>
 
       <Row className="py-3">
-        <Table bordered hover size="sm" {...getTableProps()} responsive="sm">
+        <Table bordered hover size="sm" {...getTableProps()} responsive="md">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
