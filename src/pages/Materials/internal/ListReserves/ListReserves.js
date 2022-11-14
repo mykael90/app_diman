@@ -824,9 +824,7 @@ export default function Index() {
       {
         Header: () => (
           // FORMAT HEADER
-          <div className="p-auto text-center">
-            ID - Denominação - Saldo - Unidade
-          </div>
+          <div className="p-auto text-center">ID - Denominação - Qtd - Und</div>
         ),
         id: 'mobile',
         width: 100,
