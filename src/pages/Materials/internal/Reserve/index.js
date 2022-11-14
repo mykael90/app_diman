@@ -85,8 +85,8 @@ export default function Index() {
 
   const handlePushItem = (push, row, list) => {
     // não incluir repetido na lista
-    console.log(row);
-    console.log(list);
+    // console.log(row);
+    // console.log(list);
     if (list.length > 0) {
       let exists = false;
 
