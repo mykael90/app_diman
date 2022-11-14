@@ -898,7 +898,6 @@ export default function Index() {
             )}
           </Formik>
         </Row>
-        <tableExample />
       </Row>
     </>
   );

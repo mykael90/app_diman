@@ -9,28 +9,26 @@ import ListImport from './ListImport';
 export default function SearchModal(props) {
   const { show, handleClose, push, hiddenItems, inventoryData } = props;
 
-  const useBackListener = (callback) => {
-    const { navigator } = useContext(UNSAFE_NavigationContext);
+  // Manipulando o botão de voltar do navegador para não sair da página de reserva
+  useEffect(() => {
+    // Add a fake history event so that the back button does nothing if pressed once
+    window.history.pushState(
+      'fake-route',
+      document.title,
+      window.location.href
+    );
 
-    useEffect(() => {
-      const listener = ({ location, action }) => {
-        console.log('listener', { location, action });
-        if (action === 'POP') {
-          callback({ location, action });
-        }
-      };
+    addEventListener('popstate', handleClose);
 
-      const unlisten = navigator.listen(listener);
-      return unlisten;
-    }, [callback, navigator]);
-  };
-
-  const navigate = useNavigate();
-
-  useBackListener(({ location }) => {
-    console.log('Navigated Back', { location });
-    navigate('/materials/internal/reserve', { replace: false });
-  });
+    // Here is the cleanup when this component unmounts
+    return () => {
+      removeEventListener('popstate', closeQuickView);
+      // If we left without using the back button, aka by using a button on the page, we need to clear out that fake history event
+      if (window.history.state === 'fake-route') {
+        window.history.back();
+      }
+    };
+  }, []);
 
   return (
     <Modal
