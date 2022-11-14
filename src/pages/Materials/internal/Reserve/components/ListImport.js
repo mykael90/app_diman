@@ -83,7 +83,7 @@ export default function Index(props) {
           .replace(/\./g, '')
           .replace(/,/g, '.')
           .replace(/[^0-9\.]+/g, ''),
-        quantity: row.values.quantity ?? 0,
+        quantity: row.values.quantity ?? '',
       });
 
       const newHiddenRows = [...hiddenRows, row.values.materialId];
@@ -94,6 +94,9 @@ export default function Index(props) {
 
   // Define a custom filter filter function!
   function filterDifferentThan(rows, id) {
+    // ajustando o filtro para funcionar na coluna mobile também
+    if (id[0] === 'mobile') id[0] = 'materialId';
+    console.log(id);
     return rows.filter((row) => {
       const rowValue = row.values[id];
       return !hiddenRows.includes(rowValue);
@@ -172,11 +175,12 @@ export default function Index(props) {
         isVisible: window.innerWidth > 768,
         filter: filterDifferentThan,
         Filter: FilterForId,
+        Cell: ({ value }) => <div>{value}</div>,
       },
       {
         Header: 'Denominação',
         accessor: 'name',
-        disableFilters: true,
+        // disableFilters: true,
         Cell: ({ value }) => <div className="text-start">{value}</div>,
         isVisible: window.innerWidth > 768,
       },
@@ -185,7 +189,7 @@ export default function Index(props) {
         accessor: 'unit',
         width: 100,
         disableResizing: true,
-        disableFilters: true,
+        // disableFilters: true,
         isVisible: window.innerWidth > 768,
       },
       {
@@ -193,7 +197,7 @@ export default function Index(props) {
         accessor: 'value',
         width: 100,
         disableResizing: true,
-        disableFilters: true,
+        // disableFilters: true,
         Cell: ({ value }) => <div className="text-end"> {value}</div>,
         isVisible: window.innerWidth > 768,
       },
@@ -279,10 +283,9 @@ export default function Index(props) {
           </div>
         ),
         disableSortBy: true,
-        // filterValue: 1,
-        // filter: filterGreaterThan,
-        // Filter: FilterForTotal,
-        // defaultCanFilter: true,
+        filter: filterDifferentThan,
+        Filter: FilterForId,
+        defaultCanFilter: true,
       },
     ],
     [handlePushItem]
