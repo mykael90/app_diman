@@ -2,7 +2,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import React, { useEffect, useContext } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { useNavigate, UNSAFE_NavigationContext } from 'react-router-dom';
 
 import ListImport from './ListImport';
 
