@@ -768,102 +768,106 @@ export default function Index() {
   );
 
   // Create a function that will render our row sub components
-  const renderRowSubComponent = React.useCallback(
-    ({ row }) => (
+  const renderRowSubComponent = React.useCallback(({ row }) => {
+    const columnsSub = [
+      {
+        // Make an expander cell
+        Header: () => null, // No header
+        id: 'expander', // It needs an ID
+        width: 30,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          // Use Cell to render an expander for each row.
+          // We can use the getToggleRowExpandedProps prop-getter
+          // to build the expander.
+          <Row>
+            <span {...row.getToggleRowExpandedProps()}>
+              {row.isExpanded ? '▽' : '▷'}
+            </span>
+          </Row>
+        ),
+      },
+      {
+        Header: 'ID',
+        accessor: 'materialId',
+        width: 125,
+        disableResizing: true,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Denominação',
+        accessor: 'name',
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Unidade',
+        accessor: 'unit',
+        width: 100,
+        disableResizing: true,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Qtd',
+        accessor: 'quantity',
+        width: 100,
+        disableResizing: true,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Valor',
+        accessor: 'value',
+        width: 100,
+        disableResizing: true,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: () => (
+          // FORMAT HEADER
+          <div className="p-auto text-center">
+            ID - Denominação - Saldo - Unidade
+          </div>
+        ),
+        id: 'mobile',
+        width: 100,
+        disableResizing: false,
+        isVisible: window.innerWidth < 768,
+        Cell: ({ value, row }) => (
+          <div
+          // onTouchMove={(e) => {
+          //   // verifica se arrastou suficiente para a direita
+          //   if (e.touches[0].clientX < 300) return;
+          //   handlePushItem(e, row);
+          // }}
+          >
+            <Row className="d-flex justify-content-between">
+              <Col xs="auto" className="p-auto text-start">
+                <Badge bg="light" text="dark">
+                  {row.values.materialId}
+                </Badge>
+              </Col>
+              <Col xs="auto" className="p-auto text-start">
+                <Badge bg="light" text="dark">
+                  {row.values.quantity} {row.values.unit} {window.innerWidth}
+                </Badge>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="p-auto text-start">{row.values.name}</Col>
+            </Row>
+          </div>
+        ),
+        disableSortBy: true,
+        // filterValue: 1,
+        // filter: filterGreaterThan,
+        // Filter: FilterForTotal,
+        // defaultCanFilter: true,
+      },
+    ];
+    return (
       <TableNestedrow
         style={{ padding: 0, margin: 0 }}
-        columns={[
-          {
-            // Make an expander cell
-            Header: () => null, // No header
-            id: 'expander', // It needs an ID
-            width: 30,
-            disableResizing: true,
-            Cell: ({ row }) => (
-              // Use Cell to render an expander for each row.
-              // We can use the getToggleRowExpandedProps prop-getter
-              // to build the expander.
-              <Row>
-                <span {...row.getToggleRowExpandedProps()}>
-                  {row.isExpanded ? '▽' : '▷'}
-                </span>
-              </Row>
-            ),
-          },
-          {
-            Header: 'ID',
-            accessor: 'materialId',
-            width: 125,
-            disableResizing: true,
-            isVisible: window.innerWidth > 768,
-          },
-          { Header: 'Denominação', accessor: 'name' },
-          {
-            Header: 'Unidade',
-            accessor: 'unit',
-            width: 100,
-            disableResizing: true,
-            isVisible: window.innerWidth > 768,
-          },
-          {
-            Header: 'Qtd',
-            accessor: 'quantity',
-            width: 100,
-            disableResizing: true,
-            isVisible: window.innerWidth > 768,
-          },
-          {
-            Header: 'Valor',
-            accessor: 'value',
-            width: 100,
-            disableResizing: true,
-            isVisible: window.innerWidth > 768,
-            // eslint-disable-next-line react/destructuring-assignment
-          },
-          {
-            Header: () => (
-              // FORMAT HEADER
-              <div className="p-auto text-center">
-                ID - Denominação - Saldo - Unidade
-              </div>
-            ),
-            id: 'mobile',
-            width: 100,
-            disableResizing: false,
-            isVisible: window.innerWidth < 768,
-            Cell: ({ value, row }) => (
-              <div
-              // onTouchMove={(e) => {
-              //   // verifica se arrastou suficiente para a direita
-              //   if (e.touches[0].clientX < 300) return;
-              //   handlePushItem(e, row);
-              // }}
-              >
-                <Row className="d-flex justify-content-between">
-                  <Col xs="auto" className="p-auto text-start">
-                    <Badge bg="light" text="dark">
-                      {row.values.materialId}
-                    </Badge>
-                  </Col>
-                  <Col xs="auto" className="p-auto text-start">
-                    <Badge bg="light" text="dark">
-                      {row.values.quantity} {row.values.unit}{' '}
-                      {window.innerWidth}
-                    </Badge>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col className="p-auto text-start">{row.values.name}</Col>
-                </Row>
-              </div>
-            ),
-            disableSortBy: true,
-            // filterValue: 1,
-            // filter: filterGreaterThan,
-            // Filter: FilterForTotal,
-            // defaultCanFilter: true,
-          },
-        ]}
+        columns={columnsSub}
         data={row.original.MaterialReserveItems}
         defaultColumn={{
           // Let's set up our default Filter UI
@@ -880,10 +884,10 @@ export default function Index() {
           //   },
           // ],
           hiddenColumns: [
-            ...columns
+            ...columnsSub
               .filter((col) => col.isVisible === false)
               .map((col) => col.id),
-            ...columns
+            ...columnsSub
               .filter((col) => col.isVisible === false)
               .map((col) => col.accessor),
           ],
@@ -891,9 +895,8 @@ export default function Index() {
         filterTypes={filterTypes}
         renderRowSubComponent={renderRowSubSubComponent}
       />
-    ),
-    []
-  );
+    );
+  }, []);
 
   return (
     <>
