@@ -114,7 +114,7 @@ export default function Index() {
         .replace(/\./g, '')
         .replace(/,/g, '.')
         .replace(/[^0-9\.]+/g, ''),
-      quantity: row.value.quantity ?? 0,
+      quantity: row.value.quantity ?? '',
     });
   };
 
