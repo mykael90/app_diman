@@ -101,64 +101,6 @@ function SelectColumnFilterStatus({
     </Col>
   );
 }
-function SelectColumnFilter({
-  column: { filterValue, setFilter, preFilteredRows, id },
-}) {
-  // Calculate the options for filtering
-  // using the preFilteredRows
-  console.log(1);
-  const options = React.useMemo(() => {
-    const options = new Set();
-    preFilteredRows.forEach((row) => {
-      options.add(row.values[id].toString().substring(0, 4));
-    });
-    return [...options.values()];
-  }, [id, preFilteredRows]);
-
-  // Render a multi-select box
-  return (
-    <Col>
-      <OverlayTrigger
-        placement="left"
-        delay={{ show: 250, hide: 400 }}
-        overlay={(props) =>
-          renderTooltip(props, 'Filtragem por grupo de material')
-        }
-      >
-        <Dropdown>
-          <Dropdown.Toggle
-            variant="outline-primary"
-            size="sm"
-            id="dropdown-group"
-            className="border-0"
-          >
-            <FaSearch /> {filterValue}
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Item
-              onClick={() => {
-                setFilter('');
-              }}
-            >
-              Remover Filtro
-            </Dropdown.Item>
-            {options.map((option, i) => (
-              <Dropdown.Item
-                key={i}
-                onClick={() => {
-                  setFilter(option || undefined);
-                }}
-              >
-                {option}{' '}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
-      </OverlayTrigger>
-    </Col>
-  );
-}
 
 // Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
 function filterGreaterThan(rows, id, filterValue) {

@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-import { FaLockOpen, FaLock } from 'react-icons/fa';
+import { FaLockOpen, FaLock, FaSearch } from 'react-icons/fa';
 
 import {
   Container,
@@ -25,7 +25,7 @@ import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
 // import generic table from material's components with global filter and nested row
-import TableGfilterNestedrow from '../../components/TableGfilterNestedRow';
+import TableGfilterNestedRowHiddenRows from '../../components/TableGfilterNestedRowHiddenRows';
 import TableNestedrow from '../../components/TableNestedRow';
 
 const renderTooltip = (props, message) => (
@@ -33,6 +33,52 @@ const renderTooltip = (props, message) => (
     {message}
   </Tooltip>
 );
+
+// trigger to custom filter
+function DefaultColumnFilter() {
+  return <> teste </>;
+} // as colunas padrao nao aplicam filtro
+
+// This is a custom filter UI for selecting
+// a unique option from a list
+const FilterForRestrict = ({
+  column: { filterValue, preFilteredRows, setFilter, id },
+}) =>
+  React.useMemo(
+    () => (
+      <div>
+        {filterValue === 1 ? (
+          <OverlayTrigger
+            placement="top"
+            delay={{ show: 250, hide: 400 }}
+            overlay={(props) =>
+              renderTooltip(props, 'Clique para mostrar todas as requisições')
+            }
+          >
+            <Button size="sm" variant="outline-primary" className="border-0">
+              <FaLock cursor="pointer" onClick={() => setFilter(0)} />
+            </Button>
+          </OverlayTrigger>
+        ) : (
+          <OverlayTrigger
+            placement="bottom"
+            delay={{ show: 250, hide: 400 }}
+            overlay={(props) =>
+              renderTooltip(
+                props,
+                'Clique para mostrar requisições sem liberações'
+              )
+            }
+          >
+            <Button size="sm" variant="outline-primary" className="border-0">
+              <FaLockOpen cursor="pointer" onClick={() => setFilter(1)} />
+            </Button>
+          </OverlayTrigger>
+        )}
+      </div>
+    ),
+    [filterValue, setFilter]
+  );
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
@@ -105,6 +151,9 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        // disableFilters: true,
+        Filter: FilterForRestrict,
+        filter: 'groupRestrict',
       },
       {
         Header: 'Req. Man.',
@@ -112,6 +161,7 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Tipo',
@@ -119,6 +169,7 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Valor',
@@ -126,6 +177,7 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Pedido em:',
@@ -133,6 +185,7 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Pedido por:',
@@ -147,6 +200,7 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableFilters: true,
       },
       {
         Header: 'Receb. em:',
@@ -154,6 +208,7 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        disableFilters: true,
       },
       {
         Header: 'Unidade de Custo',
@@ -169,6 +224,7 @@ export default function Index() {
             </span>
           );
         },
+        disableFilters: true,
       },
       {
         Header: () => (
@@ -179,6 +235,7 @@ export default function Index() {
         width: 100,
         disableResizing: true,
         disableSortBy: true,
+        disableFilters: true,
         Cell: ({ value, row }) => (
           <Row>
             {' '}
@@ -232,7 +289,7 @@ export default function Index() {
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
-      // Filter: DefaultColumnFilter,
+      Filter: DefaultColumnFilter, // coloca filtro para todas as colunas
       minWidth: 30,
       width: 120,
       maxWidth: 800,
@@ -247,6 +304,7 @@ export default function Index() {
         desc: true,
       },
     ],
+    filters: [{ id: 'req', value: 1 }],
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),
@@ -273,6 +331,14 @@ export default function Index() {
             }, true);
           })
         );
+        return rows;
+      },
+
+      groupRestrict: (rows, ids, filterValue) => {
+        rows = rows.filter((row) => {
+          if (filterValue) return !row.original.MaterialReleases.length;
+          return true;
+        });
         return rows;
       },
     }),
@@ -513,7 +579,7 @@ export default function Index() {
           <Card.Text>Materiais vinculados a RM ou Retorno.</Card.Text>
         </Row>
 
-        <TableGfilterNestedrow
+        <TableGfilterNestedRowHiddenRows
           columns={columns}
           data={data}
           defaultColumn={defaultColumn}
