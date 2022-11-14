@@ -848,7 +848,7 @@ export default function Index() {
               </Col>
               <Col xs="auto" className="p-auto text-start">
                 <Badge bg="light" text="dark">
-                  {row.values.quantity} {row.values.unit} {window.innerWidth}
+                  {row.values.quantity} {row.values.unit}
                 </Badge>
               </Col>
             </Row>
