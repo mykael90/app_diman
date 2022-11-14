@@ -75,7 +75,7 @@ export default function Index(props) {
           .replace(/\./g, '')
           .replace(/,/g, '.')
           .replace(/[^0-9\.]+/g, ''),
-        quantity: row.values.quantity ?? 0,
+        quantity: row.values.quantity ?? '',
       });
 
       const newHiddenRows = [...hiddenRows, row.values.materialId];
