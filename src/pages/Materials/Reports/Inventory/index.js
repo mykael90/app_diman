@@ -205,7 +205,7 @@ export default function Index() {
             accessor: 'materialId',
             width: 125,
             disableResizing: true,
-            isVisible: window.innerWidth > 576,
+            isVisible: window.innerWidth > 768,
             disableSortBy: true,
             Filter: SelectColumnFilter,
             filter: 'groupMaterial',
@@ -315,7 +315,7 @@ export default function Index() {
             disableResizing: true,
             disableFilters: true,
             disableSortBy: true,
-            isVisible: window.innerWidth > 576,
+            isVisible: window.innerWidth > 768,
             Cell: ({ value, row }) => (
               <div
                 className="p-auto text-end"
@@ -355,7 +355,7 @@ export default function Index() {
             disableResizing: true,
             disableFilters: true,
             disableSortBy: true,
-            isVisible: window.innerWidth > 576,
+            isVisible: window.innerWidth > 768,
             Cell: ({ value, row }) => (
               <div
                 className="p-auto text-end"
@@ -400,7 +400,7 @@ export default function Index() {
             disableResizing: true,
             disableFilters: true,
             disableSortBy: true,
-            isVisible: window.innerWidth > 576,
+            isVisible: window.innerWidth > 768,
             Cell: ({ value, row }) => (
               <div
                 className="p-auto text-end"

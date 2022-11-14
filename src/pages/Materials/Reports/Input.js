@@ -179,7 +179,7 @@ export default function Index() {
           <div className="p-auto text-center">Unidade de custo</div>
         ),
         accessor: 'costUnit',
-        isVisible: window.innerWidth > 576,
+        isVisible: window.innerWidth > 768,
         // eslint-disable-next-line react/destructuring-assignment
         Cell: (props) => {
           const custom = String(props.value).replace(/([0-9]{2})/gm, '$1.');
@@ -332,7 +332,7 @@ export default function Index() {
             accessor: 'materialId',
             width: 125,
             disableResizing: true,
-            isVisible: window.innerWidth > 576,
+            isVisible: window.innerWidth > 768,
           },
           { Header: 'Denominação', accessor: 'name' },
           {

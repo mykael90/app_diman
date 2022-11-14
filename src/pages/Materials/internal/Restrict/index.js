@@ -158,7 +158,7 @@ export default function Index() {
       {
         Header: 'Unidade de Custo',
         accessor: 'costUnit',
-        isVisible: window.innerWidth > 576,
+        isVisible: window.innerWidth > 768,
         disableSortBy: true,
         // eslint-disable-next-line react/destructuring-assignment
         Cell: (props) => {
@@ -289,7 +289,7 @@ export default function Index() {
             accessor: 'materialId',
             width: 125,
             disableResizing: true,
-            isVisible: window.innerWidth > 576,
+            isVisible: window.innerWidth > 768,
           },
           { Header: 'Denominação', accessor: 'name' },
           {
@@ -383,7 +383,7 @@ export default function Index() {
               width: 125,
               disableResizing: true,
               disableSortBy: true,
-              isVisible: window.innerWidth > 576,
+              isVisible: window.innerWidth > 768,
             },
             {
               Header: 'Data',
@@ -453,7 +453,7 @@ export default function Index() {
               width: 125,
               disableResizing: true,
               disableSortBy: true,
-              isVisible: window.innerWidth > 576,
+              isVisible: window.innerWidth > 768,
             },
             {
               Header: 'Data',

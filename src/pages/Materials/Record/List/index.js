@@ -56,7 +56,7 @@ export default function Index() {
         accessor: 'id',
         width: 125,
         disableResizing: true,
-        isVisible: window.innerWidth > 576,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Denominação',

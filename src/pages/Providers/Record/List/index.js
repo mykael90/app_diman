@@ -40,7 +40,7 @@ export default function Index() {
         accessor: 'id',
         width: 50,
         disableResizing: true,
-        isVisible: window.innerWidth > 576,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'CNPJ/CPF',

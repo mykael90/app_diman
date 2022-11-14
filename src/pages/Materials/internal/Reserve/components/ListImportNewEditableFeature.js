@@ -155,7 +155,7 @@ export default function Index(props) {
         accessor: 'material_id',
         width: 125,
         disableResizing: true,
-        isVisible: window.innerWidth > 576,
+        isVisible: window.innerWidth > 768,
       },
       { Header: 'Denominação', accessor: 'name' },
       {
