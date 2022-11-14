@@ -5,7 +5,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus, FaLock, FaLockOpen } from 'react-icons/fa';
 
-import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Badge,
+} from 'react-bootstrap';
 
 import { primaryDarkColor } from '../../../../../config/colors';
 
@@ -171,6 +179,7 @@ export default function Index(props) {
         accessor: 'name',
         disableFilters: true,
         Cell: ({ value }) => <div className="text-start">{value}</div>,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Unidade',
@@ -178,6 +187,7 @@ export default function Index(props) {
         width: 100,
         disableResizing: true,
         disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Preço',
@@ -186,6 +196,7 @@ export default function Index(props) {
         disableResizing: true,
         disableFilters: true,
         Cell: ({ value }) => <div className="text-end"> {value}</div>,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: () => (
@@ -230,6 +241,49 @@ export default function Index(props) {
             </Form>
           </Col>
         ),
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: () => (
+          // FORMAT HEADER
+          <div className="p-auto text-center">
+            ID - Denominação - Saldo - Unidade
+          </div>
+        ),
+        id: 'mobile',
+        width: 100,
+        disableResizing: false,
+        isVisible: window.innerWidth < 768,
+        Cell: ({ value, row }) => (
+          <div
+            onTouchMove={(e) => {
+              // verifica se arrastou suficiente para a direita
+              if (e.touches[0].clientX < 300) return;
+              handlePushItem(e, row);
+            }}
+          >
+            <Row className="d-flex justify-content-between">
+              <Col xs="auto" className="p-auto text-start">
+                <Badge bg="light" text="dark">
+                  {row.values.materialId}
+                </Badge>
+              </Col>
+              <Col xs="auto" className="p-auto text-start">
+                <Badge bg="light" text="dark">
+                  {row.values.freeInventory} {row.values.unit}
+                </Badge>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="p-auto text-start">{row.values.name}</Col>
+            </Row>
+          </div>
+        ),
+        disableSortBy: true,
+        // filterValue: 1,
+        // filter: filterGreaterThan,
+        // Filter: FilterForTotal,
+        // defaultCanFilter: true,
       },
     ],
     [handlePushItem]
@@ -256,9 +310,12 @@ export default function Index(props) {
       },
     ],
     filters: [{ id: 'freeInventory', value: 1 }],
-    hiddenColumns: columns
-      .filter((col) => col.isVisible === false)
-      .map((col) => col.accessor),
+    hiddenColumns: [
+      ...columns.filter((col) => col.isVisible === false).map((col) => col.id),
+      ...columns
+        .filter((col) => col.isVisible === false)
+        .map((col) => col.accessor),
+    ],
   };
 
   const filterTypes = React.useMemo(

@@ -381,6 +381,7 @@ export default function Index() {
         disableResizing: true,
         disableSortBy: true,
         disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Previsão',
@@ -389,6 +390,7 @@ export default function Index() {
         disableResizing: true,
         disableSortBy: true,
         disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Reservado por',
@@ -404,12 +406,14 @@ export default function Index() {
         },
         disableSortBy: true,
         disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Reserva para',
         accessor: 'workerName',
         disableSortBy: true,
         disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Autorização',
@@ -425,6 +429,7 @@ export default function Index() {
         },
         disableSortBy: true,
         disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
 
       {
@@ -434,6 +439,7 @@ export default function Index() {
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
         disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Local',
@@ -443,6 +449,7 @@ export default function Index() {
         // eslint-disable-next-line react/destructuring-assignment
         disableSortBy: true,
         disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Status',
@@ -485,6 +492,7 @@ export default function Index() {
         defaultCanFilter: true,
         Filter: SelectColumnFilterStatus,
         filter: 'groupStatus',
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Ações',
@@ -492,6 +500,7 @@ export default function Index() {
         width: 110,
         disableResizing: true,
         disableSortBy: true,
+        isVisible: window.innerWidth > 768,
         Cell: ({ row }) => (
           <Row className="d-flex flex-nowrap">
             <Col xs="auto" className="text-center m-0 p-0 px-1 ps-2">
@@ -589,6 +598,78 @@ export default function Index() {
           </Row>
         ),
       },
+      {
+        Header: () => (
+          // FORMAT HEADER
+          <div className="p-auto text-center">
+            Requisição - Previsão - Status
+          </div>
+        ),
+        id: 'mobile',
+        width: 100,
+        disableResizing: false,
+        isVisible: window.innerWidth < 768,
+        Cell: ({ value, row }) => (
+          <div
+          // onTouchMove={(e) => {
+          //   // verifica se arrastou suficiente para a direita
+          //   if (e.touches[0].clientX < 300) return;
+          //   handlePushItem(e, row);
+          // }}
+          >
+            <Row className="d-flex justify-content-between">
+              <Col xs="auto" className="p-auto text-start">
+                <Badge bg="light" text="dark">
+                  {row.values.reqMaintenance}
+                </Badge>
+              </Col>
+              <Col xs="auto" className="p-auto text-start">
+                <Badge bg="light" text="dark">
+                  {row.values.intendedUseBr} {row.values.userUsername}
+                </Badge>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="p-auto text-start">{row.values.workerName}</Col>
+            </Row>
+            <Row>
+              <Col className="p-auto text-center">
+                {row.original?.withdrawnAtBr ? (
+                  <>
+                    <Badge bg="success">UTILIZADA</Badge>
+                    {row.original?.withdrawnAtBr}
+                  </>
+                ) : (
+                  <>
+                    {row.original?.canceledAtBr ? (
+                      <>
+                        <Badge bg="danger">CANCELADA</Badge>
+                        {row.original?.canceledAtBr}
+                      </>
+                    ) : (
+                      <>
+                        {' '}
+                        {row.original?.separatedAtBr ? (
+                          <>
+                            <Badge bg="primary">SEPARADA</Badge>
+                            {row.original?.separatedAtBr}
+                          </>
+                        ) : (
+                          <Badge bg="secondary">EM ESPERA</Badge>
+                        )}{' '}
+                      </>
+                    )}{' '}
+                  </>
+                )}
+              </Col>
+            </Row>
+          </div>
+        ),
+        disableSortBy: true,
+        // defaultCanFilter: true,
+        // Filter: SelectColumnFilterStatus,
+        // filter: 'groupStatus',
+      },
     ],
     []
   );
@@ -615,9 +696,12 @@ export default function Index() {
     ],
     filters: [{ id: 'status', value: 'EM ESPERA' }],
     pageSize: 20,
-    hiddenColumns: columns
-      .filter((col) => col.isVisible === false)
-      .map((col) => col.accessor),
+    hiddenColumns: [
+      ...columns.filter((col) => col.isVisible === false).map((col) => col.id),
+      ...columns
+        .filter((col) => col.isVisible === false)
+        .map((col) => col.accessor),
+    ],
   };
 
   const filterTypes = React.useMemo(
@@ -719,19 +803,65 @@ export default function Index() {
             accessor: 'unit',
             width: 100,
             disableResizing: true,
+            isVisible: window.innerWidth > 768,
           },
           {
             Header: 'Qtd',
             accessor: 'quantity',
             width: 100,
             disableResizing: true,
+            isVisible: window.innerWidth > 768,
           },
           {
             Header: 'Valor',
             accessor: 'value',
             width: 100,
             disableResizing: true,
+            isVisible: window.innerWidth > 768,
             // eslint-disable-next-line react/destructuring-assignment
+          },
+          {
+            Header: () => (
+              // FORMAT HEADER
+              <div className="p-auto text-center">
+                ID - Denominação - Saldo - Unidade
+              </div>
+            ),
+            id: 'mobile',
+            width: 100,
+            disableResizing: false,
+            isVisible: window.innerWidth < 768,
+            Cell: ({ value, row }) => (
+              <div
+              // onTouchMove={(e) => {
+              //   // verifica se arrastou suficiente para a direita
+              //   if (e.touches[0].clientX < 300) return;
+              //   handlePushItem(e, row);
+              // }}
+              >
+                <Row className="d-flex justify-content-between">
+                  <Col xs="auto" className="p-auto text-start">
+                    <Badge bg="light" text="dark">
+                      {row.values.materialId}
+                    </Badge>
+                  </Col>
+                  <Col xs="auto" className="p-auto text-start">
+                    <Badge bg="light" text="dark">
+                      {row.values.quantity} {row.values.unit}{' '}
+                      {window.innerWidth}
+                    </Badge>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className="p-auto text-start">{row.values.name}</Col>
+                </Row>
+              </div>
+            ),
+            disableSortBy: true,
+            // filterValue: 1,
+            // filter: filterGreaterThan,
+            // Filter: FilterForTotal,
+            // defaultCanFilter: true,
           },
         ]}
         data={row.original.MaterialReserveItems}
@@ -749,9 +879,14 @@ export default function Index() {
           //     asc: true,
           //   },
           // ],
-          hiddenColumns: columns
-            .filter((col) => col.isVisible === false)
-            .map((col) => col.accessor),
+          hiddenColumns: [
+            ...columns
+              .filter((col) => col.isVisible === false)
+              .map((col) => col.id),
+            ...columns
+              .filter((col) => col.isVisible === false)
+              .map((col) => col.accessor),
+          ],
         }}
         filterTypes={filterTypes}
         renderRowSubComponent={renderRowSubSubComponent}
