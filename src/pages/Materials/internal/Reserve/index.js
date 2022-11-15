@@ -838,6 +838,7 @@ export default function Index() {
                                                   variant="outline-danger"
                                                   size="sm"
                                                   className="border-0"
+                                                  tabindex="-1"
                                                 >
                                                   <FaTrashAlt size={18} />
                                                 </Button>
