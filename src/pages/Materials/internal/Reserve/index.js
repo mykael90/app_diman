@@ -345,7 +345,13 @@ export default function Index() {
               setFieldValue,
               setFieldTouched,
             }) => (
-              <Form noValidate autoComplete="off">
+              <Form
+                noValidate
+                autoComplete="off"
+                onKeyPress={(e) => {
+                  if (e.ctrlKey && e.code === 'Enter') submitForm(e);
+                }}
+              >
                 <ReleaseItemsModal // modal p/ liberação de materiais
                   handleCancelModal={handleCancelModal}
                   handleClose={handleCloseModalRel}
@@ -676,6 +682,7 @@ export default function Index() {
                                             onBlur={handleBlur}
                                             size="sm"
                                             className="p-0 m-0 ps-2"
+                                            tabindex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -698,6 +705,7 @@ export default function Index() {
                                             placeholder="Selecione o ID material"
                                             size="sm"
                                             className="p-0 m-0 ps-2"
+                                            tabindex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -722,6 +730,7 @@ export default function Index() {
                                             placeholder="UND"
                                             size="sm"
                                             className="p-0 m-0 ps-2"
+                                            tabindex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -740,6 +749,7 @@ export default function Index() {
                                             placeholder="SALDO"
                                             size="sm"
                                             className="p-0 m-0 ps-2"
+                                            tabindex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -758,6 +768,7 @@ export default function Index() {
                                             placeholder="VALOR"
                                             size="sm"
                                             className="p-0 m-0 ps-2"
+                                            tabindex="-1"
                                           />
                                         </Form.Group>
 
