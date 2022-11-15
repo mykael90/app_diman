@@ -52,7 +52,10 @@ const FilterForRestrict = ({
             placement="top"
             delay={{ show: 250, hide: 400 }}
             overlay={(props) =>
-              renderTooltip(props, 'Clique para mostrar todas as requisições')
+              renderTooltip(
+                props,
+                'Clique para mostrar requisições com alguma restrição'
+              )
             }
           >
             <Button size="sm" variant="outline-primary" className="border-0">
@@ -66,7 +69,7 @@ const FilterForRestrict = ({
             overlay={(props) =>
               renderTooltip(
                 props,
-                'Clique para mostrar requisições sem liberações'
+                'Clique para mostrar requisições totalmente liberadas'
               )
             }
           >
@@ -298,13 +301,13 @@ export default function Index() {
   );
 
   const initialState = {
-    sortBy: [
-      {
-        id: 'req',
-        desc: true,
-      },
-    ],
-    filters: [{ id: 'req', value: 1 }],
+    // sortBy: [
+    //   {
+    //     id: 'req',
+    //     desc: true,
+    //   },
+    // ],
+    filters: [{ id: 'req', value: 0 }],
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),
@@ -336,8 +339,42 @@ export default function Index() {
 
       groupRestrict: (rows, ids, filterValue) => {
         rows = rows.filter((row) => {
-          if (filterValue) return !row.original.MaterialReleases.length;
-          return true;
+          const quantityTotalRestrict = row.original.MaterialRestricts.reduce(
+            (ac, value) => {
+              ac += value.MaterialRestrictItems.reduce(
+                (acItems, valueItems) => {
+                  acItems += valueItems.quantity;
+                  return acItems;
+                },
+                0
+              );
+              return ac;
+            },
+            0
+          );
+          const quantityTotalRelease = row.original.MaterialReleases.reduce(
+            (ac, value) => {
+              // eslint-disable-next-line no-unsafe-optional-chaining
+              ac += value.MaterialReleaseItems?.reduce(
+                (acItems, valueItems) => {
+                  acItems += valueItems.quantity;
+                  return acItems;
+                },
+                0
+              );
+              return ac;
+            },
+            0
+          );
+          console.log(
+            row,
+            row.original.req,
+            quantityTotalRestrict,
+            quantityTotalRelease
+          );
+          if (filterValue)
+            return quantityTotalRestrict === quantityTotalRelease;
+          return quantityTotalRestrict !== quantityTotalRelease;
         });
         return rows;
       },
