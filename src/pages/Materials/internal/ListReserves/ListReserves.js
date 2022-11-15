@@ -575,17 +575,17 @@ export default function Index() {
               <Col className="p-auto text-start">{row.values.workerName}</Col>
             </Row>
             <Row>
-              <Col className="p-auto text-center">
+              <Col className="p-auto text-start">
                 {row.original?.withdrawnAtBr ? (
                   <>
-                    <Badge bg="success">UTILIZADA</Badge>
+                    <Badge bg="success">UTILIZADA</Badge>{' '}
                     {row.original?.withdrawnAtBr}
                   </>
                 ) : (
                   <>
                     {row.original?.canceledAtBr ? (
                       <>
-                        <Badge bg="danger">CANCELADA</Badge>
+                        <Badge bg="danger">CANCELADA</Badge>{' '}
                         {row.original?.canceledAtBr}
                       </>
                     ) : (
@@ -593,7 +593,7 @@ export default function Index() {
                         {' '}
                         {row.original?.separatedAtBr ? (
                           <>
-                            <Badge bg="primary">SEPARADA</Badge>
+                            <Badge bg="primary">SEPARADA</Badge>{' '}
                             {row.original?.separatedAtBr}
                           </>
                         ) : (
@@ -608,9 +608,9 @@ export default function Index() {
           </div>
         ),
         disableSortBy: true,
-        // defaultCanFilter: true,
-        // Filter: SelectColumnFilterStatus,
-        // filter: 'groupStatus',
+        defaultCanFilter: true,
+        Filter: SelectColumnFilterStatus,
+        filter: 'groupStatus',
       },
     ],
     []
@@ -636,7 +636,9 @@ export default function Index() {
         desc: true,
       },
     ],
-    filters: [{ id: 'status', value: 'EM ESPERA' }],
+    filters: [
+      { id: window.innerWidth > 768 ? 'status' : 'mobile', value: 'EM ESPERA' },
+    ],
     pageSize: 20,
     hiddenColumns: [
       ...columns.filter((col) => col.isVisible === false).map((col) => col.id),
@@ -671,7 +673,9 @@ export default function Index() {
       },
 
       groupStatus: (rows, ids, filterValue) => {
-        rows = rows.filter((row) => {
+        console.log(rows);
+        const filterRows = rows.filter((row) => {
+          console.log(row, filterValue);
           switch (filterValue) {
             case 'EM ESPERA':
               return (
@@ -693,7 +697,7 @@ export default function Index() {
               return row;
           }
         });
-        return rows;
+        return filterRows;
       },
     }),
     []
