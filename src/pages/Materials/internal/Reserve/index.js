@@ -519,7 +519,7 @@ export default function Index() {
                             setFieldValue('workerId', selected);
                           }}
                           placeholder="Selecione o profissional"
-                          onBlur={handleBlur}
+                          // onBlur={handleBlur}
                         />
                         {touched.workerId && !!errors.workerId ? (
                           <Badge bg="danger">{errors.workerId}</Badge>
