@@ -149,6 +149,7 @@ function EditableCell({
           // onBlur={onBlur}
           className={original.dateInitialQuantity ? 'd-none' : ''}
           style={{ width: '75px' }}
+          step="any"
         />
         <Button
           type="submit"

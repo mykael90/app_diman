@@ -47,6 +47,7 @@ function EditableCell({
           type="number"
           id={`qs_${index}`}
           size="sm"
+          step="any"
         />
         <Button
           onClick={(e) => handlePushItem(e, index)}

@@ -456,6 +456,7 @@ export default function Index() {
                                     placeholder="QTD"
                                     size="sm"
                                     className="p-0 m-0 ps-2 pe-2 text-end"
+                                    step="any"
                                   />
                                 </Form.Group>
                                 <Col

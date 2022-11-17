@@ -232,6 +232,7 @@ export default function Index(props) {
                 type="number"
                 onChange={(e) => handleQuantityChange(e, row)}
                 style={{ width: '75px' }}
+                step="any"
               />
               <Button
                 type="submit"

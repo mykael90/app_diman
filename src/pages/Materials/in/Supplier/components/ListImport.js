@@ -190,6 +190,7 @@ export default function Index(props) {
                 size="sm"
                 type="number"
                 onChange={(e) => handleQuantityChange(e, row)}
+                step="any"
               />
               <Button
                 type="submit"
