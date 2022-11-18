@@ -12,7 +12,7 @@ import {
   useExpanded,
   usePagination,
 } from 'react-table';
-import { Form, Table, Row, Col, Button } from 'react-bootstrap';
+import { Form, Table, Row, Col, Button, Badge } from 'react-bootstrap';
 import {
   FaFilter,
   FaSortAlphaDown,
@@ -24,9 +24,11 @@ export function GlobalFilter({
   preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
+  globalFilteredRows,
 }) {
   const inputRef = useRef();
   const count = preGlobalFilteredRows.length;
+  const countFiltered = globalFilteredRows.length;
   const [value, setValue] = React.useState(globalFilter);
   // eslint-disable-next-line no-shadow
   const onChange = useAsyncDebounce((value) => {
@@ -35,15 +37,15 @@ export function GlobalFilter({
 
   return (
     <Form onSubmit={(e) => e.preventDefault()}>
-      <Form.Group
-        as={Row}
-        className="d-flex align-items-center"
-        controlId="searchForm"
-      >
-        <Form.Label column xs="auto" className="pe-0">
-          <FaFilter className="text-dark" />
-        </Form.Label>
-        <Col>
+      <Row>
+        <Form.Group
+          as={Col}
+          className="d-flex align-items-center"
+          controlId="searchForm"
+        >
+          <Form.Label column xs="auto" className="pe-2">
+            <FaFilter className="text-dark" />
+          </Form.Label>
           <Form.Control
             size="sm"
             type="text"
@@ -52,14 +54,21 @@ export function GlobalFilter({
               setValue(e.target.value.toUpperCase());
               onChange(e.target.value);
             }}
-            placeholder={` ${count} registros...`}
+            placeholder="Digite aqui sua consulta..."
             className="border-0"
             autoComplete="off"
             autoFocus
             ref={inputRef}
           />
+        </Form.Group>
+      </Row>
+      <Row className="d-flex justify-content-end">
+        <Col sm="auto">
+          <Badge bg="ligth" text="dark" className="mt-1">
+            {countFiltered} registros encontrados de {count}
+          </Badge>
         </Col>
-      </Form.Group>
+      </Row>
     </Form>
   );
 }
@@ -92,6 +101,7 @@ export default function TableGfilterNestedrow({
     visibleColumns,
     state,
     preGlobalFilteredRows,
+    globalFilteredRows,
     setGlobalFilter,
   } = useTable(
     {
@@ -124,6 +134,7 @@ export default function TableGfilterNestedrow({
             preGlobalFilteredRows={preGlobalFilteredRows}
             globalFilter={state.globalFilter}
             setGlobalFilter={setGlobalFilter}
+            globalFilteredRows={globalFilteredRows}
           />
         </Col>
       </Row>

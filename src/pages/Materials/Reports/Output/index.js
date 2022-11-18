@@ -666,17 +666,10 @@ export default function Index() {
             const rowValue = row.values[id];
             const arrayFilter = String(filterValue).split(' ');
 
-            console.log(row);
-            // console.log(id);
-            // // console.log();
-            // console.log(index);
-            // console.log(filterValue.substring(1, 0));
-            // console.log(row.original.MaterialOutItems.length);
-
             if (
               !index && // TESTAR SO NO 0 PARA ECONOMIZAR MEMORIA
               filterValue.substring(1, 0) === '*' && // PARA PESQUISAR NA SUBROW DO NOME DO MATERIAL TEM Q UTILIZAR O * NO INÍCIO DA CONSULTA SEGUIDO DE ESPAÇO
-              row.original.MaterialOutItems.length > 0
+              row.original.MaterialOutItems?.length > 0
             ) {
               const [, ...arrayFilterSub] = arrayFilter;
               const materials = row.original.MaterialOutItems;
