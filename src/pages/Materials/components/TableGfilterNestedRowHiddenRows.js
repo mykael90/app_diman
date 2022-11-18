@@ -230,11 +230,11 @@ export default function TableGfilterNestedRowHiddenRows({
                     <tr {...row.getRowProps()} className="border-0">
                       <td
                         colSpan={visibleColumns.length}
-                        // className="bg-dark"
+                        className="bg-info"
                         style={{
                           width: '100%',
                           borderColor: 'rgb(222,226,230)',
-                          background: '#FFF',
+                          // background: '#FFF',
                         }}
                       >
                         {/*

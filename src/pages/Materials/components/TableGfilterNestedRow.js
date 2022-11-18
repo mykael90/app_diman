@@ -200,8 +200,8 @@ export default function TableGfilterNestedrow({
                       <td
                         className={`py-3 text-center align-middle ${
                           row.isExpanded
-                            ? 'fw-bold bg-info text-dark font-size-sm'
-                            : 'fw-normal'
+                            ? 'bg-info text-dark font-size-sm'
+                            : ' '
                         }`}
                         style={{
                           verticalAlign: 'middle',

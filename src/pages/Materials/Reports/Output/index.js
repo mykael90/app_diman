@@ -287,7 +287,7 @@ export default function Index() {
                   >
                     <Button
                       size="sm"
-                      variant="outline-info"
+                      variant="outline-primary"
                       className="border-0 m-0"
                     >
                       <FaInfo />

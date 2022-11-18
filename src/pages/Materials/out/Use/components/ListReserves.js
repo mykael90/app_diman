@@ -462,7 +462,7 @@ export default function Index({
               >
                 <Button
                   size="sm"
-                  variant="outline-info"
+                  variant='outline-primary'
                   className="border-0 mt-2 d-none"
                   onClick={() => {
                     handleImportReserve(row.original);
