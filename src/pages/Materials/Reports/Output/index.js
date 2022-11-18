@@ -660,11 +660,55 @@ export default function Index() {
       // "startWith"
       text: (rows, ids, filterValue) => {
         rows = rows.filter((row) =>
-          ids.some((id) => {
+          ids.some((id, index) => {
             // console.log(row.original.MaterialOutItems, id);
 
             const rowValue = row.values[id];
             const arrayFilter = String(filterValue).split(' ');
+
+            console.log(row);
+            // console.log(id);
+            // // console.log();
+            // console.log(index);
+            // console.log(filterValue.substring(1, 0));
+            // console.log(row.original.MaterialOutItems.length);
+
+            if (
+              !index && // TESTAR SO NO 0 PARA ECONOMIZAR MEMORIA
+              filterValue.substring(1, 0) === '*' && // PARA PESQUISAR NA SUBROW DO NOME DO MATERIAL TEM Q UTILIZAR O * NO INÍCIO DA CONSULTA SEGUIDO DE ESPAÇO
+              row.original.MaterialOutItems.length > 0
+            ) {
+              const [, ...arrayFilterSub] = arrayFilter;
+              const materials = row.original.MaterialOutItems;
+
+              return materials.reduce((ac, mat) => {
+                // ac -> acumulador; mat -> material
+                ac =
+                  ac ||
+                  arrayFilterSub.reduce((res, cur) => {
+                    // res -> response; cur -> currency (atual)
+                    res =
+                      res &&
+                      String(mat.name)
+                        .toLowerCase()
+                        .includes(String(cur).toLowerCase());
+                    return res;
+                  }, true);
+                return ac;
+              }, false);
+
+              // return arrayFilterSub.reduce((res, cur) => {
+              //   // res -> response; cur -> currency (atual)
+              //   res =
+              //     res &&
+              //     String(materials[0].name)
+              //       .toLowerCase()
+              //       .includes(String(cur).toLowerCase());
+              //   return res;
+              // }, true);
+
+              // return true;
+            }
 
             return arrayFilter.reduce((res, cur) => {
               // res -> response; cur -> currency (atual)
