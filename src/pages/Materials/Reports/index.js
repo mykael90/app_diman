@@ -7,7 +7,7 @@ import { Container } from 'react-bootstrap';
 export default function index() {
   return (
     <Card>
-      <Card.Header>
+      <Card.Header className="d-print-none">
         <Container>
           <Nav variant="tabs" defaultActiveKey="#1">
             <Nav.Item>
@@ -75,7 +75,7 @@ export default function index() {
       </Card.Header>
       <Container>
         <Card.Body>
-          <Outlet />
+          <Outlet className="d-print-block" />
         </Card.Body>
       </Container>
     </Card>

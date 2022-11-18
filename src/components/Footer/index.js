@@ -9,7 +9,7 @@ const logoUFRN = require('../../assets/img/logo_ufrn_gray.png');
 export default function Footer() {
   const navigate = useNavigate();
   return (
-    <footer className="bg-dark text-white">
+    <footer className="bg-dark text-white d-print-none">
       <Container className="py-1 ps-4 mb-0">
         <Row className="d-flex justify-content-between align-items-center py-2">
           <Col>

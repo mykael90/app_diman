@@ -34,12 +34,12 @@ export default function Header() {
 
   return (
     <>
-      <StyledNav />
+      <StyledNav className="d-print-none" />
 
       <StyledNavbar
         collapseOnSelect
         expand="lg"
-        className="border-bottom border-2 justify-content-center"
+        className="border-bottom border-2 justify-content-center d-print-none"
         style={{ background: '#F8F9FA' }}
       >
         <Container>
