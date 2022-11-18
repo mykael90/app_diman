@@ -119,37 +119,6 @@ export default function Index() {
         },
       },
       {
-        Header: 'Valor',
-        accessor: 'value',
-        width: 120,
-        disableResizing: true,
-        Cell: ({ value }) => <div className="p-auto text-end">{value}</div>,
-      },
-      {
-        Header: () => <div className="p-auto text-center">Data de pedido</div>,
-        accessor: 'registerDate',
-        width: 120,
-        disableResizing: true,
-        disableSortBy: true,
-        Cell: ({ value }) => <div className="p-auto text-center">{value}</div>,
-      },
-      {
-        Header: () => (
-          <div className="p-auto text-center">Usuário resp. pedido</div>
-        ),
-        accessor: 'requiredBy',
-        width: 150,
-        disableResizing: true,
-        Cell: (props) => {
-          const custom = String(props.value).replace(
-            /(^[a-z]*)\.([a-z]*).*/gm,
-            '$1.$2'
-          ); // deixar só os dois primeiros nomes
-          return <div className="p-auto text-center"> {custom}</div>;
-        },
-        disableSortBy: true,
-      },
-      {
         Header: () => (
           <div className="p-auto text-center">Data de recebimento</div>
         ),
@@ -176,6 +145,31 @@ export default function Index() {
       },
       {
         Header: () => (
+          <div className="p-auto text-center">Usuário resp. pedido</div>
+        ),
+        accessor: 'requiredBy',
+        width: 150,
+        disableResizing: true,
+        Cell: (props) => {
+          const custom = String(props.value).replace(
+            /(^[a-z]*)\.([a-z]*).*/gm,
+            '$1.$2'
+          ); // deixar só os dois primeiros nomes
+          return <div className="p-auto text-center"> {custom}</div>;
+        },
+        disableSortBy: true,
+      },
+      {
+        Header: () => <div className="p-auto text-center">Data de pedido</div>,
+        accessor: 'registerDate',
+        width: 120,
+        disableResizing: true,
+        disableSortBy: true,
+        Cell: ({ value }) => <div className="p-auto text-center">{value}</div>,
+      },
+
+      {
+        Header: () => (
           <div className="p-auto text-center">Unidade de custo</div>
         ),
         accessor: 'costUnit',
@@ -190,6 +184,13 @@ export default function Index() {
           ) : null;
         },
         disableSortBy: true,
+      },
+      {
+        Header: 'Valor',
+        accessor: 'value',
+        width: 120,
+        disableResizing: true,
+        Cell: ({ value }) => <div className="p-auto text-end">{value}</div>,
       },
       {
         Header: () => <div className="p-auto text-center">Ações</div>,

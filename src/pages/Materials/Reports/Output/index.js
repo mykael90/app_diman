@@ -196,11 +196,37 @@ export default function Index() {
         },
       },
       {
-        Header: 'Valor',
-        accessor: 'valueBr',
+        Header: 'Retira',
+        accessor: 'createdAtBr',
         width: 120,
         disableResizing: true,
-        // eslint-disable-next-line react/destructuring-assignment
+        disableSortBy: true,
+      },
+      {
+        Header: 'Profissional',
+        accessor: 'removedBy',
+        width: 200,
+        disableResizing: true,
+        Cell: ({ value, row }) => (
+          <OverlayTrigger
+            placement="right"
+            delay={{ show: 250, hide: 400 }}
+            overlay={(props) =>
+              renderTooltip(
+                props,
+                row.original.Worker?.WorkerContracts[0].WorkerJobtype.job
+              )
+            }
+          >
+            <Row
+              onClick={(e) => alert('Funcionalidade em implantação')}
+              style={{ cursor: 'pointer' }}
+            >
+              <Col>{value || row.original.authorizerUsername} </Col>
+            </Row>
+          </OverlayTrigger>
+        ),
+        disableSortBy: true,
       },
       {
         Header: 'Autorização',
@@ -214,23 +240,6 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
-        disableSortBy: true,
-      },
-      {
-        Header: 'Retira',
-        accessor: 'createdAtBr',
-        width: 120,
-        disableResizing: true,
-        disableSortBy: true,
-      },
-      {
-        Header: 'Profissional',
-        accessor: 'removedBy',
-        width: 200,
-        disableResizing: true,
-        Cell: ({ value, row }) => (
-          <span>{value || row.original.authorizerUsername}</span>
-        ),
         disableSortBy: true,
       },
       {
@@ -251,6 +260,14 @@ export default function Index() {
         Header: 'Local',
         accessor: 'place',
         disableSortBy: true,
+      },
+      {
+        Header: 'Valor',
+        accessor: 'valueBr',
+        width: 120,
+        disableResizing: true,
+        // eslint-disable-next-line react/destructuring-assignment
+        Cell: ({ value }) => <div className="text-end">{value}</div>,
       },
       {
         Header: 'Ações',
@@ -644,6 +661,8 @@ export default function Index() {
       text: (rows, ids, filterValue) => {
         rows = rows.filter((row) =>
           ids.some((id) => {
+            // console.log(row.original.MaterialOutItems, id);
+
             const rowValue = row.values[id];
             const arrayFilter = String(filterValue).split(' ');
 
