@@ -14,6 +14,7 @@ import {
   Col,
   OverlayTrigger,
   Tooltip,
+  Badge,
 } from 'react-bootstrap';
 
 import ReturnItemsModal from './components/ReturnItemsModal';
@@ -37,22 +38,22 @@ export default function Index() {
   const [showModalReturn, setShowModalReturn] = useState(false);
   const [reqInModal, setReqInModal] = useState('');
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/out/');
-        setReqs(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
+  async function getData() {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/materials/out/');
+      setReqs(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
     }
+  }
 
+  useEffect(() => {
     getData();
   }, []);
 
@@ -62,6 +63,7 @@ export default function Index() {
 
   const handleCloseModalReturn = () => {
     setShowModalReturn(false);
+    getData();
   };
 
   const handleShowModalReturn = (reqIn) => {
@@ -91,22 +93,42 @@ export default function Index() {
         accessor: 'reqMaintenance',
         width: 120,
         disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: 'Tipo',
         accessor: 'type',
-        width: 120,
+        width: 80,
         disableResizing: true,
+        disableSortBy: true,
+        Cell: ({ value }) => {
+          switch (value) {
+            case 'USO':
+              return <Badge bg="success">{value}</Badge>;
+            case 'EMPRÉSTIMO':
+              return <Badge bg="secondary">{value}</Badge>;
+            case 'DESCARTE':
+              return <Badge bg="warning">{value}</Badge>;
+            case 'DOAÇÃO':
+              return <Badge bg="info">{value}</Badge>;
+            case 'DEVOLUÇÃO':
+              return <Badge bg="dark">{value}</Badge>;
+            case 'EXTRAVIO':
+              return <Badge bg="danger">{value}</Badge>;
+            default:
+              return <Badge>{value}</Badge>;
+          }
+        },
       },
       {
-        Header: 'Valor',
-        accessor: 'valueBr',
+        Header: 'Retira',
+        accessor: 'createdAtBr',
         width: 120,
         disableResizing: true,
-        // eslint-disable-next-line react/destructuring-assignment
+        disableSortBy: true,
       },
       {
-        Header: 'Autorizado por:',
+        Header: 'Autorização',
         accessor: 'authorizerUsername',
         width: 150,
         disableResizing: true,
@@ -117,15 +139,10 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableSortBy: true,
       },
       {
-        Header: 'Retira em:',
-        accessor: 'createdAtBr',
-        width: 120,
-        disableResizing: true,
-      },
-      {
-        Header: 'Retirado por:',
+        Header: 'Profissional',
         accessor: 'removedBy',
         width: 200,
         disableResizing: true,
@@ -136,10 +153,27 @@ export default function Index() {
           ); // deixar só os dois primeiros nomes
           return <span> {custom}</span>;
         },
+        disableSortBy: true,
       },
       {
         Header: 'Local',
         accessor: 'place',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Valor',
+        accessor: 'valueBr',
+        width: 120,
+        disableResizing: true,
+        // eslint-disable-next-line react/destructuring-assignment
+        Cell: ({ value }) => <div className="text-end">{value}</div>,
+      },
+      {
+        Header: 'Retorno',
+        accessor: (originalRow) => originalRow.MaterialReturned.length,
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
       },
       {
         Header: () => null,
@@ -193,12 +227,12 @@ export default function Index() {
   );
 
   const initialState = {
-    sortBy: [
-      {
-        id: 'req',
-        desc: true,
-      },
-    ],
+    // sortBy: [
+    //   {
+    //     id: 'id',
+    //     desc: true,
+    //   },
+    // ],
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),
