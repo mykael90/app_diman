@@ -149,7 +149,7 @@ export default function TableGfilterNestedRowHiddenRows({
       </Row>
 
       <Row className="py-3">
-        <Table bordered hover size="sm" {...getTableProps()} responsive="md">
+        <Table bordered size="sm" {...getTableProps()} responsive="md">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -210,7 +210,9 @@ export default function TableGfilterNestedRowHiddenRows({
                   <tr {...row.getRowProps()}>
                     {row.cells.map((cell) => (
                       <td
-                        className="text-center py-3"
+                        className={`text-center py-3 ${
+                          row.isExpanded ? 'bg-info' : 'fw-normal'
+                        }`}
                         style={{
                           verticalAlign: 'middle',
                         }}
@@ -228,6 +230,7 @@ export default function TableGfilterNestedRowHiddenRows({
                     <tr {...row.getRowProps()} className="border-0">
                       <td
                         colSpan={visibleColumns.length}
+                        // className="bg-dark"
                         style={{
                           width: '100%',
                           borderColor: 'rgb(222,226,230)',

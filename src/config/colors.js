@@ -7,6 +7,7 @@ export const body2Color = '#FFF';
 
 export const infraColor = '#F29049';
 export const infraDarkColor = '#AE520D';
+export const infraLight = '#FFE7D7';
 
 // export const successColor = '#0197F6';
 // export const infoColor = '#0197F6';

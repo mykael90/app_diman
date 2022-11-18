@@ -140,7 +140,7 @@ export default function TableGfilterNestedrow({
       </Row>
 
       <Row className="pt-3">
-        <Table bordered hover size="sm" {...getTableProps()} responsive="md">
+        <Table bordered size="sm" {...getTableProps()} responsive="md">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -198,7 +198,11 @@ export default function TableGfilterNestedrow({
                   <tr {...row.getRowProps()}>
                     {row.cells.map((cell) => (
                       <td
-                        className="py-3 text-center align-middle"
+                        className={`py-3 text-center align-middle ${
+                          row.isExpanded
+                            ? 'fw-bold bg-info text-dark font-size-sm'
+                            : 'fw-normal'
+                        }`}
                         style={{
                           verticalAlign: 'middle',
                         }}
@@ -216,10 +220,11 @@ export default function TableGfilterNestedrow({
                     <tr {...row.getRowProps()} className="border-0">
                       <td
                         colSpan={visibleColumns.length}
+                        className="bg-info"
                         style={{
                           width: '100%',
                           borderColor: 'rgb(222,226,230)',
-                          background: '#FFF',
+                          // background: 'red',
                         }}
                       >
                         {/*
