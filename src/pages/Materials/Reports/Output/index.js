@@ -13,9 +13,12 @@ import {
   FaRedoAlt,
   FaSyncAlt,
   FaRegEdit,
-  FaEdit,
+  FaSearch,
+  FaSearchPlus,
+  FaSearchMinus,
   FaExclamationTriangle,
   FaExclamation,
+  FaGripLinesVertical,
 } from 'react-icons/fa';
 
 import {
@@ -27,6 +30,8 @@ import {
   OverlayTrigger,
   Tooltip,
   Badge,
+  Dropdown,
+  Form,
 } from 'react-bootstrap';
 
 import axios from '../../../../services/axios';
@@ -35,13 +40,320 @@ import Loading from '../../../../components/Loading';
 import EditModal from './components/EditModal';
 
 // import generic table from material's components with global filter and nested row
-import TableGfilterNestedRow from '../../components/TableGfilterNestedRow';
+import TableGfilterNestedRowHiddenRows from '../../components/TableGfilterNestedRowHiddenRows';
 import TableNestedrow from '../../components/TableNestedRow';
 
 // trigger to custom filter
 function DefaultColumnFilter() {
   return <> </>;
 } // as colunas padrao nao aplicam filtro
+
+function SelectColumnFilter({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  const options = React.useMemo(() => {
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id]);
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
+  // Render a multi-select box
+  return (
+    <Col>
+      <OverlayTrigger
+        placement="left"
+        delay={{ show: 250, hide: 400 }}
+        overlay={(props) => renderTooltip(props, `Filter for ${id}`)}
+      >
+        <Dropdown>
+          <Dropdown.Toggle
+            variant="outline-primary"
+            size="sm"
+            id="dropdown-group"
+            className="border-0"
+          >
+            {filterValue ? <span>{filterValue}</span> : <FaSearch />}
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <Dropdown.Item
+              onClick={() => {
+                setFilter('');
+              }}
+            >
+              Remover Filtro
+            </Dropdown.Item>
+            {options.sort().map((option, i) => (
+              <Dropdown.Item
+                key={i}
+                onClick={() => {
+                  setFilter(option || undefined);
+                }}
+              >
+                {option}{' '}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      </OverlayTrigger>
+    </Col>
+  );
+}
+
+function InputColumnFilter({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  const options = React.useMemo(() => {
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id]);
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
+  // Render a multi-select box
+  return (
+    <Row>
+      <Col xs="auto" className="pe-0">
+        <OverlayTrigger
+          placement="left"
+          delay={{ show: 250, hide: 400 }}
+          overlay={(props) => renderTooltip(props, `Filter for ${id}`)}
+        >
+          <Button
+            variant="outline-primary"
+            size="sm"
+            id="dropdown-group"
+            className="border-0"
+            onClick={(e) => {
+              e.preventDefault();
+              const searchInput = e.currentTarget.parentElement.nextSibling;
+
+              if (searchInput.className.includes('d-none')) {
+                searchInput.className = searchInput.className.replace(
+                  'd-none',
+                  'd-inline'
+                );
+              } else {
+                searchInput.className = searchInput.className.replace(
+                  'd-inline',
+                  'd-none'
+                );
+                setFilter(undefined);
+              }
+
+              return true;
+            }}
+          >
+            {!filterValue ? <FaSearchPlus /> : <FaSearchMinus />}
+          </Button>
+        </OverlayTrigger>
+      </Col>
+      <Col className="ps-1 d-none">
+        <Form.Control
+          type="text"
+          size="sm"
+          value={filterValue || ''}
+          onChange={(e) => {
+            setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
+          }}
+        />
+      </Col>
+    </Row>
+  );
+}
+function InputDateColumnFilter({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  const options = React.useMemo(() => {
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id]);
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
+  // Render a multi-select box
+  return (
+    <>
+      <Row className="py-0 my-0">
+        <Col xs="auto" className="pe-0 my-0 py-0">
+          <OverlayTrigger
+            placement="left"
+            delay={{ show: 250, hide: 400 }}
+            overlay={(props) => renderTooltip(props, `Filter for ${id}`)}
+          >
+            <Button
+              variant="outline-primary"
+              size="sm"
+              id="dropdown-group"
+              className="border-0"
+              onClick={(e) => {
+                e.preventDefault();
+                const searchInputAfter =
+                  e.currentTarget.parentElement.parentElement.nextSibling;
+                const searchInputBefore =
+                  e.currentTarget.parentElement.parentElement.nextSibling
+                    .nextSibling;
+
+                if (searchInputAfter.className.includes('d-none')) {
+                  searchInputAfter.className =
+                    searchInputAfter.className.replace('d-none', 'd-block');
+                  searchInputBefore.className =
+                    searchInputBefore.className.replace('d-none', 'd-block');
+                } else {
+                  searchInputAfter.className =
+                    searchInputAfter.className.replace('d-block', 'd-none');
+                  searchInputBefore.className =
+                    searchInputBefore.className.replace('d-block', 'd-none');
+                  setFilter(undefined);
+                }
+
+                return true;
+              }}
+            >
+              {!filterValue ? <FaSearchPlus /> : <FaSearchMinus />}
+            </Button>
+          </OverlayTrigger>
+        </Col>
+      </Row>
+      <Row className="d-none">
+        <Col className="fw-normal">De:</Col>
+        <Col xs={12}>
+          <Form.Control
+            type="date"
+            size="sm"
+            value={filterValue?.after || ''}
+            onChange={(e) => {
+              setFilter(
+                { after: e.target.value, before: filterValue?.before } ||
+                  undefined
+              ); // Set undefined to remove the filter entirely
+            }}
+            style={{ width: '110px' }}
+          />
+        </Col>
+      </Row>
+      <Row className="d-none">
+        <Col className="fw-normal">Até:</Col>
+        <Col xs={12}>
+          <Form.Control
+            type="date"
+            size="sm"
+            value={filterValue?.before || ''}
+            onChange={(e) => {
+              setFilter(
+                { after: filterValue?.after, before: e.target.value } ||
+                  undefined
+              ); // Set undefined to remove the filter entirely
+            }}
+            style={{ width: '110px' }}
+          />
+        </Col>
+      </Row>
+    </>
+  );
+}
+function InputValueColumnFilter({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  const options = React.useMemo(() => {
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id]);
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
+  // Render a multi-select box
+  return (
+    <>
+      <Row className="py-0 my-0">
+        <Col xs="auto" className="pe-0 my-0 py-0">
+          <OverlayTrigger
+            placement="left"
+            delay={{ show: 250, hide: 400 }}
+            overlay={(props) => renderTooltip(props, `Filter for ${id}`)}
+          >
+            <Button
+              variant="outline-primary"
+              size="sm"
+              id="dropdown-group"
+              className="border-0"
+              onClick={(e) => {
+                e.preventDefault();
+                const searchInputAfter =
+                  e.currentTarget.parentElement.parentElement.nextSibling;
+                const searchInputBefore =
+                  e.currentTarget.parentElement.parentElement.nextSibling
+                    .nextSibling;
+
+                if (searchInputAfter.className.includes('d-none')) {
+                  searchInputAfter.className =
+                    searchInputAfter.className.replace('d-none', 'd-block');
+                  searchInputBefore.className =
+                    searchInputBefore.className.replace('d-none', 'd-block');
+                } else {
+                  searchInputAfter.className =
+                    searchInputAfter.className.replace('d-block', 'd-none');
+                  searchInputBefore.className =
+                    searchInputBefore.className.replace('d-block', 'd-none');
+                  setFilter(undefined);
+                }
+
+                return true;
+              }}
+            >
+              {!filterValue ? <FaSearchPlus /> : <FaSearchMinus />}
+            </Button>
+          </OverlayTrigger>
+        </Col>
+      </Row>
+      <Row className="d-none">
+        <Col className="fw-normal">De:</Col>
+        <Col xs={12}>
+          <Form.Control
+            type="number"
+            size="sm"
+            value={filterValue?.after || ''}
+            onChange={(e) => {
+              setFilter(
+                { after: e.target.value, before: filterValue?.before } ||
+                  undefined
+              ); // Set undefined to remove the filter entirely
+            }}
+            style={{ width: '110px' }}
+            step="any"
+          />
+        </Col>
+      </Row>
+      <Row className="d-none">
+        <Col className="fw-normal">Até:</Col>
+        <Col xs={12}>
+          <Form.Control
+            type="number"
+            size="sm"
+            value={filterValue?.before || ''}
+            onChange={(e) => {
+              setFilter(
+                { after: filterValue?.after, before: e.target.value } ||
+                  undefined
+              ); // Set undefined to remove the filter entirely
+            }}
+            style={{ width: '110px' }}
+            step="any"
+          />
+        </Col>
+      </Row>
+    </>
+  );
+}
 
 const renderTooltip = (props, message) => (
   <Tooltip id="button-tooltip" {...props}>
@@ -174,11 +486,13 @@ export default function Index() {
           </div>
         ),
         disableSortBy: true,
+        Filter: InputColumnFilter,
+        filter: 'text',
       },
       {
         Header: 'Tipo',
         accessor: 'type',
-        width: 80,
+        width: 120,
         disableResizing: true,
         disableSortBy: true,
         Cell: ({ value }) => {
@@ -199,6 +513,8 @@ export default function Index() {
               return <Badge>{value}</Badge>;
           }
         },
+        Filter: SelectColumnFilter,
+        filter: 'includes',
       },
       {
         Header: 'Retira',
@@ -206,6 +522,8 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableSortBy: true,
+        Filter: InputDateColumnFilter,
+        filter: 'rangeDate',
       },
       {
         Header: 'Profissional',
@@ -232,6 +550,8 @@ export default function Index() {
           </OverlayTrigger>
         ),
         disableSortBy: true,
+        Filter: InputColumnFilter,
+        filter: 'text',
       },
       {
         Header: 'Autorização',
@@ -246,6 +566,8 @@ export default function Index() {
           return <span> {custom}</span>;
         },
         disableSortBy: true,
+        Filter: SelectColumnFilter,
+        filter: 'text',
       },
       {
         Header: 'Expedição',
@@ -260,11 +582,15 @@ export default function Index() {
           return <span> {custom}</span>;
         },
         disableSortBy: true,
+        Filter: SelectColumnFilter,
+        filter: 'text',
       },
       {
         Header: 'Local',
         accessor: 'place',
         disableSortBy: true,
+        Filter: InputColumnFilter,
+        filter: 'text',
       },
       {
         Header: 'Valor',
@@ -273,6 +599,9 @@ export default function Index() {
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
         Cell: ({ value }) => <div className="text-end">{value}</div>,
+        disableSortBy: true,
+        Filter: InputValueColumnFilter,
+        filter: 'rangeValue',
       },
       {
         Header: 'Ações',
@@ -441,7 +770,7 @@ export default function Index() {
         data={row.original.MaterialInItems}
         defaultColumn={{
           // Let's set up our default Filter UI
-          Filter: DefaultColumnFilter,
+          // Filter: DefaultColumnFilter,
           minWidth: 30,
           width: 50,
           maxWidth: 800,
@@ -638,7 +967,7 @@ export default function Index() {
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
-      // Filter: DefaultColumnFilter,
+      Filter: DefaultColumnFilter,
       minWidth: 30,
       width: 120,
       maxWidth: 800,
@@ -647,12 +976,12 @@ export default function Index() {
   );
 
   const initialState = {
-    sortBy: [
-      {
-        id: 'createdAt',
-        desc: true,
-      },
-    ],
+    // sortBy: [
+    //   {
+    //     id: 'createdAt',
+    //     desc: true,
+    //   },
+    // ],
     pageSize: 50,
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
@@ -694,18 +1023,6 @@ export default function Index() {
                   }, true);
                 return ac;
               }, false);
-
-              // return arrayFilterSub.reduce((res, cur) => {
-              //   // res -> response; cur -> currency (atual)
-              //   res =
-              //     res &&
-              //     String(materials[0].name)
-              //       .toLowerCase()
-              //       .includes(String(cur).toLowerCase());
-              //   return res;
-              // }, true);
-
-              // return true;
             }
 
             return arrayFilter.reduce((res, cur) => {
@@ -717,6 +1034,117 @@ export default function Index() {
                   .includes(String(cur).toLowerCase());
               return res;
             }, true);
+          })
+        );
+        return rows;
+      },
+
+      rangeDate: (rows, ids, filterValue) => {
+        rows = rows.filter((row) =>
+          ids.some((id, index) => {
+            const rowValue = row.values[id];
+
+            // Date row
+            const rowDate = rowValue.split('/');
+            const day = Number(rowDate[0]);
+            const month = Number(rowDate[1]) - 1;
+            const year = Number(rowDate[2].substring(0, 4));
+            const rowDateFormated = new Date(year, month, day);
+            console.log(
+              row.values[id],
+              rowDateFormated,
+              rowDateFormated.getTime()
+            );
+
+            // Date After
+            let dateAfterFormated;
+            if (filterValue.after) {
+              const dateAfter = filterValue.after?.split('-');
+              const dayAfter = Number(dateAfter[2]);
+              const monthAfter = Number(dateAfter[1]) - 1;
+              const yearAfter = Number(dateAfter[0].substring(0, 4));
+              dateAfterFormated = new Date(yearAfter, monthAfter, dayAfter);
+              console.log(
+                filterValue.after,
+                dateAfterFormated,
+                dateAfterFormated.getTime()
+              );
+            }
+
+            // Date Before
+            let dateBeforeFormated;
+            if (filterValue.before) {
+              const dateBefore = filterValue.before?.split('-');
+              const dayBefore = Number(dateBefore[2]);
+              const monthBefore = Number(dateBefore[1]) - 1;
+              const yearBefore = Number(dateBefore[0].substring(0, 4));
+              dateBeforeFormated = new Date(yearBefore, monthBefore, dayBefore);
+              console.log(
+                filterValue.before,
+                dateBeforeFormated,
+                dateBeforeFormated.getTime()
+              );
+            }
+
+            if (filterValue.after && filterValue.before)
+              return (
+                rowDateFormated.getTime() >= dateAfterFormated.getTime() &&
+                rowDateFormated.getTime() <= dateBeforeFormated.getTime()
+              );
+
+            if (filterValue.after)
+              return rowDateFormated.getTime() >= dateAfterFormated.getTime();
+
+            if (filterValue.before)
+              return rowDateFormated.getTime() <= dateBeforeFormated.getTime();
+
+            return true;
+          })
+        );
+        return rows;
+      },
+
+      rangeValue: (rows, ids, filterValue) => {
+        rows = rows.filter((row) =>
+          ids.some((id, index) => {
+            const rowValue = row.values[id];
+
+            // Value row
+            let rowValueFormated;
+            if (row.values[id]) {
+              rowValueFormated = Number(
+                rowValue.split(' ')[1].replace(',', '.')
+              );
+              console.log(row.values[id], rowValueFormated);
+            }
+
+            // Value After
+            let valueAfterFormated;
+            if (filterValue.after) {
+              valueAfterFormated = Number(filterValue.after);
+              console.log(filterValue.after, valueAfterFormated);
+            }
+
+            // Value Before
+            let valueBeforeFormated;
+            if (filterValue.before) {
+              valueBeforeFormated = Number(filterValue.before);
+              console.log(filterValue.before, valueBeforeFormated);
+            }
+
+            if (filterValue.after && filterValue.before)
+              return (
+                rowValueFormated >= valueAfterFormated &&
+                rowValueFormated <= valueBeforeFormated
+              );
+
+            if (filterValue.after)
+              return rowValueFormated >= valueAfterFormated;
+
+            if (filterValue.before)
+              return rowValueFormated <= valueBeforeFormated;
+
+            return true;
           })
         );
         return rows;
@@ -743,7 +1171,7 @@ export default function Index() {
           </Card.Text>
         </Row>
 
-        <TableGfilterNestedRow
+        <TableGfilterNestedRowHiddenRows
           columns={columns}
           data={data}
           defaultColumn={defaultColumn}
