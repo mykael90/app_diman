@@ -36,7 +36,7 @@ const renderTooltip = (props, message) => (
 
 // trigger to custom filter
 function DefaultColumnFilter() {
-  return <> teste </>;
+  return <> </>;
 } // as colunas padrao nao aplicam filtro
 
 // This is a custom filter UI for selecting
@@ -155,8 +155,6 @@ export default function Index() {
         disableResizing: true,
         disableSortBy: true,
         // disableFilters: true,
-        Filter: FilterForRestrict,
-        filter: 'groupRestrict',
       },
       {
         Header: 'Req. Man.',
@@ -175,23 +173,15 @@ export default function Index() {
         disableFilters: true,
       },
       {
-        Header: 'Valor',
-        accessor: 'value',
+        Header: 'Recebimento',
+        accessor: 'createdAt',
         width: 120,
         disableResizing: true,
         disableSortBy: true,
         disableFilters: true,
       },
       {
-        Header: 'Pedido em:',
-        accessor: 'registerDate',
-        width: 120,
-        disableResizing: true,
-        disableSortBy: true,
-        disableFilters: true,
-      },
-      {
-        Header: 'Pedido por:',
+        Header: 'Usuário Pedido',
         accessor: 'requiredBy',
         width: 150,
         disableResizing: true,
@@ -206,13 +196,14 @@ export default function Index() {
         disableFilters: true,
       },
       {
-        Header: 'Receb. em:',
-        accessor: 'createdAt',
+        Header: 'Pedido',
+        accessor: 'registerDate',
         width: 120,
         disableResizing: true,
         disableSortBy: true,
         disableFilters: true,
       },
+
       {
         Header: 'Unidade de Custo',
         accessor: 'costUnit',
@@ -230,15 +221,26 @@ export default function Index() {
         disableFilters: true,
       },
       {
+        Header: 'Valor',
+        accessor: 'value',
+        width: 120,
+        disableResizing: true,
+        disableSortBy: true,
+        disableFilters: true,
+      },
+      {
         Header: () => (
           // FORMAT HEADER
           <div className="p-auto text-center">Total</div>
         ),
-        accessor: 'totalInventory',
+        id: 'total',
         width: 100,
         disableResizing: true,
         disableSortBy: true,
-        disableFilters: true,
+        // disableFilters: true,
+        defaultCanFilter: true,
+        Filter: FilterForRestrict,
+        filter: 'groupRestrict',
         Cell: ({ value, row }) => (
           <Row>
             {' '}
@@ -307,7 +309,7 @@ export default function Index() {
     //     desc: true,
     //   },
     // ],
-    filters: [{ id: 'req', value: 0 }],
+    filters: [{ id: 'total', value: 0 }],
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),

@@ -25,6 +25,7 @@ export function GlobalFilter({
   globalFilter,
   setGlobalFilter,
   globalFilteredRows,
+  toggleAllRowsExpanded,
 }) {
   const inputRef = useRef();
   const count = preGlobalFilteredRows.length;
@@ -54,6 +55,7 @@ export function GlobalFilter({
               setValue(e.target.value.toUpperCase());
               onChange(e.target.value);
             }}
+            onFocus={() => toggleAllRowsExpanded(false)} // tirando a expansao antes de filtrar, evita bugs
             placeholder="Digite aqui sua consulta..."
             className="border-0"
             autoComplete="off"
@@ -103,6 +105,7 @@ export default function TableGfilterNestedrow({
     preGlobalFilteredRows,
     globalFilteredRows,
     setGlobalFilter,
+    toggleAllRowsExpanded,
   } = useTable(
     {
       columns,
@@ -135,6 +138,7 @@ export default function TableGfilterNestedrow({
             globalFilter={state.globalFilter}
             setGlobalFilter={setGlobalFilter}
             globalFilteredRows={globalFilteredRows}
+            toggleAllRowsExpanded={toggleAllRowsExpanded}
           />
         </Col>
       </Row>

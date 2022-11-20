@@ -50,6 +50,7 @@ function DefaultColumnFilter() {
 
 function SelectColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
+  toggleAllRowsExpanded,
 }) {
   // Calculate the options for filtering
   // using the preFilteredRows
@@ -74,6 +75,8 @@ function SelectColumnFilter({
             size="sm"
             id="dropdown-group"
             className="border-0"
+            // onClick={() => toggleAllRowsExpanded(true)}
+            onFocus={() => toggleAllRowsExpanded(false)} // tirando a expansao antes de filtrar, evita bugs
           >
             {filterValue ? <span>{filterValue}</span> : <FaSearch />}
           </Dropdown.Toggle>
@@ -81,6 +84,7 @@ function SelectColumnFilter({
           <Dropdown.Menu>
             <Dropdown.Item
               onClick={() => {
+                // toggleAllRowsExpanded(false);
                 setFilter('');
               }}
             >
@@ -105,6 +109,7 @@ function SelectColumnFilter({
 
 function InputColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
+  toggleAllRowsExpanded,
 }) {
   // Calculate the options for filtering
   // using the preFilteredRows
@@ -161,6 +166,7 @@ function InputColumnFilter({
           onChange={(e) => {
             setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
           }}
+          onFocus={() => toggleAllRowsExpanded(false)} // tirando a expansao antes de filtrar, evita bugs
         />
       </Col>
     </Row>
@@ -168,6 +174,7 @@ function InputColumnFilter({
 }
 function InputDateColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
+  toggleAllRowsExpanded,
 }) {
   // Calculate the options for filtering
   // using the preFilteredRows
@@ -235,6 +242,7 @@ function InputDateColumnFilter({
                   undefined
               ); // Set undefined to remove the filter entirely
             }}
+            onFocus={() => toggleAllRowsExpanded(false)} // tirando a expansao antes de filtrar, evita bugs
             style={{ width: '110px' }}
           />
         </Col>
@@ -252,6 +260,7 @@ function InputDateColumnFilter({
                   undefined
               ); // Set undefined to remove the filter entirely
             }}
+            onFocus={() => toggleAllRowsExpanded(false)} // tirando a expansao antes de filtrar, evita bugs
             style={{ width: '110px' }}
           />
         </Col>
@@ -261,6 +270,7 @@ function InputDateColumnFilter({
 }
 function InputValueColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
+  toggleAllRowsExpanded,
 }) {
   // Calculate the options for filtering
   // using the preFilteredRows
@@ -328,6 +338,7 @@ function InputValueColumnFilter({
                   undefined
               ); // Set undefined to remove the filter entirely
             }}
+            onFocus={() => toggleAllRowsExpanded(false)} // tirando a expansao antes de filtrar, evita bugs
             style={{ width: '110px' }}
             step="any"
           />
@@ -346,6 +357,7 @@ function InputValueColumnFilter({
                   undefined
               ); // Set undefined to remove the filter entirely
             }}
+            onFocus={() => toggleAllRowsExpanded(false)} // tirando a expansao antes de filtrar, evita bugs
             style={{ width: '110px' }}
             step="any"
           />
