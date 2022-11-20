@@ -316,7 +316,7 @@ function InputValueColumnFilter({
         </Col>
       </Row>
       <Row className="d-none">
-        <Col className="fw-normal">De:</Col>
+        <Col className="fw-normal">Mín R$:</Col>
         <Col xs={12}>
           <Form.Control
             type="number"
@@ -334,7 +334,7 @@ function InputValueColumnFilter({
         </Col>
       </Row>
       <Row className="d-none">
-        <Col className="fw-normal">Até:</Col>
+        <Col className="fw-normal">Máx R$:</Col>
         <Col xs={12}>
           <Form.Control
             type="number"
@@ -871,7 +871,7 @@ export default function Index() {
             <br />
             <Row>
               <Col className="text-center">
-                <span className="text-center fw-bold">RETORNOS:</span>
+                <span className="text-center fw-bold">RETORNOS</span>
               </Col>
             </Row>
             <TableNestedrow

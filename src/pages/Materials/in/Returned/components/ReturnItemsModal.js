@@ -474,28 +474,34 @@ export default function SearchModal(props) {
                       <Col xs="auto" className="text-center pt-2 pb-4">
                         <Dropdown as={ButtonGroup}>
                           <Button
-                            onClick={(e) => submitForm(e)}
+                            onClick={(e) => {
+                              setReceiveFree(true);
+                              submitForm(e);
+                            }}
                             variant="success"
                           >
-                            Retornar Restrito
+                            Repor Estoque
                           </Button>
 
-                          <Dropdown.Toggle
-                            split
-                            variant="success"
-                            id="dropdown-split-basic"
-                          />
+                          {values.req ? (
+                            <>
+                              <Dropdown.Toggle
+                                split
+                                variant="success"
+                                id="dropdown-split-basic"
+                              />
 
-                          <Dropdown.Menu>
-                            <Dropdown.Item
-                              onClick={(e) => {
-                                setReceiveFree(true);
-                                submitForm(e);
-                              }}
-                            >
-                              Repor Estoque
-                            </Dropdown.Item>
-                          </Dropdown.Menu>
+                              <Dropdown.Menu>
+                                <Dropdown.Item
+                                  onClick={(e) => {
+                                    submitForm(e);
+                                  }}
+                                >
+                                  Receber Restrito
+                                </Dropdown.Item>
+                              </Dropdown.Menu>
+                            </>
+                          ) : null}
                         </Dropdown>
                       </Col>
                     </Row>

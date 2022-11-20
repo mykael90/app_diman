@@ -113,10 +113,10 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
                   <Col xs="auto" className="text-center">
                     <Dropdown as={ButtonGroup}>
                       <Button
-                        onClick={(e) => handleStore(e, index)}
+                        onClick={(e) => handleStore(e, index, true)}
                         variant="success"
                       >
-                        Receber Restrito
+                        Repor Estoque
                       </Button>
 
                       <Dropdown.Toggle
@@ -126,10 +126,8 @@ export default function ResponseSipac({ sipac, handleStore, handleDelete }) {
                       />
 
                       <Dropdown.Menu>
-                        <Dropdown.Item
-                          onClick={(e) => handleStore(e, index, true)}
-                        >
-                          Repor Estoque
+                        <Dropdown.Item onClick={(e) => handleStore(e, index)}>
+                          Receber Restrito
                         </Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
