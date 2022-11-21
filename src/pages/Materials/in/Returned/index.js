@@ -77,7 +77,11 @@ export default function Index() {
     () => [
       {
         // Make an expander cell
-        Header: () => null, // No header
+        Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+          <span {...getToggleAllRowsExpandedProps()}>
+            {isAllRowsExpanded ? '▽' : '▷'}
+          </span>
+        ),
         id: 'expander', // It needs an ID
         width: 30,
         disableResizing: true,
@@ -100,7 +104,7 @@ export default function Index() {
       {
         Header: 'Tipo',
         accessor: 'type',
-        width: 80,
+        width: 120,
         disableResizing: true,
         disableSortBy: true,
         Cell: ({ value }) => {
@@ -171,7 +175,7 @@ export default function Index() {
         Cell: ({ value }) => <div className="text-end">{value}</div>,
       },
       {
-        Header: 'Retorno',
+        Header: 'Retornos',
         accessor: (originalRow) => originalRow.MaterialReturned.length,
         width: 100,
         disableResizing: true,
