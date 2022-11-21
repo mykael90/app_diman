@@ -20,7 +20,7 @@ export default function Footer() {
                 letterSpacing: '2px',
               }}
             >
-              ABOUT
+              SOBRE
             </span>
             <div>Sistema de gestão da manutenção predial</div>
           </Col>
@@ -33,7 +33,7 @@ export default function Footer() {
                 letterSpacing: '2px',
               }}
             >
-              DEVELOPMENT
+              DESENVOLVIMENTO
             </span>
             <div>
               <FaUserCircle /> Mykael Mello
