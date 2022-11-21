@@ -11,64 +11,52 @@ export default function index() {
         <Container>
           <Nav variant="tabs" defaultActiveKey="#1">
             <Nav.Item>
-              <Nav.Link href="#1">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/reports/inventory"
-                >
-                  Inventário
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/reports/inventory"
+              >
+                <Nav.Link href="#1">Inventário</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#2">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/reports/input"
-                >
-                  Entradas
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/reports/input"
+              >
+                <Nav.Link href="#2">Entradas</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#3">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/reports/output"
-                >
-                  Saídas
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/reports/output"
+              >
+                <Nav.Link href="#3">Saídas</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#4">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/reports/provisionfrequency"
-                >
-                  Provisões
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/reports/provisionfrequency"
+              >
+                <Nav.Link href="#4">Provisões</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#5">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/reports/consumefrequency"
-                >
-                  Consumos
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/reports/consumefrequency"
+              >
+                <Nav.Link href="#5">Consumos</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#6">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/reports/maintenancebalanceoutput"
-                >
-                  Balanço por Manutenção
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/reports/maintenancebalanceoutput"
+              >
+                <Nav.Link href="#6">Balanço por Manutenção</Nav.Link>
+              </Link>
             </Nav.Item>
           </Nav>
         </Container>

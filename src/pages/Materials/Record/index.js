@@ -11,34 +11,25 @@ export default function index() {
         <Container>
           <Nav variant="tabs" defaultActiveKey="#1">
             <Nav.Item>
-              <Nav.Link href="#1">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/record/list"
-                >
-                  Listagem
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/record/list"
+              >
+                <Nav.Link href="#1">Listagem</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#2">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/record/add"
-                >
-                  Adicionar
-                </Link>
-              </Nav.Link>
+              <Link className="text-decoration-none" to="/materials/record/add">
+                <Nav.Link href="#2">Adicionar</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#3">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/record/remove"
-                >
-                  Remover
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/record/remove"
+              >
+                <Nav.Link href="#3">Remover</Nav.Link>
+              </Link>
             </Nav.Item>
           </Nav>
         </Container>

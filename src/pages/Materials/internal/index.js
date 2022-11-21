@@ -11,44 +11,36 @@ export default function index() {
         <Container>
           <Nav variant="tabs" defaultActiveKey="#1">
             <Nav.Item>
-              <Nav.Link href="#1">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/internal/listreserves"
-                >
-                  Relação de Reservas
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/internal/listreserves"
+              >
+                <Nav.Link href="#1">Relação de Reservas</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#2">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/internal/reserve"
-                >
-                  Reservar
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/internal/reserve"
+              >
+                <Nav.Link href="#2">Reservar</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#3">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/internal/restrict"
-                >
-                  Restringir/Liberar
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/internal/restrict"
+              >
+                <Nav.Link href="#3">Restringir/Liberar</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#4">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/internal/initialQuantity"
-                >
-                  Definir Saldo
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/internal/initialQuantity"
+              >
+                <Nav.Link href="#4">Definir Saldo</Nav.Link>
+              </Link>
             </Nav.Item>
           </Nav>
         </Container>

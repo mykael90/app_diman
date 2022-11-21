@@ -20,6 +20,7 @@ import {
 import {
   Row,
   Col,
+  Card,
   Button,
   OverlayTrigger,
   Tooltip,
@@ -104,7 +105,6 @@ function SelectColumnFilterStatus({
 
 // Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
 function filterGreaterThan(rows, id, filterValue) {
-  console.log(filterValue);
   return rows.filter((row) => {
     const rowValue = Number(row.values[id]);
     if (filterValue === 1) return rowValue !== 0; // fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
@@ -677,9 +677,7 @@ export default function Index() {
       },
 
       groupStatus: (rows, ids, filterValue) => {
-        console.log(rows);
         const filterRows = rows.filter((row) => {
-          console.log(row, filterValue);
           switch (filterValue) {
             case 'EM ESPERA':
               return (
@@ -855,6 +853,13 @@ export default function Index() {
         data={dataModal}
         handleSave={handleSaveEditModal}
       />
+
+      <Row className="text-center py-3">
+        <Card.Title>Relação de Reservas</Card.Title>
+        <Card.Text>
+          Reservas realizadas para retirada no almoxarifado provisório da DIMAN.
+        </Card.Text>
+      </Row>
 
       <TableGfilterNestedRowHiddenRows
         columns={columns}

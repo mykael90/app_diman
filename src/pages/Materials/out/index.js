@@ -11,63 +11,53 @@ export default function index() {
         <Container>
           <Nav variant="tabs" defaultActiveKey="#1">
             <Nav.Item>
-              <Nav.Link href="#1">
-                <Link className="text-decoration-none" to="/materials/out/use">
-                  Uso
-                </Link>
-              </Nav.Link>
+              <Link className="text-decoration-none" to="/materials/out/use">
+                <Nav.Link href="#1">Uso</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#2">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/out/discard"
-                >
-                  Descarte
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/out/discard"
+              >
+                <Nav.Link href="#2">Descarte</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#3">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/out/devolution"
-                >
-                  Devolução
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/out/devolution"
+              >
+                <Nav.Link href="#3">Devolução</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#4">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/out/donation"
-                >
-                  Doação
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/out/donation"
+              >
+                <Nav.Link href="#4">Doação</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#5" disabled>
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/out/loss"
-                  style={{ color: 'inherit' }}
-                >
+              <Link
+                className="text-decoration-none"
+                to="/materials/out/loan"
+                style={{ color: 'inherit' }}
+              >
+                <Nav.Link href="#5">Empréstimo</Nav.Link>
+              </Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Link
+                className="text-decoration-none"
+                to="/materials/out/loss"
+                style={{ color: 'inherit' }}
+              >
+                <Nav.Link href="#6" disabled>
                   Extravio
-                </Link>
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="#6">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/out/loan"
-                  style={{ color: 'inherit' }}
-                >
-                  Empréstimo
-                </Link>
-              </Nav.Link>
+                </Nav.Link>
+              </Link>
             </Nav.Item>
           </Nav>
         </Container>

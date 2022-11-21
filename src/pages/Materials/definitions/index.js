@@ -11,24 +11,20 @@ export default function index() {
         <Container>
           <Nav variant="tabs" defaultActiveKey="#1">
             <Nav.Item>
-              <Nav.Link href="#1">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/definitions/proccessflow"
-                >
-                  Fluxo de processo
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/definitions/proccessflow"
+              >
+                <Nav.Link href="#1">Fluxo de processo</Nav.Link>
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#2">
-                <Link
-                  className="text-decoration-none"
-                  to="/materials/definitions/terminology"
-                >
-                  Terminologia
-                </Link>
-              </Nav.Link>
+              <Link
+                className="text-decoration-none"
+                to="/materials/definitions/terminology"
+              >
+                <Nav.Link href="#2">Terminologia</Nav.Link>
+              </Link>
             </Nav.Item>
           </Nav>
         </Container>
