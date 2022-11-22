@@ -19,6 +19,15 @@ import {
   FaSortAlphaUp,
   FaSort,
 } from 'react-icons/fa';
+import styled from 'styled-components';
+
+const Styles = styled.div`
+  table {
+    table {
+      background-color: #fff;
+    }
+  }
+`;
 
 export function GlobalFilter({
   preGlobalFilteredRows,
@@ -134,7 +143,7 @@ export default function TableGfilterNestedRowHiddenRows({
   );
 
   return (
-    <>
+    <Styles>
       <Row className="justify-content-center">
         <Col
           xs={10}
@@ -153,7 +162,7 @@ export default function TableGfilterNestedRowHiddenRows({
       </Row>
 
       <Row className="py-3">
-        <Table bordered size="sm" {...getTableProps()} responsive="md">
+        <Table striped bordered size="sm" {...getTableProps()} responsive="md">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -215,7 +224,7 @@ export default function TableGfilterNestedRowHiddenRows({
                     {row.cells.map((cell) => (
                       <td
                         className={`text-center py-3 ${
-                          row.isExpanded ? 'bg-info' : 'fw-normal'
+                          row.isExpanded ? 'bg-info text-white' : 'fw-normal'
                         }`}
                         style={{
                           verticalAlign: 'middle',
@@ -345,6 +354,6 @@ export default function TableGfilterNestedRowHiddenRows({
           </Form.Select>
         </Form.Group>
       </Row>
-    </>
+    </Styles>
   );
 }

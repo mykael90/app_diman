@@ -19,6 +19,15 @@ import {
   FaSortAlphaUp,
   FaSort,
 } from 'react-icons/fa';
+import styled from 'styled-components';
+
+const Styles = styled.div`
+  table {
+    table {
+      background-color: #fff;
+    }
+  }
+`;
 
 export function GlobalFilter({
   preGlobalFilteredRows,
@@ -125,7 +134,7 @@ export default function TableGfilterNestedrow({
   );
 
   return (
-    <>
+    <Styles>
       <Row className="justify-content-center">
         <Col
           xs={10}
@@ -144,7 +153,7 @@ export default function TableGfilterNestedrow({
       </Row>
 
       <Row className="pt-3">
-        <Table bordered size="sm" {...getTableProps()} responsive="md">
+        <Table striped bordered size="sm" {...getTableProps()} responsive="md">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -204,7 +213,7 @@ export default function TableGfilterNestedrow({
                       <td
                         className={`py-3 text-center align-middle ${
                           row.isExpanded
-                            ? 'bg-info text-dark font-size-sm'
+                            ? 'bg-info text-white font-size-sm'
                             : ' '
                         }`}
                         style={{
@@ -335,6 +344,6 @@ export default function TableGfilterNestedrow({
           </Form.Select>
         </Form.Group>
       </Row>
-    </>
+    </Styles>
   );
 }
