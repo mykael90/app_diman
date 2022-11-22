@@ -355,12 +355,12 @@ export default function Index() {
             width: 120,
             disableResizing: true,
           },
-          {
-            Header: 'Req. Manut.',
-            accessor: 'reqMaintenance',
-            width: 100,
-            disableResizing: true,
-          },
+          // {
+          //   Header: 'Req. Manut.',
+          //   accessor: 'reqMaintenance',
+          //   width: 100,
+          //   disableResizing: true,
+          // }, NÃO É REQ. DE MANUTENCAO, AGRUPA VARIAS MANUTENCAO. TEM Q SER POR RM
           {
             Header: 'Tipo Provision.',
             accessor: 'intype',
