@@ -791,7 +791,7 @@ export default function Index() {
           sortBy: [
             {
               id: 'id',
-              asc: true,
+              a: true,
             },
           ],
           hiddenColumns: columns
