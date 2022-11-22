@@ -790,8 +790,8 @@ export default function Index() {
         initialState={{
           sortBy: [
             {
-              id: 'id',
-              asc: false,
+              id: 'name',
+              asc: true,
             },
           ],
           hiddenColumns: columns
@@ -990,7 +990,7 @@ export default function Index() {
   const initialState = {
     // sortBy: [
     //   {
-    //     id: 'createdAt',
+    //     id: 'id',
     //     desc: true,
     //   },
     // ],
