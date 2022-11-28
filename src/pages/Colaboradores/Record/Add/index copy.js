@@ -16,42 +16,15 @@ import Loading from '../../../../components/Loading';
 
 import ProfilePhoto from './components/ProfilePhoto';
 
-export default function Index({ data }) {
-  data = {
-    urlPhoto: 'http://localhost:3001/workers/images/worker_211.jpg',
-    id: 211,
-    name: 'Mykael',
-    email: 'eng.mykael@gmail.com',
-    birthdate: null,
-    filenamePhoto: 'worker_211.jpg',
-    rg: null,
-    cpf: null,
-    created_at: '2022-11-28T02:38:28.000Z',
-    updated_at: '2022-11-28T02:39:09.000Z',
-    job: null,
-    WorkerContacts: [],
-    WorkerContracts: [],
-    Addresses: [],
-  };
-
+export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
-  // const [contacttypes, setContacttypes] = useState([]);
-  // const [jobtypes, setJobtypes] = useState([]);
-  // const [contracts, setContracts] = useState([]);
-  const [photoURL, setPhotoURL] = useState('');
-  const [photo, setPhoto] = React.useState('');
-  const [initialValues, setInitialValues] = useState({
-    name: '',
-    email: '',
-    birthdate: '',
-    rg: '',
-    cpf: '',
-    filenamePhoto: '',
-  });
+  const [contacttypes, setContacttypes] = useState([]);
+  const [jobtypes, setJobtypes] = useState([]);
+  const [contracts, setContracts] = useState([]);
 
   const schema = yup.object().shape({
     name: yup.string().required('Requerido'),
-    email: yup.string().email('Digite um email válido').required('Requerido'),
+    // email: yup.string().email('Digite um email válido').required('Requerido'),
     // rg: yup.string().required('Requerido'),
     // cpf: yup.string().required('Requerido'),
     // birthdate: yup
@@ -59,39 +32,6 @@ export default function Index({ data }) {
     //   .max(new Date(), 'Não é possível incluir uma data futura')
     //   .required('Campo obrigatório'),
   });
-
-  useEffect(() => {
-    async function getContacttypes() {
-      try {
-        setIsLoading(true);
-        // const responseContact = await axios.get(`/workers/contacttypes`);
-        // const responseContract = await axios.get(`/workers/contracts`);
-        // const responseJob = await axios.get(`/workers/jobtypes`);
-
-        // setContacttypes(responseContact.data);
-        // setContracts(responseContract.data);
-        // setJobtypes(responseJob.data);
-
-        if (data) {
-          setInitialValues(data);
-        }
-
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
-
-    if (data) {
-      setInitialValues(data);
-    }
-
-    getContacttypes();
-  }, []);
 
   function removeEmptyString(object) {
     Object.entries(object).forEach(([key, value]) => {
@@ -112,32 +52,13 @@ export default function Index({ data }) {
   const handleStore = async (values, resetForm) => {
     const formattedValues = JSON.parse(JSON.stringify(values));
     removeEmptyString(formattedValues);
-
-    const formData = new FormData();
-    if (photo) {
-      Object.entries(formattedValues).forEach((entry) => {
-        formData.append(entry[0], entry[1]);
-      });
-      // passando todos os campos para o form virtual
-      formData.append('photo', photo);
-    }
-
+    formattedValues.cpf = formattedValues.cpf.replace(/[^0-9]+/gi, '');
+    formattedValues.rg = formattedValues.rg.replace(/[^0-9]+/gi, '');
     try {
       setIsLoading(true);
-      if (photo) {
-        await axios.post(`/workers/`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-      } else {
-        await axios.post(`/workers/`, formattedValues);
-      }
-
-      resetForm();
-      setPhoto('');
-      setPhotoURL('');
+      await axios.post(`/workers/`, formattedValues);
       setIsLoading(false);
+      resetForm();
       toast.success('Colaborador Cadastrado Com Sucesso!');
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
@@ -148,47 +69,63 @@ export default function Index({ data }) {
     }
   };
 
-  const handleUpdate = async (values) => {
-    const formattedValues = JSON.parse(JSON.stringify(values));
-    removeEmptyString(formattedValues);
-
-    const formData = new FormData();
-    if (photo) {
-      console.log('colocando as coisas');
-      Object.entries(formattedValues).forEach((entry) => {
-        formData.append(entry[0], entry[1]);
-      });
-      // passando todos os campos para o form virtual
-      formData.append('photo', photo);
-      console.log(formData);
-    }
-
-    try {
-      setIsLoading(true);
-
-      // FAZ A ATUALIZAÇÃO E RETORNA PARA A LISTAGEM
-
-      if (photo) {
-        console.log('axios correto');
-        await axios.put(`/workers/${formattedValues.id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-      } else {
-        await axios.put(`/workers/${formattedValues.id}`, formattedValues);
-      }
-      setIsLoading(false);
-      toast.success(`Edição de registro realizada com sucesso`);
-    } catch (err) {
-      // eslint-disable-next-line no-unused-expressions
-      err.response?.data?.errors
-        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-
-      setIsLoading(false);
-    }
+  const initialValues = {
+    name: '',
+    email: '',
+    birthdate: '',
+    rg: '',
+    cpf: '',
+    WorkerContracts: {
+      WorkerJobtypeId: '',
+      start: '',
+      ContractId: '',
+    },
+    WorkerContacts: [
+      {
+        contacttypeId: '',
+        contact: '',
+        obs: '',
+        default: '',
+      },
+    ],
+    Addresses: {
+      country: '',
+      city: '',
+      district: '',
+      street: '',
+      zipcode: '',
+      number: '',
+      complement: '',
+      WorkerAddress: {
+        title: '',
+      },
+    },
   };
+
+  useEffect(() => {
+    async function getContacttypes() {
+      try {
+        setIsLoading(true);
+        const responseContact = await axios.get(`/workers/contacttypes`);
+        const responseContract = await axios.get(`/workers/contracts`);
+        const responseJob = await axios.get(`/workers/jobtypes`);
+
+        setContacttypes(responseContact.data);
+        setContracts(responseContract.data);
+        setJobtypes(responseJob.data);
+
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
+    getContacttypes();
+  }, []);
 
   return (
     <>
@@ -205,13 +142,8 @@ export default function Index({ data }) {
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
-              if (data) {
-                handleUpdate(values);
-              } else {
-                handleStore(values, resetForm);
-              }
+              handleStore(values, resetForm);
             }}
-            enableReinitialize
           >
             {({
               handleSubmit,
@@ -221,7 +153,6 @@ export default function Index({ data }) {
               values,
               touched,
               errors,
-              setFieldValue,
             }) => (
               <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Row className="d-flex justify-content-center align-items-center pb-4">
@@ -231,16 +162,7 @@ export default function Index({ data }) {
                     className="px-3 d-flex justify-content-center align-items-center"
                   >
                     <ProfilePhoto
-                      setPhoto={setPhoto}
-                      photoURL={
-                        photoURL ||
-                        `${
-                          process.env.REACT_APP_BASE_AXIOS_REST
-                        }/workers/images/${
-                          values.filenamePhoto || 'default.png'
-                        }`
-                      }
-                      setPhotoURL={setPhotoURL}
+                      src={`${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`}
                     />
                   </Col>
                   <Col md={8} lg={6}>
@@ -284,13 +206,11 @@ export default function Index({ data }) {
                           as={IMaskInput}
                           mask="000.000.000-00"
                           value={values.cpf}
+                          onChange={handleChange}
                           isInvalid={touched.cpf && !!errors.cpf}
                           isValid={touched.cpf && !errors.cpf}
                           placeholder="Digite o CPF"
                           onBlur={handleBlur}
-                          onAccept={(value, mask) => {
-                            setFieldValue(mask.el.input.id, mask.unmaskedValue);
-                          }}
                         />
                         <Form.Control.Feedback
                           tooltip
@@ -312,15 +232,13 @@ export default function Index({ data }) {
                         <Form.Control
                           type="text"
                           as={IMaskInput}
-                          mask={Number}
+                          mask="000.000.000"
                           value={values.rg}
+                          onChange={handleChange}
                           isInvalid={touched.rg && !!errors.rg}
                           isValid={touched.rg && !errors.rg}
                           placeholder="Digite o RG"
                           onBlur={handleBlur}
-                          onAccept={(value, mask) => {
-                            setFieldValue(mask.el.input.id, mask.unmaskedValue);
-                          }}
                         />
                         <Form.Control.Feedback
                           tooltip
@@ -366,18 +284,13 @@ export default function Index({ data }) {
                       >
                         <Form.Label>EMAIL</Form.Label>
                         <Form.Control
-                          as={IMaskInput}
-                          mask={/^\S*@?\S*$/}
                           type="text"
                           value={values.email}
-                          // onChange={handleChange}
+                          onChange={handleChange}
                           isInvalid={touched.email && !!errors.email}
                           isValid={touched.email && !errors.email}
                           placeholder="Digite o email"
                           onBlur={handleBlur}
-                          onAccept={(value, mask) => {
-                            setFieldValue(mask.el.input.id, mask.unmaskedValue);
-                          }}
                         />
                         <Form.Control.Feedback
                           tooltip
@@ -391,20 +304,19 @@ export default function Index({ data }) {
                   </Col>
                 </Row>
 
-                {/* <Row
+                <Row
                   className="d-flex text-center"
                   style={{ background: primaryDarkColor, color: 'white' }}
                 >
                   <span className="fs-6">CONTATOS</span>
-                </Row> */}
-
-                {/* <Row className="justify-content-center pt-2 pb-4">
+                </Row>
+                <Row className="justify-content-center pt-2 pb-4">
                   <FieldArray name="WorkerContacts">
                     {(fieldArrayProps) => {
                       const { push, remove } = fieldArrayProps;
                       return (
                         <Row>
-                          {values.WorkerContacts?.length > 0 &&
+                          {values.WorkerContacts.length > 0 &&
                             values.WorkerContacts.map((contato, i) => (
                               <>
                                 <Form.Group
@@ -516,17 +428,14 @@ export default function Index({ data }) {
                       );
                     }}
                   </FieldArray>
-                </Row> */}
-
-                {/*
+                </Row>
                 <Row
                   className="d-flex text-center"
                   style={{ background: primaryDarkColor, color: 'white' }}
                 >
                   <span className="fs-6">ENDEREÇOS</span>
-                </Row> */}
-
-                {/* <Row className="justify-content-center pt-2 pb-4">
+                </Row>
+                <Row className="justify-content-center pt-2 pb-4">
                   <Form.Group
                     as={Col}
                     xs={12}
@@ -537,7 +446,7 @@ export default function Index({ data }) {
                     <Form.Label>CEP</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.Addresses?.zipcode}
+                      value={values.Addresses.zipcode}
                       onChange={handleChange}
                       placeholder="Digite o CEP"
                       onBlur={handleBlur}
@@ -553,7 +462,7 @@ export default function Index({ data }) {
                     <Form.Label>LOGRADOURO</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.Addresses?.street}
+                      value={values.Addresses.street}
                       onChange={handleChange}
                       placeholder="Digite o Logradouro"
                       onBlur={handleBlur}
@@ -569,7 +478,7 @@ export default function Index({ data }) {
                     <Form.Label>NÚMERO</Form.Label>
                     <Form.Control
                       type="number"
-                      value={values.Addresses?.number}
+                      value={values.Addresses.number}
                       onChange={handleChange}
                       placeholder="Digite o Número"
                       onBlur={handleBlur}
@@ -585,7 +494,7 @@ export default function Index({ data }) {
                     <Form.Label>BAIRRO</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.Addresses?.district}
+                      value={values.Addresses.district}
                       onChange={handleChange}
                       placeholder="Digite o Bairro"
                       onBlur={handleBlur}
@@ -601,7 +510,7 @@ export default function Index({ data }) {
                     <Form.Label>CIDADE</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.Addresses?.city}
+                      value={values.Addresses.city}
                       onChange={handleChange}
                       placeholder="Digite a Cidade"
                       onBlur={handleBlur}
@@ -617,7 +526,7 @@ export default function Index({ data }) {
                     <Form.Label>PAÍS</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.Addresses?.country}
+                      value={values.Addresses.country}
                       onChange={handleChange}
                       placeholder="Selecione o País"
                       onBlur={handleBlur}
@@ -632,7 +541,7 @@ export default function Index({ data }) {
                     <Form.Label>COMPLEMENTO</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.Addresses?.complement}
+                      value={values.Addresses.complement}
                       onChange={handleChange}
                       placeholder="Digite o Complemento"
                       onBlur={handleBlur}
@@ -647,33 +556,31 @@ export default function Index({ data }) {
                     <Form.Label>Titulo</Form.Label>
                     <Form.Control
                       type="text"
-                      value={values.Addresses?.WorkerAddress.title}
+                      value={values.Addresses.WorkerAddress.title}
                       onChange={handleChange}
                       placeholder="Digite o Titulo do Endereço"
                       onBlur={handleBlur}
                     />
                   </Form.Group>
-                </Row> */}
-                {/*
+                </Row>
                 <Row
                   className="d-flex text-center"
                   style={{ background: primaryDarkColor, color: 'white' }}
                 >
-                  <span className="fs-6">CONTRATO</span>
+                  <span className="fs-6">CONTRATOS</span>
                 </Row>
-                <Row className="d-flex justify-content-center align-items-center pt-2 pb-4">
+                <Row className="justify-content-center pt-2 pb-4">
                   <Form.Group
                     as={Col}
                     xs={12}
                     md={4}
-                    lg={3}
                     controlId="WorkerContracts.ContractId"
                     className="pt-2"
                   >
                     <Form.Label>NÚMERO DO CONTRATO</Form.Label>
                     <Form.Select
                       type="text"
-                      value={values.WorkerContracts?.ContractId}
+                      value={values.WorkerContracts.ContractId}
                       onChange={handleChange}
                       placeholder="Selecione o Contrato"
                       onBlur={handleBlur}
@@ -690,14 +597,13 @@ export default function Index({ data }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    lg={3}
                     controlId="WorkerContracts.WorkerJobtypeId"
                     className="pt-2"
                   >
                     <Form.Label>FUNÇÃO</Form.Label>
                     <Form.Select
                       type="text"
-                      value={values.WorkerContracts?.WorkerJobtypeId}
+                      value={values.WorkerContracts.WorkerJobtypeId}
                       onChange={handleChange}
                       placeholder="Selecione a Função"
                       onBlur={handleBlur}
@@ -714,7 +620,6 @@ export default function Index({ data }) {
                     as={Col}
                     xs={12}
                     md={4}
-                    lg={2}
                     controlId="WorkerContracts.start"
                     className="pt-2"
                   >
@@ -722,41 +627,30 @@ export default function Index({ data }) {
                     <Form.Control
                       type="date"
                       dateFormat="YYYY-MM-DD"
-                      value={values.WorkerContracts?.start}
+                      value={values.WorkerContracts.start}
                       onChange={handleChange}
                       placeholder="Digite o inicio do contrato"
                       onBlur={handleBlur}
                     />
                   </Form.Group>
                 </Row>
-                <hr /> */}
-
+                <hr />
                 <Row className="justify-content-center pt-2 pb-4">
                   <Col xs="auto" className="text-center">
                     <Button
                       variant="warning"
                       onClick={() => {
                         resetForm();
-                        setPhoto('');
-                        setPhotoURL('');
                       }}
                     >
                       Limpar
                     </Button>
                   </Col>
-                  {data ? (
-                    <Col xs="auto" className="text-center">
-                      <Button variant="success" type="submit">
-                        Alterar
-                      </Button>
-                    </Col>
-                  ) : (
-                    <Col xs="auto" className="text-center">
-                      <Button variant="success" type="submit">
-                        Cadastrar
-                      </Button>
-                    </Col>
-                  )}
+                  <Col xs="auto" className="text-center">
+                    <Button variant="success" type="submit">
+                      Cadastrar
+                    </Button>
+                  </Col>
                 </Row>
               </Form>
             )}
