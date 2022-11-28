@@ -3,6 +3,7 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Button, Row, Col, Form, Image } from 'react-bootstrap';
 import { IMaskInput } from 'react-imask';
 import { FaPhone, FaPlus, FaTrashAlt } from 'react-icons/fa';
@@ -16,29 +17,14 @@ import Loading from '../../../../components/Loading';
 
 import ProfilePhoto from './components/ProfilePhoto';
 
-export default function Index({ data }) {
-  data = {
-    urlPhoto: 'http://localhost:3001/workers/images/worker_211.jpg',
-    id: 211,
-    name: 'Mykael',
-    email: 'eng.mykael@gmail.com',
-    birthdate: null,
-    filenamePhoto: 'worker_211.jpg',
-    rg: null,
-    cpf: null,
-    created_at: '2022-11-28T02:38:28.000Z',
-    updated_at: '2022-11-28T02:39:09.000Z',
-    job: null,
-    WorkerContacts: [],
-    WorkerContracts: [],
-    Addresses: [],
-  };
-
+export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   // const [contacttypes, setContacttypes] = useState([]);
   // const [jobtypes, setJobtypes] = useState([]);
   // const [contracts, setContracts] = useState([]);
-  const [photoURL, setPhotoURL] = useState('');
+  const [photoURL, setPhotoURL] = useState(
+    `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
+  );
   const [photo, setPhoto] = React.useState('');
   const [initialValues, setInitialValues] = useState({
     name: '',
@@ -48,6 +34,9 @@ export default function Index({ data }) {
     cpf: '',
     filenamePhoto: '',
   });
+
+  const { id } = useParams();
+  console.log(id);
 
   const schema = yup.object().shape({
     name: yup.string().required('Requerido'),
@@ -61,22 +50,18 @@ export default function Index({ data }) {
   });
 
   useEffect(() => {
-    async function getContacttypes() {
+    async function getData() {
       try {
-        setIsLoading(true);
-        // const responseContact = await axios.get(`/workers/contacttypes`);
-        // const responseContract = await axios.get(`/workers/contracts`);
-        // const responseJob = await axios.get(`/workers/jobtypes`);
-
-        // setContacttypes(responseContact.data);
-        // setContracts(responseContract.data);
-        // setJobtypes(responseJob.data);
-
-        if (data) {
-          setInitialValues(data);
+        if (id) {
+          setIsLoading(true);
+          const responseWorker = await axios.get(`/workers/${id}`);
+          setIsLoading(false);
+          setInitialValues(responseWorker.data);
+          if (responseWorker.data.filenamePhoto)
+            setPhotoURL(
+              `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/${responseWorker.data.filenamePhoto}`
+            );
         }
-
-        setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
         err.response?.data?.errors
@@ -86,11 +71,7 @@ export default function Index({ data }) {
       }
     }
 
-    if (data) {
-      setInitialValues(data);
-    }
-
-    getContacttypes();
+    getData();
   }, []);
 
   function removeEmptyString(object) {
@@ -205,7 +186,7 @@ export default function Index({ data }) {
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
-              if (data) {
+              if (id) {
                 handleUpdate(values);
               } else {
                 handleStore(values, resetForm);
@@ -232,14 +213,7 @@ export default function Index({ data }) {
                   >
                     <ProfilePhoto
                       setPhoto={setPhoto}
-                      photoURL={
-                        photoURL ||
-                        `${
-                          process.env.REACT_APP_BASE_AXIOS_REST
-                        }/workers/images/${
-                          values.filenamePhoto || 'default.png'
-                        }`
-                      }
+                      photoURL={photoURL}
                       setPhotoURL={setPhotoURL}
                     />
                   </Col>
@@ -744,7 +718,7 @@ export default function Index({ data }) {
                       Limpar
                     </Button>
                   </Col>
-                  {data ? (
+                  {id ? (
                     <Col xs="auto" className="text-center">
                       <Button variant="success" type="submit">
                         Alterar

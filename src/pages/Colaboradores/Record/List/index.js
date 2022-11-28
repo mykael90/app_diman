@@ -2,6 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
@@ -100,7 +101,9 @@ export default function Index() {
           // Use Cell to render an expander for each row.
           // We can use the getToggleRowExpandedProps prop-getter
           // to build the expander.
-          <Button>Editar</Button>
+          <Link to={`/colaboradores/record/update/${row.original.id}`}>
+            <Button>Editar</Button>
+          </Link>
         ),
       },
     ],

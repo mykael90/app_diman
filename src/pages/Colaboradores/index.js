@@ -22,6 +22,7 @@ export default function MaterialsRoutes() {
       <Route path="record" element={<Record />}>
         <Route path="list" element={<List />} />{' '}
         <Route path="add" element={<Add />} />{' '}
+        <Route path="update/:id" element={<Add />} />{' '}
       </Route>
     </Routes>
   );

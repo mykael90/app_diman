@@ -24,7 +24,6 @@ function ProfilePhoto({ setPhoto, photoURL, setPhotoURL }) {
   const handleChange = (e) => {
     const file = e.target.files[0];
     setPhoto(file);
-    if (file) console.log('mudou foto');
     return setPhotoURL(URL.createObjectURL(file));
   };
 
