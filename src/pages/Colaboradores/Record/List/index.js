@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import { FaPencilAlt } from 'react-icons/fa';
+
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 
 import axios from '../../../../services/axios';
@@ -79,18 +81,18 @@ export default function Index() {
         ),
       },
       { Header: 'Nome', accessor: 'name' },
-      { Header: 'CPF', accessor: 'cpf' },
-      { Header: 'Data de Nascimento', accessor: 'birthdate' },
-      { Header: 'Email', accessor: 'email' },
-      {
-        Header: 'Contato',
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContacts.findIndex(
-            (value) => value.default
-          );
-          return originalRow.WorkerContacts[index]?.contact;
-        },
-      },
+      // { Header: 'CPF', accessor: 'cpf' },
+      // { Header: 'Data de Nascimento', accessor: 'birthdate' },
+      // { Header: 'Email', accessor: 'email' },
+      // {
+      //   Header: 'Contato',
+      //   accessor: (originalRow) => {
+      //     const index = originalRow.WorkerContacts.findIndex(
+      //       (value) => value.default
+      //     );
+      //     return originalRow.WorkerContacts[index]?.contact;
+      //   },
+      // },
       {
         // Make an expander cell
         Header: 'Ações', // No header
@@ -102,7 +104,13 @@ export default function Index() {
           // We can use the getToggleRowExpandedProps prop-getter
           // to build the expander.
           <Link to={`/colaboradores/record/update/${row.original.id}`}>
-            <Button>Editar</Button>
+            <Button
+              size="sm"
+              variant="outline-secondary"
+              className="border-0 m-0"
+            >
+              <FaPencilAlt />
+            </Button>
           </Link>
         ),
       },
