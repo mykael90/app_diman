@@ -23,7 +23,7 @@ export default function index() {
                 className="text-decoration-none"
                 to="/colaboradores/record/add"
               >
-                <Nav.Link href="#2">Adicionar</Nav.Link>
+                <Nav.Link href="#2">Cadastro</Nav.Link>
               </Link>
             </Nav.Item>
           </Nav>

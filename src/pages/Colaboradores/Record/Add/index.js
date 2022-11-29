@@ -20,8 +20,8 @@ import ProfilePhoto from './components/ProfilePhoto';
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   // const [contacttypes, setContacttypes] = useState([]);
-  // const [jobtypes, setJobtypes] = useState([]);
-  // const [contracts, setContracts] = useState([]);
+  const [jobtypes, setJobtypes] = useState([]);
+  const [contracts, setContracts] = useState([]);
   const [photoURL, setPhotoURL] = useState(
     `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
   );
@@ -33,6 +33,11 @@ export default function Index() {
     rg: '',
     cpf: '',
     filenamePhoto: '',
+    WorkerContracts: {
+      WorkerJobtypeId: '',
+      start: '',
+      ContractId: '',
+    },
   });
 
   const { id } = useParams();
@@ -40,7 +45,7 @@ export default function Index() {
 
   const schema = yup.object().shape({
     name: yup.string().required('Requerido'),
-    email: yup.string().email('Digite um email válido').required('Requerido'),
+    // email: yup.string().email('Digite um email válido').required('Requerido'),
     // rg: yup.string().required('Requerido'),
     // cpf: yup.string().required('Requerido'),
     // birthdate: yup
@@ -72,6 +77,28 @@ export default function Index() {
     }
 
     getData();
+
+    async function getContracts() {
+      try {
+        setIsLoading(true);
+
+        const responseContract = await axios.get(`/workers/contracts`);
+        const responseJob = await axios.get(`/workers/jobtypes`);
+
+        setContracts(responseContract.data);
+        setJobtypes(responseJob.data);
+
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
+    getContracts();
   }, []);
 
   function removeEmptyString(object) {
@@ -94,11 +121,40 @@ export default function Index() {
     const formattedValues = JSON.parse(JSON.stringify(values));
     removeEmptyString(formattedValues);
 
+    console.log(formattedValues);
+
+    function buildFormData(formData, data, parentKey) {
+      if (
+        data &&
+        typeof data === 'object' &&
+        !(data instanceof Date) &&
+        !(data instanceof File) &&
+        !(data instanceof Blob)
+      ) {
+        Object.keys(data).forEach((key) => {
+          buildFormData(
+            formData,
+            data[key],
+            parentKey ? `${parentKey}[${key}]` : key
+          );
+        });
+      } else {
+        const value = data == null ? '' : data;
+
+        formData.append(parentKey, value);
+      }
+    }
+
     const formData = new FormData();
+    // if (photo) {
+    //   Object.entries(formattedValues).forEach((entry) => {
+    //     formData.append(entry[0], entry[1]);
+    //   });
+    //   // passando todos os campos para o form virtual
+    //   formData.append('photo', photo);
+    // }
     if (photo) {
-      Object.entries(formattedValues).forEach((entry) => {
-        formData.append(entry[0], entry[1]);
-      });
+      buildFormData(formData, formattedValues);
       // passando todos os campos para o form virtual
       formData.append('photo', photo);
     }
@@ -117,7 +173,9 @@ export default function Index() {
 
       resetForm();
       setPhoto('');
-      setPhotoURL('');
+      setPhotoURL(
+        `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
+      );
       setIsLoading(false);
       toast.success('Colaborador Cadastrado Com Sucesso!');
     } catch (err) {
@@ -628,82 +686,86 @@ export default function Index() {
                     />
                   </Form.Group>
                 </Row> */}
-                {/*
-                <Row
-                  className="d-flex text-center"
-                  style={{ background: primaryDarkColor, color: 'white' }}
-                >
-                  <span className="fs-6">CONTRATO</span>
-                </Row>
-                <Row className="d-flex justify-content-center align-items-center pt-2 pb-4">
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    lg={3}
-                    controlId="WorkerContracts.ContractId"
-                    className="pt-2"
-                  >
-                    <Form.Label>NÚMERO DO CONTRATO</Form.Label>
-                    <Form.Select
-                      type="text"
-                      value={values.WorkerContracts?.ContractId}
-                      onChange={handleChange}
-                      placeholder="Selecione o Contrato"
-                      onBlur={handleBlur}
+                {id ? null : (
+                  <>
+                    {' '}
+                    <Row
+                      className="d-flex text-center"
+                      style={{ background: primaryDarkColor, color: 'white' }}
                     >
-                      <option>Selecione o Contrato</option>
-                      {contracts.map((contract) => (
-                        <option key={contract.id} value={contract.id}>
-                          {contract.codigoSipac}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    lg={3}
-                    controlId="WorkerContracts.WorkerJobtypeId"
-                    className="pt-2"
-                  >
-                    <Form.Label>FUNÇÃO</Form.Label>
-                    <Form.Select
-                      type="text"
-                      value={values.WorkerContracts?.WorkerJobtypeId}
-                      onChange={handleChange}
-                      placeholder="Selecione a Função"
-                      onBlur={handleBlur}
-                    >
-                      <option>Selecione a Função</option>
-                      {jobtypes.map((job) => (
-                        <option key={job.id} value={job.id}>
-                          {job.job}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    lg={2}
-                    controlId="WorkerContracts.start"
-                    className="pt-2"
-                  >
-                    <Form.Label>INÍCIO</Form.Label>
-                    <Form.Control
-                      type="date"
-                      dateFormat="YYYY-MM-DD"
-                      value={values.WorkerContracts?.start}
-                      onChange={handleChange}
-                      placeholder="Digite o inicio do contrato"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                </Row>
-                <hr /> */}
+                      <span className="fs-6">CONTRATO</span>
+                    </Row>
+                    <Row className="d-flex justify-content-center align-items-center pt-2 pb-4">
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        md={4}
+                        lg={3}
+                        controlId="WorkerContracts.ContractId"
+                        className="pt-2"
+                      >
+                        <Form.Label>NÚMERO DO CONTRATO</Form.Label>
+                        <Form.Select
+                          type="text"
+                          value={values.WorkerContracts?.ContractId}
+                          onChange={handleChange}
+                          placeholder="Selecione o Contrato"
+                          onBlur={handleBlur}
+                        >
+                          <option>Selecione o Contrato</option>
+                          {contracts.map((contract) => (
+                            <option key={contract.id} value={contract.id}>
+                              {contract.codigoSipac}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        md={4}
+                        lg={3}
+                        controlId="WorkerContracts.WorkerJobtypeId"
+                        className="pt-2"
+                      >
+                        <Form.Label>FUNÇÃO</Form.Label>
+                        <Form.Select
+                          type="text"
+                          value={values.WorkerContracts?.WorkerJobtypeId}
+                          onChange={handleChange}
+                          placeholder="Selecione a Função"
+                          onBlur={handleBlur}
+                        >
+                          <option>Selecione a Função</option>
+                          {jobtypes.map((job) => (
+                            <option key={job.id} value={job.id}>
+                              {job.job}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        md={4}
+                        lg={2}
+                        controlId="WorkerContracts.start"
+                        className="pt-2"
+                      >
+                        <Form.Label>INÍCIO</Form.Label>
+                        <Form.Control
+                          type="date"
+                          dateFormat="YYYY-MM-DD"
+                          value={values.WorkerContracts?.start}
+                          onChange={handleChange}
+                          placeholder="Digite o inicio do contrato"
+                          onBlur={handleBlur}
+                        />
+                      </Form.Group>
+                    </Row>
+                    <hr />
+                  </>
+                )}
 
                 <Row className="justify-content-center pt-2 pb-4">
                   <Col xs="auto" className="text-center">
@@ -712,7 +774,9 @@ export default function Index() {
                       onClick={() => {
                         resetForm();
                         setPhoto('');
-                        setPhotoURL('');
+                        setPhotoURL(
+                          `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
+                        );
                       }}
                     >
                       Limpar
