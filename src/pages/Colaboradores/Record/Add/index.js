@@ -291,7 +291,10 @@ export default function Index() {
                           isInvalid={touched.name && !!errors.name}
                           isValid={touched.name && !errors.name}
                           placeholder="Digite o nome completo"
-                          onBlur={handleBlur}
+                          onBlur={(e) => {
+                            setFieldValue('name', e.target.value.toUpperCase()); // UPPERCASE
+                            handleBlur(e);
+                          }}
                         />
                         <Form.Control.Feedback
                           tooltip
@@ -406,7 +409,13 @@ export default function Index() {
                           isInvalid={touched.email && !!errors.email}
                           isValid={touched.email && !errors.email}
                           placeholder="Digite o email"
-                          onBlur={handleBlur}
+                          onBlur={(e) => {
+                            setFieldValue(
+                              'email',
+                              e.target.value.toLowerCase()
+                            ); // lowercase
+                            handleBlur(e);
+                          }}
                           onAccept={(value, mask) => {
                             setFieldValue(mask.el.input.id, mask.unmaskedValue);
                           }}
