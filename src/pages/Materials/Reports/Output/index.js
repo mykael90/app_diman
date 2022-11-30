@@ -32,6 +32,7 @@ import {
   Badge,
   Dropdown,
   Form,
+  Image,
 } from 'react-bootstrap';
 
 import axios from '../../../../services/axios';
@@ -373,6 +374,20 @@ const renderTooltip = (props, message) => (
   </Tooltip>
 );
 
+const renderTooltipImage = (props, message, src) => (
+  <Tooltip id="button-tooltip" {...props}>
+    <Image
+      crossOrigin=""
+      src={src}
+      alt="Foto de perfil do colaborador"
+      width="150"
+      rounded="true"
+    />
+
+    {message}
+  </Tooltip>
+);
+
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
@@ -547,9 +562,12 @@ export default function Index() {
             placement="right"
             delay={{ show: 250, hide: 400 }}
             overlay={(props) =>
-              renderTooltip(
+              renderTooltipImage(
                 props,
-                row.original.Worker?.WorkerContracts[0].WorkerJobtype.job
+                row.original.Worker?.WorkerContracts[0]?.WorkerJobtype?.job,
+                `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/${
+                  row.original.Worker.filenamePhoto ?? 'default.png'
+                }`
               )
             }
           >
