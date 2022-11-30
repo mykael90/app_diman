@@ -37,6 +37,7 @@ export default function Index() {
       WorkerJobtypeId: '',
       start: '',
       ContractId: '',
+      located: '',
     },
   });
 
@@ -769,6 +770,30 @@ export default function Index() {
                           onChange={handleChange}
                           placeholder="Digite o inicio do contrato"
                           onBlur={handleBlur}
+                        />
+                      </Form.Group>
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        md={4}
+                        lg={2}
+                        controlId="WorkerContracts.located"
+                        className="pt-2"
+                      >
+                        <Form.Label>LOTAÇÃO</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={values.WorkerContracts?.located}
+                          onChange={handleChange}
+                          placeholder="Digite a lotação"
+                          onBlur={(e) => {
+                            setFieldValue(
+                              'WorkerContracts.located',
+                              e.target.value.toUpperCase()
+                            ); // UPPERCASE
+                            handleBlur(e);
+                          }}
+                          // onBlur={handleBlur}
                         />
                       </Form.Group>
                     </Row>

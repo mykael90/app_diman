@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 
 import { FaPencilAlt } from 'react-icons/fa';
 
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
@@ -80,7 +80,28 @@ export default function Index() {
           </span>
         ),
       },
-      { Header: 'Nome', accessor: 'name' },
+      {
+        Header: ({ value, row }) => <div className="text-start">Nome</div>,
+        accessor: 'name',
+        disableSortBy: true,
+        Cell: ({ value, row }) => (
+          <Row>
+            <Col xs="12" className="text-start mb-0 pb-0">
+              {value}
+            </Col>
+            <Col xs="auto" className="mt-0 pt-0">
+              <Badge
+                className="text-dark bg-light mt-0 pt-0"
+                style={{
+                  fontSize: '0.6em',
+                }}
+              >
+                {row.original.job}
+              </Badge>
+            </Col>
+          </Row>
+        ),
+      },
       // { Header: 'CPF', accessor: 'cpf' },
       // { Header: 'Data de Nascimento', accessor: 'birthdate' },
       // { Header: 'Email', accessor: 'email' },
@@ -95,9 +116,9 @@ export default function Index() {
       // },
       {
         // Make an expander cell
-        Header: 'Ações', // No header
+        Header: () => null, // No header
         id: 'actions', // It needs an ID
-        width: 100,
+        width: 40,
         disableResizing: true,
         Cell: ({ row }) => (
           // Use Cell to render an expander for each row.
@@ -123,95 +144,21 @@ export default function Index() {
     ({ row }) => (
       <Row>
         <Col>
-          <span>{JSON.stringify(row.original)}</span>
-          <Row>
-            <Col className="bg-primary">
-              {row.original.WorkerContracts.start}
-            </Col>
-          </Row>
-          {/* <TableNestedrow
-            style={{ padding: 0, margin: 0 }}
-            columns={[
-              {
-                Header: 'Contrato',
-                accessor: 'contractId',
-                width: 125,
-                disableResizing: true,
-              },
-              {
-                Header: 'JobId',
-                accessor: 'workerJobtypeId',
-                width: 100,
-                disableResizing: true,
-              },
-              {
-                Header: 'Início',
-                accessor: 'start',
-                width: 100,
-                disableResizing: true,
-              },
-              {
-                Header: 'Fim',
-                accessor: 'end',
-                width: 100,
-                disableResizing: true,
-                // eslint-disable-next-line react/destructuring-assignment
-              },
-              {
-                Header: 'Lotado em',
-                accessor: 'located',
-                width: 100,
-                disableResizing: true,
-                // eslint-disable-next-line react/destructuring-assignment
-                Cell: ({ value, row }) => (
-                  <>
-                    <span className="bg-primary" style={{ color: ' red' }}>
-                      O valor é {value}
-                    </span>
-                    <Button>botao</Button>
-                  </>
-                ),
-              },
-            ]}
-            data={row.original.WorkerContracts}
-            defaultColumn={{
-              // Let's set up our default Filter UI
-              // Filter: DefaultColumnFilter,
-              minWidth: 30,
-              width: 50,
-              maxWidth: 800,
-            }}
-            initialState={{
-              sortBy: [
-                {
-                  id: 'name',
-                  asc: true,
-                },
-              ],
-              hiddenColumns: columns
-                .filter((col) => col.isVisible === false)
-                .map((col) => col.accessor),
-            }}
-            filterTypes={filterTypes}
-          /> */}
-        </Col>
-
-        <Col>
           <TableNestedrow
             style={{ padding: 0, margin: 0 }}
             columns={[
-              {
-                Header: 'Contrato',
-                accessor: 'contractId',
-                width: 125,
-                disableResizing: true,
-              },
-              {
-                Header: 'JobId',
-                accessor: 'workerJobtypeId',
-                width: 100,
-                disableResizing: true,
-              },
+              // {
+              //   Header: 'Contrato',
+              //   accessor: 'ContractId',
+              //   width: 125,
+              //   disableResizing: true,
+              // },
+              // {
+              //   Header: 'JobId',
+              //   accessor: 'workerJobtypeId',
+              //   width: 100,
+              //   disableResizing: true,
+              // },
               {
                 Header: 'Início',
                 accessor: 'start',
