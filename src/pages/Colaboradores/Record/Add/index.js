@@ -709,12 +709,12 @@ export default function Index() {
                       <Form.Group
                         as={Col}
                         xs={12}
-                        md={4}
+                        md={3}
                         lg={3}
                         controlId="WorkerContracts.ContractId"
                         className="pt-2"
                       >
-                        <Form.Label>NÚMERO DO CONTRATO</Form.Label>
+                        <Form.Label>CONTRATO</Form.Label>
                         <Form.Select
                           type="text"
                           value={values.WorkerContracts?.ContractId}
@@ -733,7 +733,7 @@ export default function Index() {
                       <Form.Group
                         as={Col}
                         xs={12}
-                        md={4}
+                        md={3}
                         lg={3}
                         controlId="WorkerContracts.WorkerJobtypeId"
                         className="pt-2"
@@ -757,7 +757,7 @@ export default function Index() {
                       <Form.Group
                         as={Col}
                         xs={12}
-                        md={4}
+                        md={3}
                         lg={2}
                         controlId="WorkerContracts.start"
                         className="pt-2"
@@ -775,7 +775,7 @@ export default function Index() {
                       <Form.Group
                         as={Col}
                         xs={12}
-                        md={4}
+                        md={3}
                         lg={2}
                         controlId="WorkerContracts.located"
                         className="pt-2"
