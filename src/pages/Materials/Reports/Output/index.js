@@ -375,7 +375,7 @@ const renderTooltip = (props, message) => (
 );
 
 const renderTooltipImage = (props, message, src) => (
-  <Tooltip id="button-tooltip" {...props}>
+  <Tooltip id="button-tooltip" className="opacity-100" {...props}>
     <Image
       crossOrigin=""
       src={src}
