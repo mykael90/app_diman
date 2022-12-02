@@ -564,9 +564,10 @@ export default function Index() {
             overlay={(props) =>
               renderTooltipImage(
                 props,
-                row.original.Worker?.WorkerContracts[0]?.WorkerJobtype?.job,
+                row.original.Worker?.WorkerContracts[0]?.WorkerJobtype?.job ??
+                  'SERVIDOR',
                 `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/${
-                  row.original.Worker.filenamePhoto ?? 'default.png'
+                  row.original.Worker?.filenamePhoto ?? 'default.png'
                 }`
               )
             }
