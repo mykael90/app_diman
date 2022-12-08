@@ -34,7 +34,7 @@ function Index() {
   }, []);
 
   const loadLabels = async () => {
-    const labels = ['Mykael Mello'];
+    const labels = ['Mykael Mello', 'Maria Rafaela'];
     return Promise.all(
       labels.map(async (label) => {
         const descriptions = [];
@@ -107,7 +107,8 @@ function Index() {
           )
           .withFaceLandmarks()
           .withFaceExpressions()
-          .withAgeAndGender();
+          .withAgeAndGender()
+          .withFaceDescriptors();
 
         const resizedDetections = faceapi.resizeResults(
           detections,
@@ -115,10 +116,10 @@ function Index() {
         );
 
         // problema -->
-        // const faceMatcher = new faceapi.FaceMatcher(labels, 0.6);
-        // const results = resizedDetections.map((d) =>
-        //   faceMatcher.findBestMatch(d.descriptor)
-        // );
+        const faceMatcher = new faceapi.FaceMatcher(labels, 0.6);
+        const results = resizedDetections.map((d) =>
+          faceMatcher.findBestMatch(d.descriptor)
+        );
 
         canvasRef &&
           canvasRef.current &&
@@ -156,16 +157,16 @@ function Index() {
 
         // problema--->
 
-        // canvasRef &&
-        //   canvasRef.current &&
-        //   results.forEach((result, index) => {
-        //     const { box } = resizedDetections[index].detection;
-        //     const { label, distance } = result;
-        //     new faceapi.draw.DrawTextField(
-        //       [`${label} (${parseInt(distance * 100, 10)})`],
-        //       box.bottomRight
-        //     ).draw(canvasRef.current);
-        //   });
+        canvasRef &&
+          canvasRef.current &&
+          results.forEach((result, index) => {
+            const { box } = resizedDetections[index].detection;
+            const { label, distance } = result;
+            new faceapi.draw.DrawTextField(
+              [`${label} (${parseInt(distance * 100, 10)})`],
+              box.bottomRight
+            ).draw(canvasRef.current);
+          });
 
         // problema
       }
