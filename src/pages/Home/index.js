@@ -145,7 +145,7 @@ export default function Home() {
             <Button variant="secondary" className="me-2">
               Desenvolvedores
             </Button>
-            <Button variant="secondary">Colaboradores</Button>
+            <Button variant="secondary">collaborator</Button>
           </Card.Body>
         </Card>
       </Container>
@@ -164,7 +164,7 @@ export default function Home() {
                   src="https://source.unsplash.com/400x400/?workers"
                 />
                 <Card.Body>
-                  <Card.Title>COLABORADORES</Card.Title>
+                  <Card.Title>collaborator</Card.Title>
                   <Card.Subtitle className="py-2 mb-2 text-muted">
                     Gestão dos profissionais da DIMAN
                   </Card.Subtitle>
