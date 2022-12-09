@@ -12,6 +12,8 @@ function Index() {
   const [modelsLoaded, setModelsLoaded] = React.useState(false);
   const [captureVideo, setCaptureVideo] = React.useState(false);
 
+  const infoDetection = React.useRef();
+
   const videoRef = React.useRef();
   const videoHeight = 480;
   const videoWidth = 640;
@@ -86,7 +88,6 @@ function Index() {
 
   const handleVideoOnPlay = async () => {
     const labels = await loadLabels();
-    console.log(labels);
     const displaySize = {
       width: videoWidth,
       height: videoHeight,
@@ -110,16 +111,40 @@ function Index() {
           .withAgeAndGender()
           .withFaceDescriptors();
 
+        console.log(detections);
+
         const resizedDetections = faceapi.resizeResults(
           detections,
           displaySize
         );
 
-        // problema -->
-        const faceMatcher = new faceapi.FaceMatcher(labels, 0.6);
+        // match the face descriptors of the detected faces from our input image to our reference data
+        // 0.6 is a good distance threshold value to judge
+        // whether the descriptors match or not
+        const maxDescriptorDistance = 0.6;
+
+        const faceMatcher = new faceapi.FaceMatcher(
+          labels,
+          maxDescriptorDistance
+        );
         const results = resizedDetections.map((d) =>
           faceMatcher.findBestMatch(d.descriptor)
         );
+
+        infoDetection.current = results;
+
+        // fazer o esquema do registro do funcionário
+        console.log(
+          infoDetection.current,
+          infoDetection.current[0]?.label,
+          infoDetection.current[0]?.distance
+        );
+
+        if (
+          infoDetection.current[0]?.label !== 'unknown' &&
+          infoDetection.current[0]?.distance < 0.3
+        )
+          alert(`Detectou ${infoDetection.current[0]?.label}`);
 
         canvasRef &&
           canvasRef.current &&
@@ -175,8 +200,48 @@ function Index() {
 
   const closeWebcam = () => {
     videoRef.current.pause();
-    videoRef.current.srcObject.getTracks()[0].stop();
+    videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+    canvasRef.current = '';
+    infoDetection.current = '';
     setCaptureVideo(false);
+    window.location.reload(true);
+  };
+
+  function saveFile(blob, filename) {
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveOrOpenBlob(blob, filename);
+    } else {
+      const a = document.createElement('a');
+      document.body.appendChild(a);
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = filename;
+      a.click();
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 0);
+    }
+  }
+
+  const capturePicture = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
+    const contex = canvas.getContext('2d');
+    contex.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    // videoRef.current.player.srcObject.getVideoTracks().forEach((track) => {
+    //   track.stop();
+    // });
+
+    canvas.toBlob((blob) => {
+      console.log(blob);
+      // storage.push(blob);
+      saveFile(blob, infoDetection.current[0]?.label || 'image.jpg');
+    });
+
+    console.log(canvas.toDataURL());
+    // this.setState({ imageDataURL: canvas.toDataURL() });
   };
 
   return (
@@ -188,35 +253,9 @@ function Index() {
 
         <div style={{ textAlign: 'center', padding: '10px' }}>
           {captureVideo && modelsLoaded ? (
-            <Button
-              onClick={closeWebcam}
-              style={{
-                cursor: 'pointer',
-                backgroundColor: 'green',
-                color: 'white',
-                padding: '15px',
-                fontSize: '25px',
-                border: 'none',
-                borderRadius: '10px',
-              }}
-            >
-              Close Webcam
-            </Button>
+            <Button onClick={closeWebcam}>Close Webcam</Button>
           ) : (
-            <Button
-              onClick={startVideo}
-              style={{
-                cursor: 'pointer',
-                backgroundColor: 'green',
-                color: 'white',
-                padding: '15px',
-                fontSize: '25px',
-                border: 'none',
-                borderRadius: '10px',
-              }}
-            >
-              Open Webcam
-            </Button>
+            <Button onClick={startVideo}>Open Webcam</Button>
           )}
         </div>
         {captureVideo ? (
@@ -243,6 +282,7 @@ function Index() {
             <div>loading...</div>
           )
         ) : null}
+        <Button onClick={capturePicture}>Capture Picture</Button>
       </Container>
     </>
   );
