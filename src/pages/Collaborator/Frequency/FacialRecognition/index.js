@@ -62,31 +62,44 @@ function Index() {
           name: worker.name,
           urlPhoto: worker.urlPhoto,
         }));
-      console.log('labels', labels);
+
       setIsLoading(false);
 
-      const analysisArray = await Promise.all(
+      const arrayDetections = await Promise.all(
         labels.map(async (label) => {
-          const descriptions = [];
+          // se for trabalhar com varias fotos da mesma pessoa para melhorar reconhecimento, tem que fazer um loop e detections vira um array
           const img = await faceapi.fetchImage(label.urlPhoto);
           const detections = await faceapi
             .detectSingleFace(img)
             .withFaceLandmarks()
             .withFaceDescriptor();
 
-          console.log('detections', detections);
-
-          if (detections !== null) {
-            descriptions.push(detections.descriptor);
-
-            return new faceapi.LabeledFaceDescriptors(
-              `${label.id} ${label.name.split(' ')[0]}`,
-              descriptions
-            );
-          }
+          return {
+            label: `${label.id} ${label.name.split(' ')[0]}`,
+            detections,
+          };
         })
       );
-      console.log('analise', analysisArray);
+
+      console.log('arrayDetections', arrayDetections);
+
+      const validArrayDetections = arrayDetections.filter(
+        // se for trabalhar com varias fotos da mesma pessoa, tem q tirar as fotos que nao atendem (nao tem rostos), tanto do array da mesma pessoa como entre diferentes pessoas
+        (item) => item.detections
+      );
+
+      console.log('validArrayDetections', validArrayDetections);
+
+      const analysisArray = await Promise.all(
+        validArrayDetections.map(async (item) => {
+          // se for trabalhar com varios arrays tem que colocar os varios 'detections'
+          const descriptions = [];
+
+          descriptions.push(item.detections.descriptor);
+
+          return new faceapi.LabeledFaceDescriptors(item.label, descriptions);
+        })
+      );
 
       return analysisArray;
     } catch (err) {}
@@ -184,15 +197,22 @@ function Index() {
 
           if (
             infoDetection.current[0]?.label !== 'unknown' &&
-            infoDetection.current[0]?.distance < 0.3
-          )
-            // alert(`Detectou ${infoDetection.current[0]?.label}`);
+            infoDetection.current[0]?.distance < 0.35
+          ) {
+            alert(
+              ` Confirma registro do colaborador ${infoDetection.current[0]?.label}?`
+            );
+            // toast.success(
+            //   ` Colaborador ${infoDetection.current[0]?.label} localizado com Sucesso! `
+            // );
+            console.log('Rodar função para registrar frequência');
+          }
 
-            canvasRef &&
-              canvasRef.current &&
-              canvasRef.current
-                .getContext('2d')
-                .clearRect(0, 0, videoWidth, videoHeight);
+          canvasRef &&
+            canvasRef.current &&
+            canvasRef.current
+              .getContext('2d')
+              .clearRect(0, 0, videoWidth, videoHeight);
 
           canvasRef &&
             canvasRef.current &&
@@ -328,11 +348,11 @@ function Index() {
           <Col xs="auto">
             {captureVideo && modelsLoaded ? (
               <Button variant="warning" onClick={closeWebcam}>
-                Close Webcam
+                Finalizar Reconhecimento
               </Button>
             ) : (
               <Button variant="success" onClick={startVideo}>
-                Open Webcam
+                Iniciar Reconhecimento
               </Button>
             )}
           </Col>
