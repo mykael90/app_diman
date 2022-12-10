@@ -7,14 +7,18 @@ import { toast } from 'react-toastify';
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import * as faceapi from 'face-api.js';
 
+import ConfirmModal from './components/ConfirmModal';
+
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
 function Index() {
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showModal, setShowModal] = React.useState(false);
   const [modelsLoaded, setModelsLoaded] = React.useState(false);
   const [captureVideo, setCaptureVideo] = React.useState(false);
   const [workers, setWorkers] = React.useState([]);
+  const [workerIdModal, setWorkerIdModal] = React.useState('');
 
   const infoDetection = React.useRef();
 
@@ -22,6 +26,12 @@ function Index() {
   const videoHeight = 480;
   const videoWidth = 640;
   const canvasRef = React.useRef();
+
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = (workerId) => {
+    setWorkerIdModal(workerId);
+    setShowModal(true);
+  };
 
   React.useEffect(() => {
     const loadModels = async () => {
@@ -138,6 +148,26 @@ function Index() {
     });
   };
 
+  const closeWebcam = async () => {
+    try {
+      setIsLoading(true);
+      canvasRef.current = '';
+      infoDetection.current = '';
+      setCaptureVideo(false);
+      await videoRef.current.pause();
+      await videoRef.current.srcObject.getTracks().forEach(async (track) => {
+        await track.stop();
+        await videoRef.current.srcObject.removeTrack(track);
+        console.log('fecha');
+      });
+      // window.location.reload(true);
+      setIsLoading(false);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+    }
+  };
+
   const handleVideoOnPlay = async () => {
     try {
       setIsLoading(true);
@@ -188,7 +218,7 @@ function Index() {
 
           infoDetection.current = results;
 
-          // fazer o esquema do registro do funcionário
+          // REGISTRAR FUNCIONARIO fazer o esquema do registro do funcionário
           console.log(
             infoDetection.current,
             infoDetection.current[0]?.label,
@@ -199,13 +229,15 @@ function Index() {
             infoDetection.current[0]?.label !== 'unknown' &&
             infoDetection.current[0]?.distance < 0.35
           ) {
-            alert(
-              ` Confirma registro do colaborador ${infoDetection.current[0]?.label}?`
-            );
+            // alert(
+            //   ` Confirma registro do colaborador ${infoDetection.current[0]?.label}?`
+            // );
             // toast.success(
             //   ` Colaborador ${infoDetection.current[0]?.label} localizado com Sucesso! `
             // );
+            handleShowModal(infoDetection.current[0]?.label.split(' ')[0]);
             console.log('Rodar função para registrar frequência');
+            closeWebcam();
           }
 
           canvasRef &&
@@ -259,26 +291,6 @@ function Index() {
           // problema
         }
       }, 100);
-    } catch (err) {
-      console.log(err);
-      setIsLoading(false);
-    }
-  };
-
-  const closeWebcam = async () => {
-    try {
-      setIsLoading(true);
-      canvasRef.current = '';
-      infoDetection.current = '';
-      setCaptureVideo(false);
-      await videoRef.current.pause();
-      await videoRef.current.srcObject.getTracks().forEach(async (track) => {
-        await track.stop();
-        await videoRef.current.srcObject.removeTrack(track);
-        console.log('fecha');
-      });
-      // window.location.reload(true);
-      setIsLoading(false);
     } catch (err) {
       console.log(err);
       setIsLoading(false);
@@ -344,6 +356,11 @@ function Index() {
     <>
       <Loading isLoading={isLoading} />
       <Container>
+        <ConfirmModal // modal p/ pesquisa de materiais
+          handleClose={handleCloseModal}
+          show={showModal}
+          workerId={workerIdModal}
+        />
         <Row className="d-flex justify-content-center">
           <Col xs="auto">
             {captureVideo && modelsLoaded ? (
