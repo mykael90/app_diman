@@ -47,48 +47,43 @@ function Index() {
     loadModels();
   }, []);
 
+  async function getWorkersData() {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/workers/');
+      setWorkers(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
+
   const loadLabels = async () => {
     try {
       setIsLoading(true);
-
-      const response = await axios.get('/workers/');
-      setWorkers(response.data);
-
-      // depois pode colocar um filtro aqui dos colaboradores ativos e dos que tem foto para melhorar o desempenho
-      const labels = response.data
-        .filter((item) => item.filenamePhoto)
-        .map((worker) => ({
-          id: worker.id,
-          name: worker.name,
-          urlPhoto: worker.urlPhoto,
-        }));
-      console.log('labels', labels);
+      await getWorkersData();
+      const labels = ['Mykael Mello', 'Maria Rafaela'];
       setIsLoading(false);
-
-      const analysisArray = await Promise.all(
+      return Promise.all(
         labels.map(async (label) => {
           const descriptions = [];
-          const img = await faceapi.fetchImage(label.urlPhoto);
-          const detections = await faceapi
-            .detectSingleFace(img)
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-
-          console.log('detections', detections);
-
-          if (detections !== null) {
-            descriptions.push(detections.descriptor);
-
-            return new faceapi.LabeledFaceDescriptors(
-              `${label.id} ${label.name.split(' ')[0]}`,
-              descriptions
+          for (let i = 1; i <= 5; i++) {
+            const img = await faceapi.fetchImage(
+              `${process.env.REACT_APP_BASE_PUBLIC}/labels/${label}/${i}.jpg`
             );
+            const detections = await faceapi
+              .detectSingleFace(img)
+              .withFaceLandmarks()
+              .withFaceDescriptor();
+            descriptions.push(detections.descriptor);
           }
+          return new faceapi.LabeledFaceDescriptors(label, descriptions);
         })
       );
-      console.log('analise', analysisArray);
-
-      return analysisArray;
     } catch (err) {}
     console.log(err);
     setIsLoading(false);
