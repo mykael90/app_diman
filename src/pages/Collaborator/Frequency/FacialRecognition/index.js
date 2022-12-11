@@ -18,18 +18,18 @@ function Index() {
   const [modelsLoaded, setModelsLoaded] = React.useState(false);
   const [captureVideo, setCaptureVideo] = React.useState(false);
   const [workers, setWorkers] = React.useState([]);
-  const [workerIdModal, setWorkerIdModal] = React.useState('');
+  const [workerModal, setWorkerModal] = React.useState({});
 
   const infoDetection = React.useRef();
 
   const videoRef = React.useRef();
-  const videoHeight = 480;
-  const videoWidth = 640;
+  const videoHeight = 360;
+  const videoWidth = 480;
   const canvasRef = React.useRef();
 
   const handleCloseModal = () => setShowModal(false);
-  const handleShowModal = (workerId) => {
-    setWorkerIdModal(workerId);
+  const handleShowModal = (worker) => {
+    setWorkerModal(worker);
     setShowModal(true);
   };
 
@@ -55,17 +55,33 @@ function Index() {
       }
     };
     loadModels();
+
+    const getWorkersData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/workers/');
+        setWorkers(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    };
+    getWorkersData();
   }, []);
 
   const loadLabels = async () => {
     try {
       setIsLoading(true);
 
-      const response = await axios.get('/workers/');
-      setWorkers(response.data);
+      // const response = await axios.get('/workers/');
+      // setWorkers(response.data);
 
       // depois pode colocar um filtro aqui dos colaboradores ativos e dos que tem foto para melhorar o desempenho
-      const labels = response.data
+      const labels = workers
         .filter((item) => item.filenamePhoto)
         .map((worker) => ({
           id: worker.id,
@@ -129,6 +145,9 @@ function Index() {
                 {
                   video: {
                     deviceId: device.deviceId,
+                    facingMode: {
+                      exact: 'user',
+                    },
                   },
                 },
                 // eslint-disable-next-line no-return-assign
@@ -158,7 +177,6 @@ function Index() {
       await videoRef.current.srcObject.getTracks().forEach(async (track) => {
         await track.stop();
         await videoRef.current.srcObject.removeTrack(track);
-        console.log('fecha');
       });
       // window.location.reload(true);
       setIsLoading(false);
@@ -196,7 +214,7 @@ function Index() {
             .withAgeAndGender()
             .withFaceDescriptors();
 
-          console.log(detections);
+          // console.log(detections);
 
           const resizedDetections = faceapi.resizeResults(
             detections,
@@ -219,11 +237,11 @@ function Index() {
           infoDetection.current = results;
 
           // REGISTRAR FUNCIONARIO fazer o esquema do registro do funcionário
-          console.log(
-            infoDetection.current,
-            infoDetection.current[0]?.label,
-            infoDetection.current[0]?.distance
-          );
+          // console.log(
+          //   infoDetection.current,
+          //   infoDetection.current[0]?.label,
+          //   infoDetection.current[0]?.distance
+          // );
 
           if (
             infoDetection.current[0]?.label !== 'unknown' &&
@@ -235,7 +253,21 @@ function Index() {
             // toast.success(
             //   ` Colaborador ${infoDetection.current[0]?.label} localizado com Sucesso! `
             // );
-            handleShowModal(infoDetection.current[0]?.label.split(' ')[0]);
+            console.log(workers);
+            console.log('id', infoDetection.current[0]?.label.split(' ')[0]);
+            console.log(
+              'worker',
+              workers.find(
+                ({ id }) =>
+                  id === Number(infoDetection.current[0]?.label.split(' ')[0])
+              )
+            );
+            handleShowModal(
+              workers.find(
+                ({ id }) =>
+                  id === Number(infoDetection.current[0]?.label.split(' ')[0])
+              )
+            );
             console.log('Rodar função para registrar frequência');
             closeWebcam();
           }
@@ -359,7 +391,7 @@ function Index() {
         <ConfirmModal // modal p/ pesquisa de materiais
           handleClose={handleCloseModal}
           show={showModal}
-          workerId={workerIdModal}
+          worker={workerModal}
         />
         <Row className="d-flex justify-content-center">
           <Col xs="auto">
