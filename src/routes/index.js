@@ -8,7 +8,7 @@ import Fotos from '../pages/Fotos';
 import Register from '../pages/Register';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
-import Colaboradores from '../pages/Colaboradores';
+import Collaborator from '../pages/Collaborator';
 import Materials from '../pages/Materials';
 import Equip from '../pages/Equip';
 import Eletrica from '../pages/Infra/Eletrica';
@@ -38,7 +38,7 @@ export default function RoutesPages() {
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route exact path="/colaboradores/*" element={<Colaboradores />} />
+      <Route exact path="/collaborator/*" element={<Collaborator />} />
 
       <Route exact path="/equip/*" element={<Equip />} />
       <Route exact path="/infra/eletrica/*" element={<Eletrica />} />

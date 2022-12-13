@@ -59,34 +59,36 @@ export default function Header() {
             clas="d-flex justify-content-between"
           >
             <Nav className="me-auto mt-2 px-2">
-              {/* <Nav.Link href="#1" onClick={() => navigate('/colaboradores')}>
+              {/* <Nav.Link href="#1" onClick={() => navigate('/collaborator')}>
                 COLAB
               </Nav.Link> */}
 
               <NavDropdown title="COLABORADORES" id="collasible-nav-dropdown">
                 <NavDropdown.Item // teste
                   href="#1"
-                  onClick={() => navigate('/colaboradores1/frequencia/')}
+                  onClick={() =>
+                    navigate('/collaborator/frequency/facialrecognition')
+                  }
                 >
                   Frequência
                 </NavDropdown.Item>
                 <NavDropdown.Item
                   href="#2"
-                  onClick={() => navigate('/colaboradores1/ocorrencia/')}
+                  onClick={() => navigate('/collaborator1/ocorrencia/')}
                 >
                   Ocorrência
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#3"
-                  onClick={() => navigate('/colaboradores/reports/')}
+                  onClick={() => navigate('/collaborator/reports/')}
                 >
                   Relatórios
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#4"
-                  onClick={() => navigate('/colaboradores/record/list')}
+                  onClick={() => navigate('/collaborator/record/list')}
                 >
                   Cadastro
                 </NavDropdown.Item>
