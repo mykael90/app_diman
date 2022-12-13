@@ -4,6 +4,8 @@ import { Container, Row, Col, Card, Button, Collapse } from 'react-bootstrap';
 import { ImgIcon } from './styled';
 import { primaryDarkColor } from '../../config/colors';
 
+import infra from '../../assets/img/buildings/infra.jpg';
+
 export default function Home() {
   const [open, setOpen] = useState(false);
   return (
@@ -12,7 +14,7 @@ export default function Home() {
         <Card className="d-flex border-0 rounded-0 position-relative justify-content-center">
           <Card.Img
             fluid
-            src={require('../../assets/img/buildings/infra.jpg')}
+            src={infra}
             alt="Superintendência de infraestrutura"
             className="px-0 border-0 rounded-0"
           />
@@ -270,7 +272,7 @@ export default function Home() {
               Principais linguagens e tecnologias utilizadas para elaboração
               desse projeto
             </Card.Subtitle>
-            <Row className="justify-content-center text-center">
+            {/* <Row className="justify-content-center text-center">
               <Col xs={12} sm={12} md={10}>
                 <Row xs={1} sm={2} md={4} className="mt-3">
                   <Col>
@@ -386,7 +388,7 @@ export default function Home() {
                   </Col>
                 </Row>
               </Col>
-            </Row>
+            </Row> */}
           </Card.Body>
         </Card>
       </Container>

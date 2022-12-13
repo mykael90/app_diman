@@ -37,7 +37,7 @@ export default function Home() {
           </p>
         </Row>
 
-        <Col xs={12} sm={12} md={10}>
+        {/* <Col xs={12} sm={12} md={10}>
           <Row xs={1} sm={2} md={4} className="mt-3">
             <Col>
               <ImgIcon
@@ -151,7 +151,7 @@ export default function Home() {
               <p>Express</p>
             </Col>
           </Row>
-        </Col>
+        </Col> */}
       </Row>
     </Container>
   );

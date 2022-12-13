@@ -16,7 +16,7 @@ import { StyledNav, StyledNavbar } from './styled';
 
 import { primaryDarkColor } from '../../config/colors';
 
-const logoSisman = require('../../assets/img/logo-sisman.png');
+import logoSisman from '../../assets/img/logo-sisman.png';
 
 export default function Header() {
   const dispatch = useDispatch();

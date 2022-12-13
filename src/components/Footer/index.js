@@ -3,8 +3,8 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
 
-const logoDiman = require('../../assets/img/logo_infra_diman_gray.png');
-const logoUFRN = require('../../assets/img/logo_ufrn_gray.png');
+import logoDiman from '../../assets/img/logo_infra_diman_gray.png';
+import logoUFRN from '../../assets/img/logo_ufrn_gray.png';
 
 export default function Footer() {
   const navigate = useNavigate();
