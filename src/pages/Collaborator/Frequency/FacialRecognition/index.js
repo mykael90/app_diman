@@ -136,32 +136,38 @@ function Index() {
   const startVideo = () => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       if (Array.isArray(devices)) {
-        devices.forEach((device) => {
-          if (device.kind === 'videoinput') {
-            if (!device.label.includes('Virtual')) {
-              setCaptureVideo(true);
-              // ver uma melhor forma de calibrar isso aqui quando tiver 2 câmeras
-              navigator.getUserMedia(
-                {
-                  video: {
-                    deviceId: device.deviceId,
-                    facingMode: {
-                      exact: 'user',
-                    },
+        devices.every((device) => {
+          if (
+            device.kind === 'videoinput' &&
+            !device.label.includes('Virtual')
+          ) {
+            const supports = navigator.mediaDevices.getSupportedConstraints();
+            console.log(supports);
+            console.log(device);
+            setCaptureVideo(true);
+            // ver uma melhor forma de calibrar isso aqui quando tiver 2 câmeras
+            navigator.getUserMedia(
+              {
+                video: {
+                  deviceId: device.deviceId,
+                  facingMode: {
+                    ideal: 'user',
                   },
                 },
-                // eslint-disable-next-line no-return-assign
-                (stream) => {
-                  const video = videoRef.current;
-                  video.srcObject = stream;
-                  video.play();
-                },
-                (err) => {
-                  console.error('error:', err);
-                }
-              );
-            }
+              },
+              // eslint-disable-next-line no-return-assign
+              (stream) => {
+                const video = videoRef.current;
+                video.srcObject = stream;
+                video.play();
+              },
+              (err) => {
+                console.error('error:', err);
+              }
+            );
+            return false;
           }
+          return true;
         });
       }
     });
