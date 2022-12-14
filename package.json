@@ -2,7 +2,7 @@
   "name": "react-base",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://10.1.156.199:3000/",
+  "homepage": "http://10.1.156.199",
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.0",
     "@testing-library/jest-dom": "^5.16.2",
