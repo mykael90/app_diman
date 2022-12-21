@@ -4,13 +4,14 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, Row, Col, Form, Image } from 'react-bootstrap';
+import { Button, Row, Col, Form, Image, Badge } from 'react-bootstrap';
 import { IMaskInput } from 'react-imask';
 import { FaPhone, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
+import Select from 'react-select';
 import axios from '../../../../services/axios';
 import { primaryDarkColor } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
@@ -33,16 +34,17 @@ export default function Index() {
     rg: '',
     cpf: '',
     filenamePhoto: '',
-    WorkerContracts: {
-      WorkerJobtypeId: '',
-      start: '',
-      ContractId: '',
-      located: '',
-    },
+    WorkerContracts: [
+      {
+        ContractId: '',
+        WorkerJobtypeId: '',
+        located: '',
+        start: '',
+      },
+    ],
   });
 
   const { id } = useParams();
-  console.log(id);
 
   const schema = yup.object().shape({
     name: yup.string().required('Requerido'),
@@ -61,6 +63,7 @@ export default function Index() {
         if (id) {
           setIsLoading(true);
           const responseWorker = await axios.get(`/workers/${id}`);
+          console.log(responseWorker.data);
           setIsLoading(false);
           setInitialValues(responseWorker.data);
           if (responseWorker.data.filenamePhoto)
@@ -118,11 +121,39 @@ export default function Index() {
     return object;
   }
 
-  const handleStore = async (values, resetForm) => {
-    const formattedValues = JSON.parse(JSON.stringify(values));
-    removeEmptyString(formattedValues);
+  const cleanEmpty = (obj) => {
+    if (Array.isArray(obj)) {
+      return obj
+        .map((v) => (v && typeof v === 'object' ? cleanEmpty(v) : v))
+        .filter((v) => !(v == null || v == ''));
+    }
+    return Object.entries(obj)
+      .map(([k, v]) => [k, v && typeof v === 'object' ? cleanEmpty(v) : v])
+      .reduce((a, [k, v]) => (v == null || v == '' ? a : ((a[k] = v), a)), {});
+  };
+  // LIMPANDO CHAVES NULL, UNDEFINED, EMPTY STRINGS
 
-    console.log(formattedValues);
+  const handleStore = async (values, resetForm) => {
+    const formattedValues = {
+      ...cleanEmpty(values),
+    };
+
+    Object.entries(formattedValues).forEach((item) => {
+      console.log(item);
+      console.log(
+        Array.isArray(item[1]),
+        typeof item[1],
+        Object.keys(item[1][0]).length
+      );
+      if (
+        Array.isArray(item[1]) &&
+        typeof item[1] === 'object' &&
+        Object.keys(item[1]).length === 1 &&
+        Object.keys(item[1][0]).length === 0
+      ) {
+        delete formattedValues[item[0]];
+      }
+    }); // LIMPANDO ARRAYS NULOS (tabelas vinculadas para nao dar erro)
 
     function buildFormData(formData, data, parentKey) {
       if (
@@ -233,14 +264,15 @@ export default function Index() {
   return (
     <>
       <Loading isLoading={isLoading} />
-      <Row className="bg-light border rounded d-flex justify-content-center pt-2">
-        <Row
-          className="px-0 mx-0 my-2 py-2 text-center"
+      <div className="bg-light border rounded pt-2 px-3">
+        <Col
+          xs={12}
+          className=" text-center"
           style={{ background: primaryDarkColor, color: 'white' }}
         >
           <span className="fs-5">INFORMAÇÕES PESSOAIS</span>
-        </Row>
-        <Row className="px-0 pt-2">
+        </Col>
+        <Row className="pt-2">
           <Formik
             initialValues={initialValues}
             validationSchema={schema}
@@ -282,7 +314,7 @@ export default function Index() {
                         as={Col}
                         xs={12}
                         controlId="name"
-                        className="pt-2"
+                        className="pb-3"
                       >
                         <Form.Label>NOME</Form.Label>
                         <Form.Control
@@ -297,13 +329,9 @@ export default function Index() {
                             handleBlur(e);
                           }}
                         />
-                        <Form.Control.Feedback
-                          tooltip
-                          type="invalid"
-                          style={{ position: 'static' }}
-                        >
-                          {errors.name}
-                        </Form.Control.Feedback>
+                        {touched.name && !!errors.name ? (
+                          <Badge bg="danger">{errors.name}</Badge>
+                        ) : null}
                       </Form.Group>
                     </Row>
                     <Row>
@@ -312,7 +340,7 @@ export default function Index() {
                         xs={12}
                         lg={4}
                         controlId="cpf"
-                        className="pt-2"
+                        className="pb-3"
                       >
                         <Form.Label>CPF</Form.Label>
                         <Form.Control
@@ -342,7 +370,7 @@ export default function Index() {
                         xs={12}
                         lg={4}
                         controlId="rg"
-                        className="pt-2"
+                        className="pb-3"
                       >
                         <Form.Label>RG</Form.Label>
                         <Form.Control
@@ -372,7 +400,7 @@ export default function Index() {
                         xs={12}
                         lg={4}
                         controlId="birthdate"
-                        className="pt-2"
+                        className="pb-3"
                       >
                         <Form.Label>NASCIMENTO</Form.Label>
                         <Form.Control
@@ -398,7 +426,7 @@ export default function Index() {
                         as={Col}
                         xs={12}
                         controlId="email"
-                        className="pt-2"
+                        className="pb-3"
                       >
                         <Form.Label>EMAIL</Form.Label>
                         <Form.Control
@@ -433,373 +461,181 @@ export default function Index() {
                   </Col>
                 </Row>
 
-                {/* <Row
-                  className="d-flex text-center"
-                  style={{ background: primaryDarkColor, color: 'white' }}
-                >
-                  <span className="fs-6">CONTATOS</span>
-                </Row> */}
+                <Row className="d-flex justify-content-center align-items-center">
+                  <Col
+                    xs={12}
+                    className="text-center"
+                    style={{ background: primaryDarkColor, color: 'white' }}
+                  >
+                    <span className="fs-6">CONTRATOS</span>
+                  </Col>
 
-                {/* <Row className="justify-content-center pt-2 pb-4">
-                  <FieldArray name="WorkerContacts">
+                  <FieldArray name="WorkerContracts">
                     {(fieldArrayProps) => {
-                      const { push, remove } = fieldArrayProps;
+                      const { remove, push } = fieldArrayProps;
                       return (
-                        <Row>
-                          {values.WorkerContacts?.length > 0 &&
-                            values.WorkerContacts.map((contato, i) => (
-                              <>
-                                <Form.Group
-                                  as={Col}
-                                  xs={12}
-                                  md={3}
-                                  controlId={`WorkerContacts[${i}].contacttypeId`}
+                        <Row className="d-flex justify-content-center align-items-center">
+                          <Col md={12} lg={10}>
+                            {values.WorkerContracts?.length > 0 &&
+                              values.WorkerContracts?.map((item, index) => (
+                                <div
+                                  className="my-3 p-4"
+                                  style={{ background: '#E9EFFA' }}
                                 >
-                                  <Form.Select
-                                    type="text"
-                                    value={contato.contacttypes}
-                                    onChange={handleChange}
-                                    placeholder="Selecione o tipo"
-                                    onBlur={handleBlur}
-                                  >
-                                    <option>Selecione o tipo</option>
-                                    {contacttypes.map((types) => (
-                                      <option key={types.id} value={types.id}>
-                                        {types.type}
-                                      </option>
-                                    ))}
-                                  </Form.Select>
-                                </Form.Group>
+                                  <Row>
+                                    <Col className="fs-5 text-center">
+                                      <Badge bg="dark">Nº {index + 1}</Badge>
+                                    </Col>
+                                  </Row>
 
-                                <Form.Group
-                                  as={Col}
-                                  xs={12}
-                                  md={3}
-                                  controlId={`WorkerContacts[${i}].contact`}
-                                >
-                                  <Form.Control
-                                    placeholder="Digite o contato"
-                                    value={contato.contact}
-                                    onChange={handleChange}
-                                  />
-                                </Form.Group>
-                                <Form.Group
-                                  as={Col}
-                                  xs={12}
-                                  md={3}
-                                  controlId={`WorkerContacts[${i}].obs`}
-                                >
-                                  <Form.Control
-                                    placeholder="Digite a observação"
-                                    value={contato.obs}
-                                    onChange={handleChange}
-                                  />
-                                </Form.Group>
-                                <Form.Group
-                                  as={Col}
-                                  xs={12}
-                                  md={2}
-                                  controlId={`WorkerContacts[${i}].default`}
-                                >
-                                  <Form.Check
-                                    type="switch"
-                                    label="Padrão"
-                                    onChange={handleChange}
-                                    onBlur={handleChange}
-                                    value={contato.default}
-                                  />
-                                </Form.Group>
-                                <Col sm>
-                                  {values.WorkerContacts.length <= 1 ? (
-                                    <Button
-                                      size="sm"
-                                      variant="success"
-                                      onClick={() =>
-                                        push({ contacttypeId: '', contact: '' })
-                                      }
-                                    >
-                                      <FaPlus />
-                                    </Button>
-                                  ) : values.WorkerContacts.length - 1 < i ? (
-                                    <Button
-                                      size="sm"
-                                      variant="outline-secondary"
-                                      onClick={() => remove(i)}
-                                    >
-                                      <FaTrashAlt />
-                                    </Button>
-                                  ) : (
-                                    <>
-                                      <Button
-                                        size="sm"
-                                        variant="outline-secondary"
-                                        onClick={() => remove(i)}
+                                  <Row key={index}>
+                                    <Row className="d-flex justify-content-center align-items-center mt-2">
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={8}
+                                        controlId={`WorkerContracts[${index}].ContractId`}
+                                        className="pb-3"
                                       >
-                                        <FaTrashAlt />
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="success"
-                                        onClick={() =>
-                                          push({
-                                            contacttypeId: '',
-                                            contact: '',
-                                          })
-                                        }
+                                        <Form.Label>CONTRATO</Form.Label>
+                                        <Form.Select
+                                          type="text"
+                                          value={item.ContractId}
+                                          onChange={handleChange}
+                                          placeholder="Selecione o Contrato"
+                                          onBlur={handleBlur}
+                                        >
+                                          <option>Selecione o Contrato</option>
+                                          {contracts.map((contract) => (
+                                            <option
+                                              key={contract.id}
+                                              value={contract.id}
+                                            >
+                                              {contract.codigoSipac}
+                                            </option>
+                                          ))}
+                                        </Form.Select>
+                                      </Form.Group>
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={4}
+                                        controlId={`WorkerContracts[${index}].WorkerJobtypeId`}
+                                        className="pb-3"
                                       >
-                                        <FaPlus />
-                                      </Button>
-                                    </>
-                                  )}
-                                </Col>
-                              </>
-                            ))}
+                                        <Form.Label>FUNÇÃO</Form.Label>
+                                        <Form.Select
+                                          type="text"
+                                          value={item.WorkerJobtypeId}
+                                          onChange={handleChange}
+                                          placeholder="Selecione a Função"
+                                          onBlur={handleBlur}
+                                        >
+                                          <option>Selecione a Função</option>
+                                          {jobtypes.map((job) => (
+                                            <option key={job.id} value={job.id}>
+                                              {job.job}
+                                            </option>
+                                          ))}
+                                        </Form.Select>
+                                      </Form.Group>
+                                    </Row>
+                                    <Row className="d-flex justify-content-center align-items-center">
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={6}
+                                        controlId={`WorkerContracts[${index}].located`}
+                                        className="pb-3"
+                                      >
+                                        <Form.Label>LOTAÇÃO</Form.Label>
+                                        <Form.Control
+                                          type="text"
+                                          value={item.located}
+                                          onChange={handleChange}
+                                          placeholder="Digite a lotação"
+                                          onBlur={(e) => {
+                                            setFieldValue(
+                                              'WorkerContracts.located',
+                                              e.target.value.toUpperCase()
+                                            ); // UPPERCASE
+                                            handleBlur(e);
+                                          }}
+                                          // onBlur={handleBlur}
+                                        />
+                                      </Form.Group>
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={3}
+                                        controlId={`WorkerContracts[${index}].start`}
+                                        className="pb-3"
+                                      >
+                                        <Form.Label>INÍCIO</Form.Label>
+                                        <Form.Control
+                                          type="date"
+                                          dateFormat="YYYY-MM-DD"
+                                          value={item.start}
+                                          onChange={handleChange}
+                                          placeholder="Digite o inicio do contrato"
+                                          onBlur={handleBlur}
+                                        />
+                                      </Form.Group>
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={3}
+                                        controlId={`WorkerContracts[${index}].start`}
+                                        className="pb-3"
+                                      >
+                                        <Form.Label>ENCERRAMENTO</Form.Label>
+                                        <Form.Control
+                                          type="date"
+                                          dateFormat="YYYY-MM-DD"
+                                          value={item.end}
+                                          onChange={handleChange}
+                                          placeholder="Digite o fim do contrato"
+                                          onBlur={handleBlur}
+                                        />
+                                      </Form.Group>
+                                    </Row>
+                                    <Row className="d-flex justify-content-end pb-3">
+                                      <Col xs="auto">
+                                        <Button
+                                          size="sm"
+                                          variant="outline-danger"
+                                          onClick={() => remove(index)}
+                                        >
+                                          <FaTrashAlt />
+                                        </Button>
+                                      </Col>
+                                    </Row>
+                                  </Row>
+                                </div>
+                              ))}
+                            <Row className="mt-2">
+                              <Col xs="auto">
+                                {' '}
+                                <Button
+                                  size="sm"
+                                  variant="outline-primary"
+                                  onClick={push}
+                                >
+                                  <FaPlus /> Novo contrato
+                                </Button>
+                              </Col>
+                            </Row>
+                          </Col>
                         </Row>
                       );
                     }}
                   </FieldArray>
-                </Row> */}
-
-                {/*
-                <Row
-                  className="d-flex text-center"
-                  style={{ background: primaryDarkColor, color: 'white' }}
-                >
-                  <span className="fs-6">ENDEREÇOS</span>
-                </Row> */}
-
-                {/* <Row className="justify-content-center pt-2 pb-4">
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    controlId="Addresses.zipcode"
-                    className="pt-2"
-                  >
-                    <Form.Label>CEP</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.Addresses?.zipcode}
-                      onChange={handleChange}
-                      placeholder="Digite o CEP"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    controlId="Addresses.street"
-                    className="pt-2"
-                  >
-                    <Form.Label>LOGRADOURO</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.Addresses?.street}
-                      onChange={handleChange}
-                      placeholder="Digite o Logradouro"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    controlId="Addresses.number"
-                    className="pt-2"
-                  >
-                    <Form.Label>NÚMERO</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={values.Addresses?.number}
-                      onChange={handleChange}
-                      placeholder="Digite o Número"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    controlId="Addresses.district"
-                    className="pt-2"
-                  >
-                    <Form.Label>BAIRRO</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.Addresses?.district}
-                      onChange={handleChange}
-                      placeholder="Digite o Bairro"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    controlId="Addresses.city"
-                    className="pt-2"
-                  >
-                    <Form.Label>CIDADE</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.Addresses?.city}
-                      onChange={handleChange}
-                      placeholder="Digite a Cidade"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    md={4}
-                    controlId="Addresses.country"
-                    className="pt-2"
-                  >
-                    <Form.Label>PAÍS</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.Addresses?.country}
-                      onChange={handleChange}
-                      placeholder="Selecione o País"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={8}
-                    controlId="Addresses.complement"
-                    className="pt-2"
-                  >
-                    <Form.Label>COMPLEMENTO</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.Addresses?.complement}
-                      onChange={handleChange}
-                      placeholder="Digite o Complemento"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={4}
-                    controlId="Addresses.WorkerAddress.title"
-                    className="pt-2"
-                  >
-                    <Form.Label>Titulo</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={values.Addresses?.WorkerAddress.title}
-                      onChange={handleChange}
-                      placeholder="Digite o Titulo do Endereço"
-                      onBlur={handleBlur}
-                    />
-                  </Form.Group>
-                </Row> */}
-                {id ? null : (
-                  <>
-                    {' '}
-                    <Row
-                      className="d-flex text-center"
-                      style={{ background: primaryDarkColor, color: 'white' }}
-                    >
-                      <span className="fs-6">CONTRATO</span>
-                    </Row>
-                    <Row className="d-flex justify-content-center align-items-center pt-2 pb-4">
-                      <Form.Group
-                        as={Col}
-                        xs={12}
-                        md={3}
-                        lg={3}
-                        controlId="WorkerContracts.ContractId"
-                        className="pt-2"
-                      >
-                        <Form.Label>CONTRATO</Form.Label>
-                        <Form.Select
-                          type="text"
-                          value={values.WorkerContracts?.ContractId}
-                          onChange={handleChange}
-                          placeholder="Selecione o Contrato"
-                          onBlur={handleBlur}
-                        >
-                          <option>Selecione o Contrato</option>
-                          {contracts.map((contract) => (
-                            <option key={contract.id} value={contract.id}>
-                              {contract.codigoSipac}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </Form.Group>
-                      <Form.Group
-                        as={Col}
-                        xs={12}
-                        md={3}
-                        lg={3}
-                        controlId="WorkerContracts.WorkerJobtypeId"
-                        className="pt-2"
-                      >
-                        <Form.Label>FUNÇÃO</Form.Label>
-                        <Form.Select
-                          type="text"
-                          value={values.WorkerContracts?.WorkerJobtypeId}
-                          onChange={handleChange}
-                          placeholder="Selecione a Função"
-                          onBlur={handleBlur}
-                        >
-                          <option>Selecione a Função</option>
-                          {jobtypes.map((job) => (
-                            <option key={job.id} value={job.id}>
-                              {job.job}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </Form.Group>
-                      <Form.Group
-                        as={Col}
-                        xs={12}
-                        md={3}
-                        lg={2}
-                        controlId="WorkerContracts.start"
-                        className="pt-2"
-                      >
-                        <Form.Label>INÍCIO</Form.Label>
-                        <Form.Control
-                          type="date"
-                          dateFormat="YYYY-MM-DD"
-                          value={values.WorkerContracts?.start}
-                          onChange={handleChange}
-                          placeholder="Digite o inicio do contrato"
-                          onBlur={handleBlur}
-                        />
-                      </Form.Group>
-                      <Form.Group
-                        as={Col}
-                        xs={12}
-                        md={3}
-                        lg={2}
-                        controlId="WorkerContracts.located"
-                        className="pt-2"
-                      >
-                        <Form.Label>LOTAÇÃO</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={values.WorkerContracts?.located}
-                          onChange={handleChange}
-                          placeholder="Digite a lotação"
-                          onBlur={(e) => {
-                            setFieldValue(
-                              'WorkerContracts.located',
-                              e.target.value.toUpperCase()
-                            ); // UPPERCASE
-                            handleBlur(e);
-                          }}
-                          // onBlur={handleBlur}
-                        />
-                      </Form.Group>
-                    </Row>
-                    <hr />
-                  </>
-                )}
+                </Row>
 
                 <Row className="justify-content-center pt-2 pb-4">
                   <Col xs="auto" className="text-center">
@@ -834,7 +670,7 @@ export default function Index() {
             )}
           </Formik>
         </Row>
-      </Row>
+      </div>
     </>
   );
 }
