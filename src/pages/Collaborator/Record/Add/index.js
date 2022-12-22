@@ -4,7 +4,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, Row, Col, Form, Image, Badge } from 'react-bootstrap';
+import { Button, Row, Col, Form, Badge } from 'react-bootstrap';
 import { IMaskInput } from 'react-imask';
 import { FaPhone, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -78,7 +78,7 @@ export default function Index() {
         if (id) {
           setIsLoading(true);
           const responseWorker = await axios.get(`/workers/${id}`);
-          // console.log(responseWorker.data);
+          console.log(responseWorker.data);
           setIsLoading(false);
           setInitialValues(responseWorker.data);
           if (responseWorker.data.filenamePhoto)
@@ -119,7 +119,7 @@ export default function Index() {
 
     getContracts();
 
-    updateValues.current = { ...cleanEmpty(initialValues) };
+    // updateValues.current = { ...cleanEmpty(initialValues) };
   }, []);
 
   const checkUpdate = (key, value) => {
@@ -133,7 +133,10 @@ export default function Index() {
       }
     } else {
       const arrObj = arr[0].match(/[a-zA-Z0-9]+/)[0];
+      // se não existir, crie o array para ser preenchido
+      if (!updateValues.current[arrObj]) updateValues.current[arrObj] = [{}];
       console.log('arrObj', arrObj);
+      // eslint-disable-next-line no-useless-escape
       const index = arr[0].match(/[\[\d\]]+/)[0].match(/[0-9]+/)[0];
       console.log('index', index);
       const newKey = arr[1];
@@ -234,8 +237,44 @@ export default function Index() {
   };
 
   const handleUpdate = async (values) => {
+    // const formattedValues = {
+    //   ...cleanEmpty(values),
+    // };
+
     const formattedValues = {
-      ...cleanEmpty(values),
+      ...updateValues.current,
+    };
+
+    formattedValues.id = id;
+
+    console.log(formattedValues);
+
+    try {
+      setIsLoading(true);
+
+      // FAZ A ATUALIZAÇÃO E RETORNA PARA A LISTAGEM
+
+      await axios.put(`/workers/${formattedValues.id}`, formattedValues);
+
+      setIsLoading(false);
+      toast.success(`Edição de registro realizada com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateOld = async (values) => {
+    // const formattedValues = {
+    //   ...cleanEmpty(values),
+    // };
+
+    const formattedValues = {
+      ...updateValues.current,
     };
 
     const formData = new FormData();
@@ -531,8 +570,6 @@ export default function Index() {
                                           value={item.ContractId}
                                           onChange={(e) => {
                                             handleChange(e);
-                                            console.log(e);
-                                            console.log(fieldArrayProps);
                                             checkUpdate(
                                               e.target.id,
                                               e.target.value
@@ -598,7 +635,13 @@ export default function Index() {
                                         <Form.Control
                                           type="text"
                                           value={item.located}
-                                          onChange={handleChange}
+                                          onChange={(e) => {
+                                            handleChange(e);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value
+                                            );
+                                          }}
                                           placeholder="Digite a lotação"
                                           onBlur={(e) => {
                                             setFieldValue(
@@ -623,7 +666,13 @@ export default function Index() {
                                           type="date"
                                           dateFormat="YYYY-MM-DD"
                                           value={item.start}
-                                          onChange={handleChange}
+                                          onChange={(e) => {
+                                            handleChange(e);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value
+                                            );
+                                          }}
                                           placeholder="Digite o inicio do contrato"
                                           onBlur={handleBlur}
                                         />
@@ -633,7 +682,7 @@ export default function Index() {
                                         xs={12}
                                         md={12}
                                         lg={3}
-                                        controlId={`WorkerContracts[${index}].start`}
+                                        controlId={`WorkerContracts[${index}].end`}
                                         className="pb-3"
                                       >
                                         <Form.Label>ENCERRAMENTO</Form.Label>
@@ -641,7 +690,13 @@ export default function Index() {
                                           type="date"
                                           dateFormat="YYYY-MM-DD"
                                           value={item.end}
-                                          onChange={handleChange}
+                                          onChange={(e) => {
+                                            handleChange(e);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value
+                                            );
+                                          }}
                                           placeholder="Digite o fim do contrato"
                                           onBlur={handleBlur}
                                         />
