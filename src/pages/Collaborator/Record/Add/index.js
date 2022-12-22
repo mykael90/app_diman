@@ -2,7 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Row, Col, Form, Image, Badge } from 'react-bootstrap';
 import { IMaskInput } from 'react-imask';
@@ -40,11 +40,14 @@ export default function Index() {
         WorkerJobtypeId: '',
         located: '',
         start: '',
+        end: '',
       },
     ],
   });
 
   const { id } = useParams();
+
+  const updateValues = useRef({});
 
   const schema = yup.object().shape({
     name: yup.string().required('Requerido'),
@@ -57,13 +60,25 @@ export default function Index() {
     //   .required('Campo obrigatório'),
   });
 
+  const cleanEmpty = (obj) => {
+    if (Array.isArray(obj)) {
+      return obj
+        .map((v) => (v && typeof v === 'object' ? cleanEmpty(v) : v))
+        .filter((v) => !(v == null || v == ''));
+    }
+    return Object.entries(obj)
+      .map(([k, v]) => [k, v && typeof v === 'object' ? cleanEmpty(v) : v])
+      .reduce((a, [k, v]) => (v == null || v == '' ? a : ((a[k] = v), a)), {});
+  };
+  // LIMPANDO CHAVES NULL, UNDEFINED, EMPTY STRINGS
+
   useEffect(() => {
     async function getData() {
       try {
         if (id) {
           setIsLoading(true);
           const responseWorker = await axios.get(`/workers/${id}`);
-          console.log(responseWorker.data);
+          // console.log(responseWorker.data);
           setIsLoading(false);
           setInitialValues(responseWorker.data);
           if (responseWorker.data.filenamePhoto)
@@ -103,35 +118,34 @@ export default function Index() {
     }
 
     getContracts();
+
+    updateValues.current = { ...cleanEmpty(initialValues) };
   }, []);
 
-  function removeEmptyString(object) {
-    Object.entries(object).forEach(([key, value]) => {
-      if (value && typeof value === 'object') removeEmptyString(value);
-      if (
-        (value && typeof value === 'object' && !Object.keys(value).length) ||
-        value === null ||
-        value === undefined ||
-        value.length === 0
-      ) {
-        if (Array.isArray(object)) object.splice(key, 1);
-        else delete object[key];
-      }
-    });
-    return object;
-  }
+  const checkUpdate = (key, value) => {
+    // console.log(initialValues);
 
-  const cleanEmpty = (obj) => {
-    if (Array.isArray(obj)) {
-      return obj
-        .map((v) => (v && typeof v === 'object' ? cleanEmpty(v) : v))
-        .filter((v) => !(v == null || v == ''));
+    const arr = key.split('.');
+
+    if (arr.length === 1) {
+      if (initialValues[key] !== value) {
+        updateValues.current[key] = value;
+      }
+    } else {
+      const arrObj = arr[0].match(/[a-zA-Z0-9]+/)[0];
+      console.log('arrObj', arrObj);
+      const index = arr[0].match(/[\[\d\]]+/)[0].match(/[0-9]+/)[0];
+      console.log('index', index);
+      const newKey = arr[1];
+      console.log('newKey', newKey);
+      while (updateValues.current[arrObj].length - 1 < index) {
+        updateValues.current[arrObj].push({});
+      }
+      updateValues.current[arrObj][index][newKey] = value;
     }
-    return Object.entries(obj)
-      .map(([k, v]) => [k, v && typeof v === 'object' ? cleanEmpty(v) : v])
-      .reduce((a, [k, v]) => (v == null || v == '' ? a : ((a[k] = v), a)), {});
+
+    console.log(updateValues.current);
   };
-  // LIMPANDO CHAVES NULL, UNDEFINED, EMPTY STRINGS
 
   const handleStore = async (values, resetForm) => {
     const formattedValues = {
@@ -220,8 +234,9 @@ export default function Index() {
   };
 
   const handleUpdate = async (values) => {
-    const formattedValues = JSON.parse(JSON.stringify(values));
-    removeEmptyString(formattedValues);
+    const formattedValues = {
+      ...cleanEmpty(values),
+    };
 
     const formData = new FormData();
     if (photo) {
@@ -297,6 +312,7 @@ export default function Index() {
             }) => (
               <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Row className="d-flex justify-content-center align-items-center pb-4">
+                  {JSON.stringify(touched)}
                   <Col
                     xs="12"
                     md="auto"
@@ -320,7 +336,10 @@ export default function Index() {
                         <Form.Control
                           type="text"
                           value={values.name}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            handleChange(e);
+                            checkUpdate(e.target.id, e.target.value);
+                          }}
                           isInvalid={touched.name && !!errors.name}
                           isValid={touched.name && !errors.name}
                           placeholder="Digite o nome completo"
@@ -354,6 +373,7 @@ export default function Index() {
                           onBlur={handleBlur}
                           onAccept={(value, mask) => {
                             setFieldValue(mask.el.input.id, mask.unmaskedValue);
+                            checkUpdate(mask.el.input.id, mask.unmaskedValue);
                           }}
                         />
                         <Form.Control.Feedback
@@ -384,6 +404,7 @@ export default function Index() {
                           onBlur={handleBlur}
                           onAccept={(value, mask) => {
                             setFieldValue(mask.el.input.id, mask.unmaskedValue);
+                            checkUpdate(mask.el.input.id, mask.unmaskedValue);
                           }}
                         />
                         <Form.Control.Feedback
@@ -406,7 +427,10 @@ export default function Index() {
                         <Form.Control
                           type="date"
                           value={values.birthdate}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            handleChange(e);
+                            checkUpdate(e.target.id, e.target.value);
+                          }}
                           isInvalid={touched.birthdate && !!errors.birthdate}
                           isValid={touched.birthdate && !errors.birthdate}
                           placeholder="Selecione a data"
@@ -447,6 +471,7 @@ export default function Index() {
                           }}
                           onAccept={(value, mask) => {
                             setFieldValue(mask.el.input.id, mask.unmaskedValue);
+                            checkUpdate(mask.el.input.id, mask.unmaskedValue);
                           }}
                         />
                         <Form.Control.Feedback
@@ -484,7 +509,9 @@ export default function Index() {
                                 >
                                   <Row>
                                     <Col className="fs-5 text-center">
-                                      <Badge bg="dark">Nº {index + 1}</Badge>
+                                      <Badge bg="light" text="dark">
+                                        Nº {index + 1}
+                                      </Badge>
                                     </Col>
                                   </Row>
 
@@ -502,7 +529,15 @@ export default function Index() {
                                         <Form.Select
                                           type="text"
                                           value={item.ContractId}
-                                          onChange={handleChange}
+                                          onChange={(e) => {
+                                            handleChange(e);
+                                            console.log(e);
+                                            console.log(fieldArrayProps);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value
+                                            );
+                                          }}
                                           placeholder="Selecione o Contrato"
                                           onBlur={handleBlur}
                                         >
@@ -529,7 +564,15 @@ export default function Index() {
                                         <Form.Select
                                           type="text"
                                           value={item.WorkerJobtypeId}
-                                          onChange={handleChange}
+                                          onChange={(e) => {
+                                            // console.log(e);
+                                            // console.log(fieldArrayProps.name);
+                                            handleChange(e);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value
+                                            );
+                                          }}
                                           placeholder="Selecione a Função"
                                           onBlur={handleBlur}
                                         >
