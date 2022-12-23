@@ -37,7 +37,7 @@ export default function Index() {
     WorkerContracts: [
       {
         ContractId: '',
-        WorkerJobtypeId: '',
+        workerJobtypeId: '',
         located: '',
         start: '',
         end: '',
@@ -594,13 +594,13 @@ export default function Index() {
                                         xs={12}
                                         md={12}
                                         lg={4}
-                                        controlId={`WorkerContracts[${index}].WorkerJobtypeId`}
+                                        controlId={`WorkerContracts[${index}].workerJobtypeId`}
                                         className="pb-3"
                                       >
                                         <Form.Label>FUNÇÃO</Form.Label>
                                         <Form.Select
                                           type="text"
-                                          value={item.WorkerJobtypeId}
+                                          value={item.workerJobtypeId}
                                           onChange={(e) => {
                                             // console.log(e);
                                             // console.log(fieldArrayProps.name);
