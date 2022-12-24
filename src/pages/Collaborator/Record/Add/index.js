@@ -61,6 +61,29 @@ export default function Index() {
     //   .date()
     //   .max(new Date(), 'Não é possível incluir uma data futura')
     //   .required('Campo obrigatório'),
+    WorkerContracts: yup
+      .array()
+      .of(
+        yup.object().shape({
+          ContractId: yup.number().required('Requerido').positive(),
+          WorkerJobtypeId: yup.number().required('Requerido').positive(),
+          located: yup.string().required('Requerido'),
+          start: yup
+            .date()
+            .required('Requerido')
+            // .min(
+            //   // the month is 0-indexed
+            //   new Date(2022, 9, 14).toISOString().split('T')[0],
+            //   'Escolha uma data superior a data de início do sistema'
+            // )
+            .max(
+              new Date().toISOString().split('T')[0],
+              'Escolha uma data passada para o início do contrato'
+            ),
+        })
+      )
+      .required()
+      .min(1, 'A lista de materiais não pode ser vazia'),
   });
 
   const cleanEmpty = (obj) => {
@@ -504,13 +527,17 @@ export default function Index() {
                                         className="pb-3"
                                       >
                                         <Form.Label>CONTRATO</Form.Label>
-
+                                        {/* {console.log(
+                                          touched.WorkerContracts[index]
+                                            ?.ContractId,
+                                          errors.WorkerContracts
+                                        )} */}
                                         <Select
                                           inputId={`WorkerContracts[${index}].ContractId`}
                                           options={contracts.map(
                                             (contract) => ({
                                               value: contract.id,
-                                              label: contract.codigoSipac,
+                                              label: `${contract.codigoSipac} | ${contract.objeto}`,
                                             })
                                           )}
                                           // pesquisa o valor e devolve o objeto do jeito que o react-select espera{ label, value}
@@ -523,7 +550,7 @@ export default function Index() {
                                               )
                                               .map((vector) => ({
                                                 value: vector.id,
-                                                label: vector.codigoSipac,
+                                                label: `${vector.codigoSipac} | ${vector.objeto}`,
                                               }))[0]
                                           }
                                           onChange={(selected) => {
@@ -545,46 +572,6 @@ export default function Index() {
                                               ?.ContractId
                                           }
                                         />
-                                        {/* {touched?.WorkerContracts[index]
-                                          .ContractId &&
-                                        !!errors?.WorkerContracts[index]
-                                          .ContractId ? (
-                                          <Badge bg="danger">
-                                            {
-                                              errors?.WorkerContracts[index]
-                                                .ContractId
-                                            }
-                                          </Badge>
-                                        ) : null} */}
-                                        {/* <Form.Select
-                                          type="text"
-                                          value={item.ContractId}
-                                          onChange={(e) => {
-                                            handleChange(e);
-                                            checkUpdate(
-                                              e.target.id,
-                                              e.target.value
-                                            );
-                                          }}
-                                          placeholder="Selecione o Contrato"
-                                          onBlur={handleBlur}
-                                          disabled={
-                                            initialValues.WorkerContracts[index]
-                                              ?.end ||
-                                            initialValues.WorkerContracts[index]
-                                              ?.ContractId
-                                          }
-                                        >
-                                          <option>Selecione o Contrato</option>
-                                          {contracts.map((contract) => (
-                                            <option
-                                              key={contract.id}
-                                              value={contract.id}
-                                            >
-                                              {contract.codigoSipac}
-                                            </option>
-                                          ))}
-                                        </Form.Select> */}
                                       </Form.Group>
                                       <Form.Group
                                         as={Col}
@@ -729,6 +716,20 @@ export default function Index() {
                                       )}
                                     </Row>
                                   </Row>
+                                  {touched.WorkerContracts &&
+                                  errors.WorkerContracts
+                                    ? // falta ajeitar aqui
+                                      errors.WorkerContracts.forEach((wk) => {
+                                        Object.values(wk).map((error) => {
+                                          console.log(error);
+                                          return (
+                                            <Badge bg="danger" className="me-2">
+                                              {error}
+                                            </Badge>
+                                          );
+                                        });
+                                      })
+                                    : null}
                                 </div>
                               ))}
                             {id ? (
