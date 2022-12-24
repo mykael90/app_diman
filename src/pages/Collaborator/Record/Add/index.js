@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
 import Select from 'react-select';
+import { update } from 'lodash';
 import axios from '../../../../services/axios';
 import { primaryDarkColor } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
@@ -27,7 +28,7 @@ export default function Index() {
     `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
   );
   const [photo, setPhoto] = React.useState('');
-  const [initialValues, setInitialValues] = useState({
+  const template = {
     name: '',
     email: '',
     birthdate: '',
@@ -37,13 +38,14 @@ export default function Index() {
     WorkerContracts: [
       {
         ContractId: '',
-        workerJobtypeId: '',
+        WorkerJobtypeId: '',
         located: '',
         start: '',
         end: '',
       },
     ],
-  });
+  };
+  const [initialValues, setInitialValues] = useState(template);
 
   const { id } = useParams();
 
@@ -62,30 +64,35 @@ export default function Index() {
 
   const cleanEmpty = (obj) => {
     if (Array.isArray(obj)) {
-      return obj
-        .map((v) => (v && typeof v === 'object' ? cleanEmpty(v) : v))
-        .filter((v) => !(v == null || v == ''));
+      return (
+        obj
+          .map((v) => (v && typeof v === 'object' ? cleanEmpty(v) : v))
+          // eslint-disable-next-line eqeqeq
+          .filter((v) => !(v == null || v == ''))
+      );
     }
-    return Object.entries(obj)
-      .map(([k, v]) => [k, v && typeof v === 'object' ? cleanEmpty(v) : v])
-      .reduce((a, [k, v]) => (v == null || v == '' ? a : ((a[k] = v), a)), {});
+    return (
+      Object.entries(obj)
+        .map(([k, v]) => [k, v && typeof v === 'object' ? cleanEmpty(v) : v])
+        // eslint-disable-next-line no-return-assign, eqeqeq, no-param-reassign
+        .reduce((a, [k, v]) => (v == null || v == '' ? a : ((a[k] = v), a)), {})
+    );
   };
   // LIMPANDO CHAVES NULL, UNDEFINED, EMPTY STRINGS
 
   useEffect(() => {
     async function getData() {
       try {
+        setIsLoading(true);
         if (id) {
-          setIsLoading(true);
           const responseWorker = await axios.get(`/workers/${id}`);
-          console.log(responseWorker.data);
-          setIsLoading(false);
           setInitialValues(responseWorker.data);
           if (responseWorker.data.filenamePhoto)
             setPhotoURL(
               `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/${responseWorker.data.filenamePhoto}`
             );
         }
+        setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
         err.response?.data?.errors
@@ -118,13 +125,9 @@ export default function Index() {
     }
 
     getContracts();
-
-    // updateValues.current = { ...cleanEmpty(initialValues) };
   }, []);
 
   const checkUpdate = (key, value) => {
-    // console.log(initialValues);
-
     const arr = key.split('.');
 
     if (arr.length === 1) {
@@ -135,20 +138,35 @@ export default function Index() {
       const arrObj = arr[0].match(/[a-zA-Z0-9]+/)[0];
       // se não existir, crie o array para ser preenchido
       if (!updateValues.current[arrObj]) updateValues.current[arrObj] = [{}];
-      console.log('arrObj', arrObj);
       // eslint-disable-next-line no-useless-escape
       const index = arr[0].match(/[\[\d\]]+/)[0].match(/[0-9]+/)[0];
-      console.log('index', index);
       const newKey = arr[1];
-      console.log('newKey', newKey);
       while (updateValues.current[arrObj].length - 1 < index) {
         updateValues.current[arrObj].push({});
       }
       updateValues.current[arrObj][index][newKey] = value;
     }
-
-    console.log(updateValues.current);
   };
+
+  const toFormData = ((f) => f(f))((h) => (f) => f((x) => h(h)(f)(x)))(
+    (f) => (fd) => (pk) => (d) => {
+      if (d instanceof Object) {
+        Object.keys(d).forEach((k) => {
+          const v = d[k];
+          if (pk) k = `${pk}[${k}]`;
+          if (
+            v instanceof Object &&
+            !(v instanceof Date) &&
+            !(v instanceof File)
+          ) {
+            return f(fd)(k)(v);
+          }
+          fd.append(k, v);
+        });
+      }
+      return fd;
+    }
+  )(new FormData())();
 
   const handleStore = async (values, resetForm) => {
     const formattedValues = {
@@ -156,12 +174,6 @@ export default function Index() {
     };
 
     Object.entries(formattedValues).forEach((item) => {
-      console.log(item);
-      console.log(
-        Array.isArray(item[1]),
-        typeof item[1],
-        Object.keys(item[1][0]).length
-      );
       if (
         Array.isArray(item[1]) &&
         typeof item[1] === 'object' &&
@@ -172,39 +184,8 @@ export default function Index() {
       }
     }); // LIMPANDO ARRAYS NULOS (tabelas vinculadas para nao dar erro)
 
-    function buildFormData(formData, data, parentKey) {
-      if (
-        data &&
-        typeof data === 'object' &&
-        !(data instanceof Date) &&
-        !(data instanceof File) &&
-        !(data instanceof Blob)
-      ) {
-        Object.keys(data).forEach((key) => {
-          buildFormData(
-            formData,
-            data[key],
-            parentKey ? `${parentKey}[${key}]` : key
-          );
-        });
-      } else {
-        const value = data == null ? '' : data;
-
-        formData.append(parentKey, value);
-      }
-    }
-
-    const formData = new FormData();
-    // if (photo) {
-    //   Object.entries(formattedValues).forEach((entry) => {
-    //     formData.append(entry[0], entry[1]);
-    //   });
-    //   // passando todos os campos para o form virtual
-    //   formData.append('photo', photo);
-    // }
+    const formData = toFormData(formattedValues);
     if (photo) {
-      buildFormData(formData, formattedValues);
-      // passando todos os campos para o form virtual
       formData.append('photo', photo);
     }
 
@@ -237,64 +218,22 @@ export default function Index() {
   };
 
   const handleUpdate = async (values) => {
-    // const formattedValues = {
-    //   ...cleanEmpty(values),
-    // };
-
     const formattedValues = {
-      ...updateValues.current,
+      ...values,
     };
 
     formattedValues.id = id;
 
-    console.log(formattedValues);
-
-    try {
-      setIsLoading(true);
-
-      // FAZ A ATUALIZAÇÃO E RETORNA PARA A LISTAGEM
-
-      await axios.put(`/workers/${formattedValues.id}`, formattedValues);
-
-      setIsLoading(false);
-      toast.success(`Edição de registro realizada com sucesso`);
-    } catch (err) {
-      // eslint-disable-next-line no-unused-expressions
-      err.response?.data?.errors
-        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-
-      setIsLoading(false);
-    }
-  };
-
-  const handleUpdateOld = async (values) => {
-    // const formattedValues = {
-    //   ...cleanEmpty(values),
-    // };
-
-    const formattedValues = {
-      ...updateValues.current,
-    };
-
-    const formData = new FormData();
+    const formData = toFormData(formattedValues);
     if (photo) {
-      console.log('colocando as coisas');
-      Object.entries(formattedValues).forEach((entry) => {
-        formData.append(entry[0], entry[1]);
-      });
-      // passando todos os campos para o form virtual
       formData.append('photo', photo);
-      console.log(formData);
     }
 
     try {
       setIsLoading(true);
 
       // FAZ A ATUALIZAÇÃO E RETORNA PARA A LISTAGEM
-
       if (photo) {
-        console.log('axios correto');
         await axios.put(`/workers/${formattedValues.id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -303,6 +242,7 @@ export default function Index() {
       } else {
         await axios.put(`/workers/${formattedValues.id}`, formattedValues);
       }
+
       setIsLoading(false);
       toast.success(`Edição de registro realizada com sucesso`);
     } catch (err) {
@@ -332,7 +272,7 @@ export default function Index() {
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
               if (id) {
-                handleUpdate(values);
+                handleUpdate(updateValues.current);
               } else {
                 handleStore(values, resetForm);
               }
@@ -351,7 +291,6 @@ export default function Index() {
             }) => (
               <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Row className="d-flex justify-content-center align-items-center pb-4">
-                  {JSON.stringify(touched)}
                   <Col
                     xs="12"
                     md="auto"
@@ -577,6 +516,12 @@ export default function Index() {
                                           }}
                                           placeholder="Selecione o Contrato"
                                           onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.end ||
+                                            initialValues.WorkerContracts[index]
+                                              ?.ContractId
+                                          }
                                         >
                                           <option>Selecione o Contrato</option>
                                           {contracts.map((contract) => (
@@ -594,13 +539,13 @@ export default function Index() {
                                         xs={12}
                                         md={12}
                                         lg={4}
-                                        controlId={`WorkerContracts[${index}].workerJobtypeId`}
+                                        controlId={`WorkerContracts[${index}].WorkerJobtypeId`}
                                         className="pb-3"
                                       >
                                         <Form.Label>FUNÇÃO</Form.Label>
                                         <Form.Select
                                           type="text"
-                                          value={item.workerJobtypeId}
+                                          value={item.WorkerJobtypeId}
                                           onChange={(e) => {
                                             // console.log(e);
                                             // console.log(fieldArrayProps.name);
@@ -612,6 +557,10 @@ export default function Index() {
                                           }}
                                           placeholder="Selecione a Função"
                                           onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.WorkerJobtypeId
+                                          }
                                         >
                                           <option>Selecione a Função</option>
                                           {jobtypes.map((job) => (
@@ -651,6 +600,10 @@ export default function Index() {
                                             handleBlur(e);
                                           }}
                                           // onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.end
+                                          }
                                         />
                                       </Form.Group>
                                       <Form.Group
@@ -675,6 +628,10 @@ export default function Index() {
                                           }}
                                           placeholder="Digite o inicio do contrato"
                                           onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.end
+                                          }
                                         />
                                       </Form.Group>
                                       <Form.Group
@@ -699,35 +656,45 @@ export default function Index() {
                                           }}
                                           placeholder="Digite o fim do contrato"
                                           onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.end
+                                          }
                                         />
                                       </Form.Group>
                                     </Row>
                                     <Row className="d-flex justify-content-end pb-3">
-                                      <Col xs="auto">
-                                        <Button
-                                          size="sm"
-                                          variant="outline-danger"
-                                          onClick={() => remove(index)}
-                                        >
-                                          <FaTrashAlt />
-                                        </Button>
-                                      </Col>
+                                      {initialValues.WorkerContracts[
+                                        index
+                                      ] ? null : (
+                                        <Col xs="auto">
+                                          <Button
+                                            size="sm"
+                                            variant="outline-danger"
+                                            onClick={() => remove(index)}
+                                          >
+                                            <FaTrashAlt />
+                                          </Button>
+                                        </Col>
+                                      )}
                                     </Row>
                                   </Row>
                                 </div>
                               ))}
-                            <Row className="mt-2">
-                              <Col xs="auto">
-                                {' '}
-                                <Button
-                                  size="sm"
-                                  variant="outline-primary"
-                                  onClick={push}
-                                >
-                                  <FaPlus /> Novo contrato
-                                </Button>
-                              </Col>
-                            </Row>
+                            {id ? (
+                              <Row className="mt-2">
+                                <Col xs="auto">
+                                  {' '}
+                                  <Button
+                                    size="sm"
+                                    variant="outline-primary"
+                                    onClick={push}
+                                  >
+                                    <FaPlus /> Novo contrato
+                                  </Button>
+                                </Col>
+                              </Row>
+                            ) : null}
                           </Col>
                         </Row>
                       );
@@ -736,32 +703,48 @@ export default function Index() {
                 </Row>
 
                 <Row className="justify-content-center pt-2 pb-4">
-                  <Col xs="auto" className="text-center">
-                    <Button
-                      variant="warning"
-                      onClick={() => {
-                        resetForm();
-                        setPhoto('');
-                        setPhotoURL(
-                          `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
-                        );
-                      }}
-                    >
-                      Limpar
-                    </Button>
-                  </Col>
                   {id ? (
-                    <Col xs="auto" className="text-center">
-                      <Button variant="success" type="submit">
-                        Alterar
-                      </Button>
-                    </Col>
+                    <>
+                      <Col xs="auto" className="text-center">
+                        <Button
+                          variant="danger"
+                          onClick={() => {
+                            updateValues.current = {};
+                            resetForm();
+                            console.log(updateValues.current);
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                      </Col>
+                      <Col xs="auto" className="text-center">
+                        <Button variant="success" type="submit">
+                          Alterar
+                        </Button>
+                      </Col>
+                    </>
                   ) : (
-                    <Col xs="auto" className="text-center">
-                      <Button variant="success" type="submit">
-                        Cadastrar
-                      </Button>
-                    </Col>
+                    <>
+                      <Col xs="auto" className="text-center">
+                        <Button
+                          variant="warning"
+                          onClick={() => {
+                            resetForm();
+                            setPhoto('');
+                            setPhotoURL(
+                              `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
+                            );
+                          }}
+                        >
+                          Limpar
+                        </Button>
+                      </Col>
+                      <Col xs="auto" className="text-center">
+                        <Button variant="success" type="submit">
+                          Cadastrar
+                        </Button>
+                      </Col>
+                    </>
                   )}
                 </Row>
               </Form>
