@@ -13,6 +13,7 @@ import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
 import Select from 'react-select';
 import { update } from 'lodash';
+import { computeReshapedDimensions } from 'face-api.js/build/commonjs/utils';
 import axios from '../../../../services/axios';
 import { primaryDarkColor } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
@@ -500,11 +501,62 @@ export default function Index() {
                                         xs={12}
                                         md={12}
                                         lg={8}
-                                        controlId={`WorkerContracts[${index}].ContractId`}
                                         className="pb-3"
                                       >
                                         <Form.Label>CONTRATO</Form.Label>
-                                        <Form.Select
+
+                                        <Select
+                                          inputId={`WorkerContracts[${index}].ContractId`}
+                                          options={contracts.map(
+                                            (contract) => ({
+                                              value: contract.id,
+                                              label: contract.codigoSipac,
+                                            })
+                                          )}
+                                          // pesquisa o valor e devolve o objeto do jeito que o react-select espera{ label, value}
+                                          value={
+                                            contracts
+                                              .filter(
+                                                (contract) =>
+                                                  contract.id ===
+                                                  item.ContractId
+                                              )
+                                              .map((vector) => ({
+                                                value: vector.id,
+                                                label: vector.codigoSipac,
+                                              }))[0]
+                                          }
+                                          onChange={(selected) => {
+                                            setFieldValue(
+                                              `WorkerContracts[${index}].ContractId`,
+                                              selected.value
+                                            );
+                                            checkUpdate(
+                                              `WorkerContracts[${index}].ContractId`,
+                                              selected.value
+                                            );
+                                          }}
+                                          placeholder="Selecione o Contrato"
+                                          onBlur={handleBlur}
+                                          isDisabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.end ||
+                                            initialValues.WorkerContracts[index]
+                                              ?.ContractId
+                                          }
+                                        />
+                                        {/* {touched?.WorkerContracts[index]
+                                          .ContractId &&
+                                        !!errors?.WorkerContracts[index]
+                                          .ContractId ? (
+                                          <Badge bg="danger">
+                                            {
+                                              errors?.WorkerContracts[index]
+                                                .ContractId
+                                            }
+                                          </Badge>
+                                        ) : null} */}
+                                        {/* <Form.Select
                                           type="text"
                                           value={item.ContractId}
                                           onChange={(e) => {
@@ -532,7 +584,7 @@ export default function Index() {
                                               {contract.codigoSipac}
                                             </option>
                                           ))}
-                                        </Form.Select>
+                                        </Form.Select> */}
                                       </Form.Group>
                                       <Form.Group
                                         as={Col}
@@ -547,8 +599,6 @@ export default function Index() {
                                           type="text"
                                           value={item.WorkerJobtypeId}
                                           onChange={(e) => {
-                                            // console.log(e);
-                                            // console.log(fieldArrayProps.name);
                                             handleChange(e);
                                             checkUpdate(
                                               e.target.id,
@@ -711,7 +761,6 @@ export default function Index() {
                           onClick={() => {
                             updateValues.current = {};
                             resetForm();
-                            console.log(updateValues.current);
                           }}
                         >
                           Cancelar
