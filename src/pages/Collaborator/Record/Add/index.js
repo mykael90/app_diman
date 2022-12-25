@@ -297,13 +297,15 @@ export default function Index() {
     <>
       <Loading isLoading={isLoading} />
       <div className="bg-light border rounded pt-2 px-3">
-        <Col
-          xs={12}
-          className=" text-center"
-          style={{ background: primaryDarkColor, color: 'white' }}
-        >
-          <span className="fs-5">INFORMAÇÕES PESSOAIS</span>
-        </Col>
+        <Row>
+          <Col
+            xs={12}
+            className=" text-center"
+            style={{ background: primaryDarkColor, color: 'white' }}
+          >
+            <span className="fs-5">INFORMAÇÕES PESSOAIS</span>
+          </Col>
+        </Row>
         <Row className="pt-2">
           <Formik
             initialValues={initialValues}
@@ -531,7 +533,7 @@ export default function Index() {
                                     </Col>
                                   </Row>
 
-                                  <Row key={index}>
+                                  <div key={index}>
                                     <Row className="d-flex justify-content-center align-items-center mt-2">
                                       <Form.Group
                                         as={Col}
@@ -681,7 +683,6 @@ export default function Index() {
                                         <Form.Label>INÍCIO</Form.Label>
                                         <Form.Control
                                           type="date"
-                                          dateFormat="YYYY-MM-DD"
                                           value={item.start}
                                           onChange={(e) => {
                                             handleChange(e);
@@ -728,7 +729,6 @@ export default function Index() {
                                         </OverlayTrigger>
                                         <Form.Control
                                           type="date"
-                                          dateFormat="YYYY-MM-DD"
                                           value={item.end}
                                           onChange={(e) => {
                                             handleChange(e);
@@ -761,7 +761,7 @@ export default function Index() {
                                         </Col>
                                       )}
                                     </Row>
-                                  </Row>
+                                  </div>
                                   {touched.WorkerContracts &&
                                   errors.WorkerContracts
                                     ? errors.WorkerContracts[index]
