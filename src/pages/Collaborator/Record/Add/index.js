@@ -706,7 +706,7 @@ export default function Index() {
                                         controlId={`WorkerContracts[${index}].end`}
                                         className="pb-3"
                                       >
-                                        <Form.Label>ENCERRAMENTO</Form.Label>{' '}
+                                        <Form.Label>FIM</Form.Label>{' '}
                                         <OverlayTrigger
                                           placement="top"
                                           delay={{ show: 250, hide: 400 }}
@@ -783,7 +783,19 @@ export default function Index() {
                                   <Button
                                     size="sm"
                                     variant="outline-primary"
-                                    onClick={push}
+                                    onClick={(e) => {
+                                      if (
+                                        values.WorkerContracts.find(
+                                          ({ end }) => end == null
+                                        )
+                                      ) {
+                                        toast.error(
+                                          'Para vincular um novo contrato ao colaborador, o contrato ativo precisa ser encerrado'
+                                        );
+                                      } else {
+                                        push(e);
+                                      }
+                                    }}
                                   >
                                     <FaPlus /> Novo contrato
                                   </Button>
