@@ -4,7 +4,15 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, Row, Col, Form, Badge } from 'react-bootstrap';
+import {
+  Button,
+  Row,
+  Col,
+  Form,
+  Badge,
+  OverlayTrigger,
+  Tooltip,
+} from 'react-bootstrap';
 import { IMaskInput } from 'react-imask';
 import { FaPhone, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -19,6 +27,12 @@ import { primaryDarkColor } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
 
 import ProfilePhoto from './components/ProfilePhoto';
+
+const renderTooltip = (props, message) => (
+  <Tooltip id="button-tooltip" {...props}>
+    {message}
+  </Tooltip>
+);
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
@@ -65,12 +79,12 @@ export default function Index() {
       .array()
       .of(
         yup.object().shape({
-          ContractId: yup.number().required('Requerido').positive(),
-          WorkerJobtypeId: yup.number().required('Requerido').positive(),
-          located: yup.string().required('Requerido'),
+          ContractId: yup.number().required('Contrato requerido').positive(),
+          WorkerJobtypeId: yup.number().required('Função requerida').positive(),
+          located: yup.string().required('Lotação requerida'),
           start: yup
             .date()
-            .required('Requerido')
+            .required('Início requerido')
             // .min(
             //   // the month is 0-indexed
             //   new Date(2022, 9, 14).toISOString().split('T')[0],
@@ -592,6 +606,19 @@ export default function Index() {
                                               e.target.value
                                             );
                                           }}
+                                          // tem que usar a biblioteca lodash aqui para verificar se não é nulo antes de atribuir...
+                                          // isInvalid={
+                                          //   touched.WorkerContracts[index]
+                                          //     .WorkerJobtypeId &&
+                                          //   !!errors.WorkerContracts[index]
+                                          //     .WorkerJobtypeId
+                                          // }
+                                          // isValid={
+                                          //   touched.WorkerContracts[index]
+                                          //     .WorkerJobtypeId &&
+                                          //   !errors.WorkerContracts[index]
+                                          //     .WorkerJobtypeId
+                                          // }
                                           placeholder="Selecione a Função"
                                           onBlur={handleBlur}
                                           disabled={
@@ -679,7 +706,26 @@ export default function Index() {
                                         controlId={`WorkerContracts[${index}].end`}
                                         className="pb-3"
                                       >
-                                        <Form.Label>ENCERRAMENTO</Form.Label>
+                                        <Form.Label>ENCERRAMENTO</Form.Label>{' '}
+                                        <OverlayTrigger
+                                          placement="top"
+                                          delay={{ show: 250, hide: 400 }}
+                                          overlay={(props) =>
+                                            renderTooltip(
+                                              props,
+                                              'Utilizar para desligamento do funcionário e mudança de função ou contrato'
+                                            )
+                                          }
+                                        >
+                                          <Button
+                                            className="px-1 py-0"
+                                            size="sm"
+                                            variant="outline-dark"
+                                            style={{ height: '20px' }}
+                                          >
+                                            ?
+                                          </Button>
+                                        </OverlayTrigger>
                                         <Form.Control
                                           type="date"
                                           dateFormat="YYYY-MM-DD"
@@ -718,17 +764,15 @@ export default function Index() {
                                   </Row>
                                   {touched.WorkerContracts &&
                                   errors.WorkerContracts
-                                    ? // falta ajeitar aqui
-                                      errors.WorkerContracts.forEach((wk) => {
-                                        Object.values(wk).map((error) => {
-                                          console.log(error);
-                                          return (
-                                            <Badge bg="danger" className="me-2">
-                                              {error}
-                                            </Badge>
-                                          );
-                                        });
-                                      })
+                                    ? errors.WorkerContracts[index]
+                                      ? Object.values(
+                                          errors.WorkerContracts[index]
+                                        ).map((value) => (
+                                          <Badge bg="danger" className="me-2">
+                                            {value}
+                                          </Badge>
+                                        ))
+                                      : null
                                     : null}
                                 </div>
                               ))}
