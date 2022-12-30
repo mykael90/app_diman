@@ -39,7 +39,6 @@ export default function Index() {
   // const [contacttypes, setContacttypes] = useState([]);
   const [jobtypes, setJobtypes] = useState([]);
   const [contracts, setContracts] = useState([]);
-  const [unidades, setUnidades] = useState([]);
   const [photoURL, setPhotoURL] = useState(
     `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
   );
@@ -55,10 +54,9 @@ export default function Index() {
       {
         ContractId: '',
         WorkerJobtypeId: '',
-        unidadeId: '',
+        located: '',
         start: '',
         end: '',
-        obs: '',
       },
     ],
   };
@@ -83,7 +81,7 @@ export default function Index() {
         yup.object().shape({
           ContractId: yup.number().required('Contrato requerido').positive(),
           WorkerJobtypeId: yup.number().required('Função requerida').positive(),
-          unidadeId: yup.number().required('Lotação requerida'),
+          located: yup.string().required('Lotação requerida'),
           start: yup
             .date()
             .required('Início requerido')
@@ -144,17 +142,15 @@ export default function Index() {
 
     getData();
 
-    async function getOthersData() {
+    async function getContracts() {
       try {
         setIsLoading(true);
 
         const responseContract = await axios.get(`/workers/contracts`);
         const responseJob = await axios.get(`/workers/jobtypes`);
-        const responseUnidades = await axios.get(`/unidades`);
 
         setContracts(responseContract.data);
         setJobtypes(responseJob.data);
-        setUnidades(responseUnidades.data);
 
         setIsLoading(false);
       } catch (err) {
@@ -166,7 +162,7 @@ export default function Index() {
       }
     }
 
-    getOthersData();
+    getContracts();
   }, []);
 
   const checkUpdate = (key, value) => {
@@ -360,10 +356,7 @@ export default function Index() {
                           value={values.name}
                           onChange={(e) => {
                             handleChange(e);
-                            checkUpdate(
-                              e.target.id,
-                              e.target.value.toUpperCase()
-                            );
+                            checkUpdate(e.target.id, e.target.value);
                           }}
                           isInvalid={touched.name && !!errors.name}
                           isValid={touched.name && !errors.name}
@@ -454,10 +447,7 @@ export default function Index() {
                           value={values.birthdate}
                           onChange={(e) => {
                             handleChange(e);
-                            checkUpdate(
-                              e.target.id,
-                              e.target.value.toUpperCase()
-                            );
+                            checkUpdate(e.target.id, e.target.value);
                           }}
                           isInvalid={touched.birthdate && !!errors.birthdate}
                           isValid={touched.birthdate && !errors.birthdate}
@@ -532,13 +522,12 @@ export default function Index() {
                             {values.WorkerContracts?.length > 0 &&
                               values.WorkerContracts?.map((item, index) => (
                                 <div
-                                  key={index}
-                                  className="my-3 p-4 border"
-                                  // style={{ background: '#E9EFFA' }}
+                                  className="my-3 p-4"
+                                  style={{ background: '#E9EFFA' }}
                                 >
                                   <Row>
                                     <Col className="fs-5 text-center">
-                                      <Badge bg="info" text="white">
+                                      <Badge bg="light" text="dark">
                                         Nº {index + 1}
                                       </Badge>
                                     </Col>
@@ -552,7 +541,6 @@ export default function Index() {
                                         md={12}
                                         lg={8}
                                         className="pb-3"
-                                        controlId={`WorkerContracts[${index}].ContractId`}
                                       >
                                         <Form.Label>CONTRATO</Form.Label>
                                         {/* {console.log(
@@ -560,41 +548,46 @@ export default function Index() {
                                             ?.ContractId,
                                           errors.WorkerContracts
                                         )} */}
-                                        <Form.Select
-                                          type="text"
-                                          value={item.ContractId}
-                                          onChange={(e) => {
-                                            handleChange(e);
+                                        <Select
+                                          inputId={`WorkerContracts[${index}].ContractId`}
+                                          options={contracts.map(
+                                            (contract) => ({
+                                              value: contract.id,
+                                              label: `${contract.codigoSipac} | ${contract.objeto}`,
+                                            })
+                                          )}
+                                          // pesquisa o valor e devolve o objeto do jeito que o react-select espera{ label, value}
+                                          value={
+                                            contracts
+                                              .filter(
+                                                (contract) =>
+                                                  contract.id ===
+                                                  item.ContractId
+                                              )
+                                              .map((vector) => ({
+                                                value: vector.id,
+                                                label: `${vector.codigoSipac} | ${vector.objeto}`,
+                                              }))[0]
+                                          }
+                                          onChange={(selected) => {
+                                            setFieldValue(
+                                              `WorkerContracts[${index}].ContractId`,
+                                              selected.value
+                                            );
                                             checkUpdate(
-                                              e.target.id,
-                                              e.target.value.toUpperCase()
+                                              `WorkerContracts[${index}].ContractId`,
+                                              selected.value
                                             );
                                           }}
                                           placeholder="Selecione o Contrato"
                                           onBlur={handleBlur}
-                                          disabled={
+                                          isDisabled={
                                             initialValues.WorkerContracts[index]
                                               ?.end ||
                                             initialValues.WorkerContracts[index]
                                               ?.ContractId
                                           }
-                                        >
-                                          <option>Selecione o Contrato</option>
-                                          {contracts.map((contract) => (
-                                            <option
-                                              key={contract.id}
-                                              value={contract.id}
-                                            >
-                                              {contract.codigoSipac} |{' '}
-                                              {contract.objeto.slice(
-                                                0,
-                                                contract.objeto.length < 60
-                                                  ? contract.objeto.length
-                                                  : 60
-                                              )}
-                                            </option>
-                                          ))}
-                                        </Form.Select>
+                                        />
                                       </Form.Group>
                                       <Form.Group
                                         as={Col}
@@ -612,7 +605,7 @@ export default function Index() {
                                             handleChange(e);
                                             checkUpdate(
                                               e.target.id,
-                                              e.target.value.toUpperCase()
+                                              e.target.value
                                             );
                                           }}
                                           // tem que usar a biblioteca lodash aqui para verificar se não é nulo antes de atribuir...
@@ -650,45 +643,34 @@ export default function Index() {
                                         xs={12}
                                         md={12}
                                         lg={6}
-                                        controlId={`WorkerContracts[${index}].unidadeId`}
+                                        controlId={`WorkerContracts[${index}].located`}
                                         className="pb-3"
                                       >
                                         <Form.Label>LOTAÇÃO</Form.Label>
-                                        <Form.Select
+                                        <Form.Control
                                           type="text"
-                                          value={item.unidadeId}
+                                          value={item.located}
                                           onChange={(e) => {
                                             handleChange(e);
                                             checkUpdate(
                                               e.target.id,
-                                              e.target.value.toUpperCase()
+                                              e.target.value
                                             );
                                           }}
-                                          placeholder="Selecione a unidade de lotação"
-                                          onBlur={handleBlur}
+                                          placeholder="Digite a lotação"
+                                          onBlur={(e) => {
+                                            setFieldValue(
+                                              'WorkerContracts.located',
+                                              e.target.value.toUpperCase()
+                                            ); // UPPERCASE
+                                            handleBlur(e);
+                                          }}
+                                          // onBlur={handleBlur}
                                           disabled={
                                             initialValues.WorkerContracts[index]
                                               ?.end
                                           }
-                                        >
-                                          <option>
-                                            Selecione a unidade de lotação
-                                          </option>
-                                          {unidades.map((unidade) => (
-                                            <option
-                                              key={unidade.id}
-                                              value={unidade.id}
-                                            >
-                                              {unidade.id} |{' '}
-                                              {unidade.nomeUnidade.slice(
-                                                0,
-                                                unidade.nomeUnidade.length < 60
-                                                  ? unidade.nomeUnidade.length
-                                                  : 60
-                                              )}
-                                            </option>
-                                          ))}
-                                        </Form.Select>
+                                        />
                                       </Form.Group>
                                       <Form.Group
                                         as={Col}
@@ -706,7 +688,7 @@ export default function Index() {
                                             handleChange(e);
                                             checkUpdate(
                                               e.target.id,
-                                              e.target.value.toUpperCase()
+                                              e.target.value
                                             );
                                           }}
                                           placeholder="Digite o inicio do contrato"
@@ -752,45 +734,11 @@ export default function Index() {
                                             handleChange(e);
                                             checkUpdate(
                                               e.target.id,
-                                              e.target.value.toUpperCase()
+                                              e.target.value
                                             );
                                           }}
                                           placeholder="Digite o fim do contrato"
                                           onBlur={handleBlur}
-                                          disabled={
-                                            initialValues.WorkerContracts[index]
-                                              ?.end
-                                          }
-                                        />
-                                      </Form.Group>
-                                    </Row>
-                                    <Row>
-                                      <Form.Group
-                                        xs={12}
-                                        className="pb-3"
-                                        controlId={`WorkerContracts[${index}].obs`}
-                                      >
-                                        <Form.Label>OBSERVAÇÕES:</Form.Label>
-                                        <Form.Control
-                                          as="textarea"
-                                          rows={2}
-                                          type="text"
-                                          value={item.obs}
-                                          onChange={(e) => {
-                                            handleChange(e);
-                                            checkUpdate(
-                                              e.target.id,
-                                              e.target.value.toUpperCase()
-                                            );
-                                          }}
-                                          placeholder="Observações do contrato"
-                                          onBlur={(e) => {
-                                            setFieldValue(
-                                              `WorkerContracts[${index}].obs`,
-                                              e.target.value.toUpperCase()
-                                            ); // UPPERCASE
-                                            handleBlur(e);
-                                          }}
                                           disabled={
                                             initialValues.WorkerContracts[index]
                                               ?.end
@@ -842,7 +790,7 @@ export default function Index() {
                                         )
                                       ) {
                                         toast.error(
-                                          'Para vincular um novo contrato ao colaborador, o contrato ativo precisa ser encerrado!'
+                                          'Para vincular um novo contrato ao colaborador, o contrato ativo precisa ser encerrado'
                                         );
                                       } else {
                                         push(e);
