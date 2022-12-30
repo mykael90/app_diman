@@ -17,6 +17,7 @@ import {
   body2Color,
 } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
+import PreviewMultipleImages from '../../../../components/PreviewMultipleImages';
 
 import SearchModal from './components/SearchModal';
 
@@ -571,6 +572,18 @@ export default function Index() {
                     </Button>
                   </Col>
                 </Row>
+
+                <Row
+                  className="text-center mt-3"
+                  style={{ background: primaryDarkColor, color: 'white' }}
+                >
+                  <span className="fs-6">REGISTROS FOTOGRÁFICOS</span>
+                </Row>
+
+                <Row>
+                  <PreviewMultipleImages />
+                </Row>
+
                 <hr />
 
                 <Row className="justify-content-center">
