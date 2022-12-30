@@ -1,7 +1,10 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
-import { Row, Col, Card } from 'react-bootstrap';
+import { Row, Col, Card, Button } from 'react-bootstrap';
+import { FaSearchPlus, FaTrash } from 'react-icons/fa';
 
-function ImagesGallery({ images }) {
+function ImagesGallery({ files, removeFileFromArray }) {
+  console.log('imagesGallery', files);
   return (
     <Row
       xs={2}
@@ -9,10 +12,28 @@ function ImagesGallery({ images }) {
       lg={6}
       className="d-flex justify-content-center align-items-center"
     >
-      {images.map((url) => (
-        <Col className="pb-4">
+      {files?.map((file, index) => (
+        <Col className="pb-4" key={file.imageURL}>
           <Card>
-            <Card.Img src={url} />
+            <Card.Img src={file.imageURL} />
+            <Card.Footer className="d-flex justify-content-between">
+              <Button
+                className="border-0"
+                variant="outline-primary"
+                onClick={() =>
+                  window.open(file.imageURL, '_blank', 'noreferrer')
+                }
+              >
+                <FaSearchPlus />
+              </Button>
+              <Button
+                className="border-0"
+                variant="outline-danger"
+                onClick={() => removeFileFromArray(index)}
+              >
+                <FaTrash />
+              </Button>
+            </Card.Footer>
           </Card>
         </Col>
       ))}

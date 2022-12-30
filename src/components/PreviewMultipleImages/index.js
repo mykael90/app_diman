@@ -1,34 +1,45 @@
 import React, { useState } from 'react';
 import { Row, Col, Badge, Form, Image, Button } from 'react-bootstrap';
-import { FaEdit, FaSearch } from 'react-icons/fa';
+import { FaPaperclip, FaSearch } from 'react-icons/fa';
 import ImagesGallery from '../ImagesGallery';
 
 function PreviewMultipleImages() {
-  const [images, setImages] = useState([]);
+  const [files, setFiles] = useState([]);
 
   const handleMultipleImages = (evnt) => {
-    const selectedFiles = [];
-    const targetFiles = evnt.target.files;
-    console.log(targetFiles);
-    const targetFilesObject = [...targetFiles];
-    targetFilesObject.map((file) =>
-      selectedFiles.push(URL.createObjectURL(file))
-    );
-    setImages([...images, ...selectedFiles]);
+    const targetFiles = [...evnt.target.files];
+    const newFiles = [...files];
+    console.log(newFiles, targetFiles);
+    targetFiles.forEach((file) => {
+      const imageURL = URL.createObjectURL(file);
+      const newObj = { file, imageURL };
+      newFiles.push(newObj);
+    });
+    console.log(newFiles);
+    setFiles([...newFiles]);
+  };
+
+  const removeFileFromArray = (index) => {
+    const newFiles = [...files];
+    newFiles.splice(index, 1);
+    setFiles(newFiles);
   };
 
   return (
     <Form.Group as={Col} xs="auto" controlId="photos">
+      <Form.Label className="border rounded-3 border-secondary text-muted p-2 mt-3">
+        {' '}
+        <FaPaperclip size={28} cursor="pointer" />
+      </Form.Label>
       <Form.Control
-        className="my-3"
+        className="my-3 d-none"
         type="file"
         onChange={handleMultipleImages}
         multiple
         accept="image/jpeg, image/jpg, image/png, image/gif"
       />
 
-      <ImagesGallery images={images} />
-      {JSON.stringify(images)}
+      <ImagesGallery files={files} removeFileFromArray={removeFileFromArray} />
     </Form.Group>
   );
 }
