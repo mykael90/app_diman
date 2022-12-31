@@ -3,9 +3,8 @@ import { Row, Col, Badge, Form, Image, Button } from 'react-bootstrap';
 import { FaPaperclip, FaSearch } from 'react-icons/fa';
 import ImagesGallery from '../ImagesGallery';
 
-function PreviewMultipleImages() {
-  const [files, setFiles] = useState([]);
-
+// eslint-disable-next-line react/prop-types
+function PreviewMultipleImages({ files, setFiles }) {
   const handleMultipleImages = (evnt) => {
     const targetFiles = [...evnt.target.files];
     const newFiles = [...files];

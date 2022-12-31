@@ -28,6 +28,7 @@ export default function Index() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModalSearch, setShowModalSearch] = useState(false);
+  const [files, setFiles] = useState([]);
   const inputRef = useRef();
 
   const handleCloseModalSearch = () => setShowModalSearch(false);
@@ -122,6 +123,26 @@ export default function Index() {
     return req.includes('/') ? req : `${req}/${currentYear}`;
   };
 
+  const toFormData = ((f) => f(f))((h) => (f) => f((x) => h(h)(f)(x)))(
+    (f) => (fd) => (pk) => (d) => {
+      if (d instanceof Object) {
+        Object.keys(d).forEach((k) => {
+          const v = d[k];
+          if (pk) k = `${pk}[${k}]`;
+          if (
+            v instanceof Object &&
+            !(v instanceof Date) &&
+            !(v instanceof File)
+          ) {
+            return f(fd)(k)(v);
+          }
+          fd.append(k, v);
+        });
+      }
+      return fd;
+    }
+  )(new FormData())();
+
   const handleStore = async (values, resetForm) => {
     const formattedValues = {
       ...Object.fromEntries(
@@ -151,13 +172,31 @@ export default function Index() {
       0
     );
 
+    let formData;
+    if (files.length > 0) {
+      formData = toFormData(formattedValues);
+      // eslint-disable-next-line no-restricted-syntax
+      for (const file of files) {
+        formData.append('photos', file.file);
+      }
+    }
+
     try {
       setIsLoading(true);
 
-      console.log(formattedValues);
-      await axios.post(`/materials/in/general`, formattedValues);
+      if (files.length > 0) {
+        await axios.post(`/materials/in/general`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } else {
+        console.log(formattedValues);
+        await axios.post(`/materials/in/general`, formattedValues);
+      }
 
       setIsLoading(false);
+      setFiles([]);
       resetForm();
 
       toast.success(`Entrada de material realizada com sucesso`);
@@ -581,7 +620,7 @@ export default function Index() {
                 </Row>
 
                 <Row>
-                  <PreviewMultipleImages />
+                  <PreviewMultipleImages files={files} setFiles={setFiles} />
                 </Row>
 
                 <hr />
