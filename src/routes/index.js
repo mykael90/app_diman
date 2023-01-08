@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import RequireAuth from './RequireAuth';
 
+import LightBox from '../components/LightBox';
 import Aluno from '../pages/Aluno';
 import Alunos from '../pages/Alunos';
 import Fotos from '../pages/Fotos';
@@ -34,6 +35,8 @@ export default function RoutesPages() {
   return (
     <Routes>
       {/* public routes */}
+      <Route path="/lightbox" element={<LightBox />} />
+
       <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
