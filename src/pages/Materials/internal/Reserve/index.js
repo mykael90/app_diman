@@ -27,7 +27,7 @@ import {
 } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
 
-import SearchModal from './components/SearchModal';
+import SearchModalInventory from '../../out/components/SearchModalInventory';
 import ReleaseItemsModal from './components/ReleaseItemsModal';
 
 const formatGroupLabel = (data) => (
@@ -637,7 +637,7 @@ export default function Index() {
                               className="border-top"
                               style={{ background: body2Color }}
                             >
-                              <SearchModal // modal p/ pesquisa de materiais
+                              <SearchModalInventory // modal p/ pesquisa de materiais
                                 handleClose={handleCloseModalSearch}
                                 show={showModalSearch}
                                 push={push}
@@ -695,18 +695,9 @@ export default function Index() {
                                               DESCRIÇÃO
                                             </Form.Label>
                                           ) : null}
-                                          <Form.Control
-                                            type="text"
-                                            plaintext
-                                            readOnly
-                                            value={item.name}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            placeholder="Selecione o ID material"
-                                            size="sm"
-                                            className="p-0 m-0 ps-2"
-                                            tabindex="-1"
-                                          />
+                                          <div className="px-2">
+                                            {item.name}
+                                          </div>
                                         </Form.Group>
                                         <Form.Group
                                           as={Col}
@@ -720,18 +711,9 @@ export default function Index() {
                                               UND
                                             </Form.Label>
                                           ) : null}
-                                          <Form.Control
-                                            type="text"
-                                            plaintext
-                                            readOnly
-                                            value={item.unit}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            placeholder="UND"
-                                            size="sm"
-                                            className="p-0 m-0 ps-2"
-                                            tabindex="-1"
-                                          />
+                                          <div className="px-2">
+                                            {item.unit}
+                                          </div>
                                         </Form.Group>
                                         <Form.Group
                                           as={Col}
@@ -774,7 +756,6 @@ export default function Index() {
 
                                         <Col
                                           xs={12}
-                                          md={12}
                                           lg={2}
                                           className="d-flex justify-content-between"
                                         >

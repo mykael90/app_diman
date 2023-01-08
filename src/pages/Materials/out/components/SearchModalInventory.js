@@ -3,7 +3,7 @@
 import React, { useEffect, useContext } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
-import ListImport from './ListImport';
+import ListImport from './ListImportInventory';
 
 export default function SearchModal(props) {
   const { show, handleClose, push, hiddenItems, inventoryData } = props;

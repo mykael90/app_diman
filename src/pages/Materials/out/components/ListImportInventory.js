@@ -5,12 +5,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus, FaLock, FaLockOpen } from 'react-icons/fa';
 
-import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Badge,
+} from 'react-bootstrap';
 
-import { primaryDarkColor } from '../../../../../config/colors';
+import { primaryDarkColor } from '../../../../config/colors';
 
 // import generic table from material's components with global filter and nested row
-import TableGfilterNestedRowHiddenRows from '../../../components/TableGfilterNestedRowHiddenRows';
+import TableGfilterNestedRowHiddenRows from '../../components/TableGfilterNestedRowHiddenRows';
 
 export default function Index(props) {
   const { push, hiddenItems, inventoryData } = props;
@@ -26,7 +34,7 @@ export default function Index(props) {
     //   e.target.value = Number(row.values.freeInventory);
     // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (Number(e.target.value < 0)) {
-      errors.push('A saída não pode ser negativa');
+      errors.push('A reserva não pode ser negativa');
       e.target.value = Number(0);
     }
 
@@ -60,7 +68,7 @@ export default function Index(props) {
         });
 
         if (exists) {
-          toast.error('Item já incluído na lista de saída');
+          toast.error('Item já incluído na lista de reserva');
           return;
         }
       }
@@ -86,6 +94,9 @@ export default function Index(props) {
 
   // Define a custom filter filter function!
   function filterDifferentThan(rows, id) {
+    // ajustando o filtro para funcionar na coluna mobile também
+    if (id[0] === 'mobile') id[0] = 'materialId';
+    console.log(id);
     return rows.filter((row) => {
       const rowValue = row.values[id];
       return !hiddenRows.includes(rowValue);
@@ -94,7 +105,6 @@ export default function Index(props) {
 
   // Define a custom filter filter function! Usar quando tiver tudo redondo, estoque e entradas. Por enquanto vou mostrar saldo negativo
   function filterGreaterThan(rows, id, filterValue) {
-    console.log(filterValue);
     return rows.filter((row) => {
       const rowValue = Number(row.values[id]);
       if (filterValue === 1) return rowValue !== 0; // fiz esse ajuste para mostrar saldo negativo também, ficou estranho filterGreatherThan, podia ser outro nome, mas deixa assim por enquanto
@@ -165,27 +175,31 @@ export default function Index(props) {
         isVisible: window.innerWidth > 768,
         filter: filterDifferentThan,
         Filter: FilterForId,
+        Cell: ({ value }) => <div>{value}</div>,
       },
       {
         Header: 'Denominação',
         accessor: 'name',
+        // disableFilters: true,
         Cell: ({ value }) => <div className="text-start">{value}</div>,
-        disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Unidade',
         accessor: 'unit',
         width: 100,
         disableResizing: true,
-        disableFilters: true,
+        // disableFilters: true,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Preço',
         accessor: 'value',
         width: 100,
         disableResizing: true,
-        disableFilters: true,
+        // disableFilters: true,
         Cell: ({ value }) => <div className="text-end"> {value}</div>,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: () => (
@@ -204,7 +218,7 @@ export default function Index(props) {
       },
       {
         // Make an expander cell
-        Header: 'Saída', // No header
+        Header: 'Reserva', // No header
         id: 'quantity', // It needs an ID
         width: 120,
         disableResizing: true,
@@ -231,6 +245,48 @@ export default function Index(props) {
             </Form>
           </Col>
         ),
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: () => (
+          // FORMAT HEADER
+          <div className="p-auto text-center">
+            ID - Denominação - Saldo - Unidade
+          </div>
+        ),
+        id: 'mobile',
+        width: 100,
+        disableResizing: false,
+        isVisible: window.innerWidth < 768,
+        Cell: ({ value, row }) => (
+          <div
+            onTouchMove={(e) => {
+              // verifica se arrastou suficiente para a direita
+              if (e.touches[0].clientX < 300) return;
+              handlePushItem(e, row);
+            }}
+          >
+            <Row className="d-flex justify-content-between">
+              <Col xs="auto" className="p-auto text-start">
+                <Badge bg="light" text="dark">
+                  {row.values.materialId}
+                </Badge>
+              </Col>
+              <Col xs="auto" className="p-auto text-start">
+                <Badge bg="light" text="dark">
+                  {row.values.freeInventory} {row.values.unit}
+                </Badge>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="p-auto text-start">{row.values.name}</Col>
+            </Row>
+          </div>
+        ),
+        disableSortBy: true,
+        filter: filterDifferentThan,
+        Filter: FilterForId,
+        defaultCanFilter: true,
       },
     ],
     [handlePushItem]
@@ -257,9 +313,12 @@ export default function Index(props) {
       },
     ],
     filters: [{ id: 'freeInventory', value: 1 }],
-    hiddenColumns: columns
-      .filter((col) => col.isVisible === false)
-      .map((col) => col.accessor),
+    hiddenColumns: [
+      ...columns.filter((col) => col.isVisible === false).map((col) => col.id),
+      ...columns
+        .filter((col) => col.isVisible === false)
+        .map((col) => col.accessor),
+    ],
   };
 
   const filterTypes = React.useMemo(

@@ -13,9 +13,9 @@ import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
 import Select from 'react-select';
 import { forEach } from 'lodash';
-import axios from '../../../../../services/axios';
-import { primaryDarkColor, body2Color } from '../../../../../config/colors';
-import Loading from '../../../../../components/Loading';
+import axios from '../../../../services/axios';
+import { primaryDarkColor, body2Color } from '../../../../config/colors';
+import Loading from '../../../../components/Loading';
 
 export default function SearchModal(props) {
   const { show, handleCancelModal, handleClose, data, setFieldValue } = props;

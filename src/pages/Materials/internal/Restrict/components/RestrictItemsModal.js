@@ -370,17 +370,7 @@ export default function SearchModal(props) {
                                           DESCRIÇÃO
                                         </Form.Label>
                                       ) : null}
-                                      <Form.Control
-                                        type="text"
-                                        plaintext
-                                        readOnly
-                                        value={item.name}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        placeholder="Selecione o ID material"
-                                        size="sm"
-                                        className="p-0 m-0 ps-2"
-                                      />
+                                      <div className="px-2">{item.name}</div>
                                     </Form.Group>
                                     <Form.Group
                                       as={Col}
@@ -395,17 +385,7 @@ export default function SearchModal(props) {
                                           UND
                                         </Form.Label>
                                       ) : null}
-                                      <Form.Control
-                                        type="text"
-                                        plaintext
-                                        readOnly
-                                        value={item.unit}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        placeholder="UND"
-                                        size="sm"
-                                        className="p-0 m-0 ps-2"
-                                      />
+                                      <div className="px-2">{item.unit}</div>
                                     </Form.Group>
                                     <Form.Group
                                       as={Col}
