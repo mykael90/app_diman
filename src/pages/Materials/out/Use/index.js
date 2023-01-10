@@ -21,11 +21,7 @@ import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
 import Select from 'react-select';
 import axios from '../../../../services/axios';
-import {
-  primaryDarkColor,
-  body1Color,
-  body2Color,
-} from '../../../../config/colors';
+import { primaryDarkColor, body2Color } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
 
 import SearchModalInventory from '../components/SearchModalInventory';
