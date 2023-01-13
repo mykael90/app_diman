@@ -47,6 +47,7 @@ export default function Index() {
   const template = {
     name: '',
     email: '',
+    phone: '',
     birthdate: '',
     rg: '',
     cpf: '',
@@ -477,6 +478,7 @@ export default function Index() {
                       <Form.Group
                         as={Col}
                         xs={12}
+                        lg={8}
                         controlId="email"
                         className="pb-3"
                       >
@@ -508,6 +510,43 @@ export default function Index() {
                           style={{ position: 'static' }}
                         >
                           {errors.email}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                      <Form.Group
+                        as={Col}
+                        xs={12}
+                        lg={4}
+                        controlId="phone"
+                        className="pb-3"
+                      >
+                        <Form.Label>TELEFONE</Form.Label>
+                        <Form.Control
+                          as={IMaskInput}
+                          mask="(00) 0.0000-0000"
+                          type="text"
+                          value={values.phone}
+                          // onChange={handleChange}
+                          isInvalid={touched.phone && !!errors.phone}
+                          isValid={touched.phone && !errors.phone}
+                          placeholder="Digite o telefone"
+                          onBlur={(e) => {
+                            setFieldValue(
+                              'phone',
+                              e.target.value.toLowerCase()
+                            ); // lowercase
+                            handleBlur(e);
+                          }}
+                          onAccept={(value, mask) => {
+                            setFieldValue(mask.el.input.id, mask.unmaskedValue);
+                            checkUpdate(mask.el.input.id, mask.unmaskedValue);
+                          }}
+                        />
+                        <Form.Control.Feedback
+                          tooltip
+                          type="invalid"
+                          style={{ position: 'static' }}
+                        >
+                          {errors.phone}
                         </Form.Control.Feedback>
                       </Form.Group>
                     </Row>

@@ -102,18 +102,46 @@ export default function Index() {
           </Row>
         ),
       },
+      {
+        Header: 'CPF',
+        accessor: 'cpf',
+      },
       // { Header: 'CPF', accessor: 'cpf' },
       // { Header: 'Data de Nascimento', accessor: 'birthdate' },
       // { Header: 'Email', accessor: 'email' },
-      // {
-      //   Header: 'Contato',
-      //   accessor: (originalRow) => {
-      //     const index = originalRow.WorkerContacts.findIndex(
-      //       (value) => value.default
-      //     );
-      //     return originalRow.WorkerContacts[index]?.contact;
-      //   },
-      // },
+      {
+        Header: 'Função',
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContracts.length;
+          return originalRow.WorkerContracts[index - 1]?.WorkerJobtype?.job;
+        },
+      },
+      {
+        Header: 'Idade',
+        accessor: (originalRow) =>
+          originalRow.birthdate
+            ? Math.floor(
+                (new Date() - new Date(originalRow.birthdate).getTime()) /
+                  3.15576e10
+              )
+            : null,
+      },
+
+      {
+        Header: 'Telefone',
+        accessor: 'phone',
+      },
+      {
+        Header: 'E-mail',
+        accessor: 'email',
+      },
+      {
+        Header: 'Unidade',
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContracts.length;
+          return originalRow.WorkerContracts[index - 1]?.Unidade?.id;
+        },
+      },
       {
         // Make an expander cell
         Header: () => null, // No header
@@ -264,7 +292,7 @@ export default function Index() {
       <Loading isLoading={isLoading} />
       <Container>
         <Row className="text-center py-3">
-          <Card.Title>collaborator Cadastrados</Card.Title>
+          <Card.Title>Colaboradores Cadastrados</Card.Title>
         </Row>
 
         <TableGfilterNestedrow
