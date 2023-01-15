@@ -251,7 +251,7 @@ function Index() {
 
           if (
             infoDetection.current[0]?.label !== 'unknown' &&
-            infoDetection.current[0]?.distance < 0.35
+            infoDetection.current[0]?.distance < 0.5
           ) {
             // alert(
             //   ` Confirma registro do colaborador ${infoDetection.current[0]?.label}?`

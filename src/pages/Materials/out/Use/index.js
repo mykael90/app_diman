@@ -280,7 +280,7 @@ export default function Index() {
       const workersOp = [];
       try {
         setIsLoading(true);
-        const response = await axios.get('/workers/');
+        const response = await axios.get('/workers/actives');
         const workersJobs = response.data
           .filter(
             (value, index, arr) =>

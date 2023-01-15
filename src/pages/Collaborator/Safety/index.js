@@ -7,23 +7,23 @@ import { Container } from 'react-bootstrap';
 export default function index() {
   return (
     <Card>
-      <Card.Header>
+      <Card.Header className="d-print-none">
         <Container>
           <Nav variant="tabs" defaultActiveKey="#1">
             <Nav.Item>
               <Link
                 className="text-decoration-none"
-                to="/collaborator/record/add"
+                to="/collaborator/safety/risk"
               >
-                <Nav.Link href="#1">Cadastro</Nav.Link>
+                <Nav.Link href="#1">Serviços de Risco</Nav.Link>
               </Link>
             </Nav.Item>
             <Nav.Item>
               <Link
                 className="text-decoration-none"
-                to="/collaborator/record/list"
+                to="/collaborator/safety/epi"
               >
-                <Nav.Link href="#2">Listagem Geral</Nav.Link>
+                <Nav.Link href="#2">EPI's e Treinamentos</Nav.Link>
               </Link>
             </Nav.Item>
           </Nav>
@@ -31,7 +31,7 @@ export default function index() {
       </Card.Header>
       <Container>
         <Card.Body>
-          <Outlet />
+          <Outlet className="d-print-block" />
         </Card.Body>
       </Container>
     </Card>

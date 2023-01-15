@@ -188,7 +188,7 @@ export default function Index() {
   async function getWorkers() {
     try {
       setIsLoading(true);
-      const response = await axios.get(`/workers/`);
+      const response = await axios.get(`/workers/actives`);
       setWorkersFormated(response.data);
       setIsLoading(false);
     } catch (err) {
@@ -433,28 +433,28 @@ export default function Index() {
           );
         },
       },
-      {
-        // Make an expander cell
-        Header: () => null, // No header
-        id: 'actions', // It needs an ID
-        width: 40,
-        disableResizing: true,
-        Cell: ({ row }) => (
-          // Use Cell to render an expander for each row.
-          // We can use the getToggleRowExpandedProps prop-getter
-          // to build the expander.
-          // <Link to={`/collaborator/record/update/${row.original.id}`}>
-          <Button
-            size="sm"
-            variant="outline-secondary"
-            className="border-0 m-0"
-            onClick={(e) => handleShowModalEdit(row.original)}
-          >
-            <FaPencilAlt />
-          </Button>
-          // </Link>
-        ),
-      },
+      // {
+      //   // Make an expander cell
+      //   Header: () => null, // No header
+      //   id: 'actions', // It needs an ID
+      //   width: 40,
+      //   disableResizing: true,
+      //   Cell: ({ row }) => (
+      //     // Use Cell to render an expander for each row.
+      //     // We can use the getToggleRowExpandedProps prop-getter
+      //     // to build the expander.
+      //     // <Link to={`/collaborator/record/update/${row.original.id}`}>
+      //     <Button
+      //       size="sm"
+      //       variant="outline-secondary"
+      //       className="border-0 m-0"
+      //       onClick={(e) => handleShowModalEdit(row.original)}
+      //     >
+      //       <FaPencilAlt />
+      //     </Button>
+      //     // </Link>
+      //   ),
+      // },
     ],
     []
   );
@@ -780,11 +780,10 @@ export default function Index() {
           data={dataEdit}
         />
         <Row className="text-center py-3">
-          <Card.Title>Colaboradores Cadastrados</Card.Title>
+          <Card.Title>Colaboradores com contrato vigente</Card.Title>
           <Card.Text>
-            Listagem de todos os colabores que já foram registrados no sistema,
-            inclusive desligados. Se deseja visualizar apenas colaboradoes
-            ativos realize a filtragem por contrato.
+            Listagem de todos os colabores que se encontram com contrato ativo e
+            válido.
           </Card.Text>
         </Row>
 

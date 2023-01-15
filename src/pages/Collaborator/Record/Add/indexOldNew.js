@@ -26,8 +26,6 @@ import axios from '../../../../services/axios';
 import { primaryDarkColor } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
 
-import validateCPF from '../../../../assets/script/validateCPF';
-
 import ProfilePhoto from './components/ProfilePhoto';
 
 const renderTooltip = (props, message) => (
@@ -36,7 +34,7 @@ const renderTooltip = (props, message) => (
   </Tooltip>
 );
 
-export default function Index({ data, handleCancelModal, handleSaveModal }) {
+export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   // const [contacttypes, setContacttypes] = useState([]);
   const [jobtypes, setJobtypes] = useState([]);
@@ -67,20 +65,15 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
   };
   const [initialValues, setInitialValues] = useState(template);
 
-  const id = data?.id;
+  const { id } = useParams();
 
   const updateValues = useRef({});
-
-  console.log(validateCPF('07806858491'));
 
   const schema = yup.object().shape({
     name: yup.string().required('Requerido'),
     // email: yup.string().email('Digite um email válido').required('Requerido'),
     // rg: yup.string().required('Requerido'),
-    // phone: yup.string().required('Requerido'),
-    // cpf: yup
-    //   .string()
-    //   .test('is-valid', 'CPF inválido', (cpf) => validateCPF(cpf)),
+    // cpf: yup.string().required('Requerido'),
     // birthdate: yup
     //   .date()
     //   .max(new Date(), 'Não é possível incluir uma data futura')
@@ -325,7 +318,6 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
             onSubmit={(values, { resetForm }) => {
               if (id) {
                 handleUpdate(updateValues.current);
-                handleSaveModal();
               } else {
                 handleStore(values, resetForm);
               }
@@ -382,16 +374,9 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                             handleBlur(e);
                           }}
                         />
-                        {/* {touched.name && !!errors.name ? (
+                        {touched.name && !!errors.name ? (
                           <Badge bg="danger">{errors.name}</Badge>
-                        ) : null} */}
-                        <Form.Control.Feedback
-                          tooltip
-                          type="invalid"
-                          style={{ position: 'static' }}
-                        >
-                          {errors.name}
-                        </Form.Control.Feedback>
+                        ) : null}
                       </Form.Group>
                     </Row>
                     <Row>
@@ -404,12 +389,12 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                       >
                         <Form.Label>CPF</Form.Label>
                         <Form.Control
-                          type="tel"
+                          type="text"
                           as={IMaskInput}
                           mask="000.000.000-00"
                           value={values.cpf}
                           isInvalid={touched.cpf && !!errors.cpf}
-                          // isValid={touched.cpf && !errors.cpf}
+                          isValid={touched.cpf && !errors.cpf}
                           placeholder="Digite o CPF"
                           onBlur={handleBlur}
                           onAccept={(value, mask) => {
@@ -435,12 +420,12 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                       >
                         <Form.Label>RG</Form.Label>
                         <Form.Control
-                          type="tel"
+                          type="text"
                           as={IMaskInput}
                           mask={Number}
                           value={values.rg}
                           isInvalid={touched.rg && !!errors.rg}
-                          // isValid={touched.rg && !errors.rg}
+                          isValid={touched.rg && !errors.rg}
                           placeholder="Digite o RG"
                           onBlur={handleBlur}
                           onAccept={(value, mask) => {
@@ -476,7 +461,7 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                             );
                           }}
                           isInvalid={touched.birthdate && !!errors.birthdate}
-                          // isValid={touched.birthdate && !errors.birthdate}
+                          isValid={touched.birthdate && !errors.birthdate}
                           placeholder="Selecione a data"
                           onBlur={handleBlur}
                         />
@@ -505,7 +490,7 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                           value={values.email}
                           // onChange={handleChange}
                           isInvalid={touched.email && !!errors.email}
-                          // isValid={touched.email && !errors.email}
+                          isValid={touched.email && !errors.email}
                           placeholder="Digite o email"
                           onBlur={(e) => {
                             setFieldValue(
@@ -538,11 +523,11 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                         <Form.Control
                           as={IMaskInput}
                           mask="(00) 0.0000-0000"
-                          type="tel"
+                          type="text"
                           value={values.phone}
                           // onChange={handleChange}
                           isInvalid={touched.phone && !!errors.phone}
-                          // isValid={touched.phone && !errors.phone}
+                          isValid={touched.phone && !errors.phone}
                           placeholder="Digite o telefone"
                           onBlur={(e) => {
                             setFieldValue(
@@ -924,7 +909,6 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                           onClick={() => {
                             updateValues.current = {};
                             resetForm();
-                            handleCancelModal();
                           }}
                         >
                           Cancelar

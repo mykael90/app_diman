@@ -81,14 +81,21 @@ export default function Header() {
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#3"
-                  onClick={() => navigate('/collaborator/reports/')}
+                  onClick={() => navigate('/collaborator/safety/risk')}
+                >
+                  Segurança
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  href="#4"
+                  onClick={() => navigate('/collaborator/reports/active')}
                 >
                   Relatórios
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
-                  href="#4"
-                  onClick={() => navigate('/collaborator/record/list')}
+                  href="#5"
+                  onClick={() => navigate('/collaborator/record/add')}
                 >
                   Cadastro
                 </NavDropdown.Item>
