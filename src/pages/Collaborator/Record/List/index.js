@@ -156,194 +156,6 @@ function InputColumnFilter({
     </Row>
   );
 }
-function InputDateColumnFilter({
-  column: { filterValue, setFilter, preFilteredRows, id },
-}) {
-  // Calculate the options for filtering
-  // using the preFilteredRows
-  const options = React.useMemo(() => {
-    const options = new Set();
-    preFilteredRows.forEach((row) => {
-      options.add(row.values[id]);
-    });
-    return [...options.values()];
-  }, [id, preFilteredRows]);
-  // Render a multi-select box
-  return (
-    <>
-      <Row className="py-0 my-0">
-        <Col xs="auto" className="pe-0 my-0 py-0">
-          <OverlayTrigger
-            placement="left"
-            delay={{ show: 250, hide: 400 }}
-            overlay={(props) => renderTooltip(props, `Filter for ${id}`)}
-          >
-            <Button
-              variant="outline-primary"
-              size="sm"
-              id="dropdown-group"
-              className="border-0"
-              onClick={(e) => {
-                e.preventDefault();
-                const searchInputAfter =
-                  e.currentTarget.parentElement.parentElement.nextSibling;
-                const searchInputBefore =
-                  e.currentTarget.parentElement.parentElement.nextSibling
-                    .nextSibling;
-
-                if (searchInputAfter.className.includes('d-none')) {
-                  searchInputAfter.className =
-                    searchInputAfter.className.replace('d-none', 'd-block');
-                  searchInputBefore.className =
-                    searchInputBefore.className.replace('d-none', 'd-block');
-                } else {
-                  searchInputAfter.className =
-                    searchInputAfter.className.replace('d-block', 'd-none');
-                  searchInputBefore.className =
-                    searchInputBefore.className.replace('d-block', 'd-none');
-                  setFilter(undefined);
-                }
-
-                return true;
-              }}
-            >
-              {!filterValue ? <FaSearchPlus /> : <FaSearchMinus />}
-            </Button>
-          </OverlayTrigger>
-        </Col>
-      </Row>
-      <Row className="d-none">
-        <Col className="fw-normal">De:</Col>
-        <Col xs={12}>
-          <Form.Control
-            type="date"
-            size="sm"
-            value={filterValue?.after || ''}
-            onChange={(e) => {
-              setFilter(
-                { after: e.target.value, before: filterValue?.before } ||
-                  undefined
-              ); // Set undefined to remove the filter entirely
-            }}
-            style={{ width: '110px' }}
-          />
-        </Col>
-      </Row>
-      <Row className="d-none">
-        <Col className="fw-normal">Até:</Col>
-        <Col xs={12}>
-          <Form.Control
-            type="date"
-            size="sm"
-            value={filterValue?.before || ''}
-            onChange={(e) => {
-              setFilter(
-                { after: filterValue?.after, before: e.target.value } ||
-                  undefined
-              ); // Set undefined to remove the filter entirely
-            }}
-            style={{ width: '110px' }}
-          />
-        </Col>
-      </Row>
-    </>
-  );
-}
-function InputValueColumnFilter({
-  column: { filterValue, setFilter, preFilteredRows, id },
-}) {
-  // Calculate the options for filtering
-  // using the preFilteredRows
-  const options = React.useMemo(() => {
-    const options = new Set();
-    preFilteredRows.forEach((row) => {
-      options.add(row.values[id]);
-    });
-    return [...options.values()];
-  }, [id, preFilteredRows]);
-  // Render a multi-select box
-  return (
-    <>
-      <Row className="py-0 my-0">
-        <Col xs="auto" className="pe-0 my-0 py-0">
-          <OverlayTrigger
-            placement="left"
-            delay={{ show: 250, hide: 400 }}
-            overlay={(props) => renderTooltip(props, `Filter for ${id}`)}
-          >
-            <Button
-              variant="outline-primary"
-              size="sm"
-              id="dropdown-group"
-              className="border-0"
-              onClick={(e) => {
-                e.preventDefault();
-                const searchInputAfter =
-                  e.currentTarget.parentElement.parentElement.nextSibling;
-                const searchInputBefore =
-                  e.currentTarget.parentElement.parentElement.nextSibling
-                    .nextSibling;
-
-                if (searchInputAfter.className.includes('d-none')) {
-                  searchInputAfter.className =
-                    searchInputAfter.className.replace('d-none', 'd-block');
-                  searchInputBefore.className =
-                    searchInputBefore.className.replace('d-none', 'd-block');
-                } else {
-                  searchInputAfter.className =
-                    searchInputAfter.className.replace('d-block', 'd-none');
-                  searchInputBefore.className =
-                    searchInputBefore.className.replace('d-block', 'd-none');
-                  setFilter(undefined);
-                }
-
-                return true;
-              }}
-            >
-              {!filterValue ? <FaSearchPlus /> : <FaSearchMinus />}
-            </Button>
-          </OverlayTrigger>
-        </Col>
-      </Row>
-      <Row className="d-none">
-        <Col className="fw-normal">Mín R$:</Col>
-        <Col xs={12}>
-          <Form.Control
-            type="number"
-            size="sm"
-            value={filterValue?.after || ''}
-            onChange={(e) => {
-              setFilter(
-                { after: e.target.value, before: filterValue?.before } ||
-                  undefined
-              ); // Set undefined to remove the filter entirely
-            }}
-            style={{ width: '110px' }}
-            step="any"
-          />
-        </Col>
-      </Row>
-      <Row className="d-none">
-        <Col className="fw-normal">Máx R$:</Col>
-        <Col xs={12}>
-          <Form.Control
-            type="number"
-            size="sm"
-            value={filterValue?.before || ''}
-            onChange={(e) => {
-              setFilter(
-                { after: filterValue?.after, before: e.target.value } ||
-                  undefined
-              ); // Set undefined to remove the filter entirely
-            }}
-            style={{ width: '110px' }}
-            step="any"
-          />
-        </Col>
-      </Row>
-    </>
-  );
-}
 
 const renderTooltip = (props, message) => (
   <Tooltip id="button-tooltip" {...props}>
@@ -438,9 +250,11 @@ export default function Index() {
         ),
         Filter: InputColumnFilter,
         filter: 'text',
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Função',
+        id: 'job',
         width: 200,
         disableResizing: true,
         disableSortBy: true,
@@ -451,31 +265,11 @@ export default function Index() {
         },
         Filter: SelectColumnFilter,
         filter: 'includes',
+        isVisible: window.innerWidth > 768,
       },
-      // {
-      //   Header: ({ value, row }) => <div className="text-start">Nome</div>,
-      //   accessor: 'name',
-      //   disableSortBy: true,
-      //   Cell: ({ value, row }) => (
-      //     <Row>
-      //       <Col xs="12" className="text-start mb-0 pb-0">
-      //         {value}
-      //       </Col>
-      //       <Col xs="auto" className="mt-0 pt-0">
-      //         <Badge
-      //           className="text-dark bg-light mt-0 pt-0"
-      //           style={{
-      //             fontSize: '0.6em',
-      //           }}
-      //         >
-      //           {row.original.job}
-      //         </Badge>
-      //       </Col>
-      //     </Row>
-      //   ),
-      // },
       {
         Header: 'Idade',
+        id: 'age',
         width: 70,
         disableResizing: true,
         accessor: (originalRow) =>
@@ -485,6 +279,7 @@ export default function Index() {
                   3.15576e10
               )
             : null,
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'CPF',
@@ -502,6 +297,7 @@ export default function Index() {
         },
         Filter: InputColumnFilter,
         filter: 'text',
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Telefone',
@@ -519,6 +315,7 @@ export default function Index() {
         },
         Filter: InputColumnFilter,
         filter: 'text',
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'E-mail',
@@ -528,24 +325,27 @@ export default function Index() {
         disableSortBy: true,
         Filter: InputColumnFilter,
         filter: 'text',
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Contrato',
+        id: 'contract',
         width: 100,
         disableResizing: true,
         disableSortBy: true,
         accessor: (originalRow) => {
           const index = originalRow.WorkerContracts.length;
           if (index === 0) return 'INATIVO';
-          console.log(originalRow.WorkerContracts[index - 1]?.end);
           if (originalRow.WorkerContracts[index - 1]?.end) return 'DESLIGADO';
           return originalRow.WorkerContracts[index - 1]?.Contract?.codigoSipac;
         },
         Filter: SelectColumnFilter,
         filter: 'includes',
+        isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Lotado',
+        id: 'unit',
         width: 120,
         disableResizing: true,
         disableSortBy: true,
@@ -557,6 +357,61 @@ export default function Index() {
         },
         Filter: InputColumnFilter,
         filter: 'text',
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: ({ value, row }) => (
+          <div className="text-start">Nome - Função - Contrato</div>
+        ),
+        id: 'mobile',
+        width: 100,
+        disableResizing: false,
+        disableSortBy: true,
+        defaultCanFilter: true,
+        isVisible: window.innerWidth < 768,
+        Cell: ({ value, row }) => {
+          const index = row.original.WorkerContracts.length;
+          return (
+            <>
+              <Row>
+                <Col xs="12" className="text-start mb-0 pb-0">
+                  {row.original.name}
+                </Col>
+              </Row>
+
+              <Row>
+                <Col xs="auto" className="mt-0 pt-0">
+                  <Badge
+                    className="text-dark bg-light"
+                    style={{
+                      fontSize: '0.8em',
+                    }}
+                  >
+                    {index > 0
+                      ? row.original.WorkerContracts[index - 1]?.WorkerJobtype
+                          ?.job
+                      : 'INDEFINIDO'}
+                  </Badge>
+                </Col>
+                <Col xs="auto" className="mt-0 pt-0">
+                  <Badge
+                    className="text-dark bg-light"
+                    style={{
+                      fontSize: '0.8em',
+                    }}
+                  >
+                    {index === 0
+                      ? 'INATIVO'
+                      : row.original.WorkerContracts[index - 1]?.end
+                      ? 'DESLIGADO'
+                      : row.original.WorkerContracts[index - 1]?.Contract
+                          ?.codigoSipac}
+                  </Badge>
+                </Col>
+              </Row>
+            </>
+          );
+        },
       },
       {
         // Make an expander cell
@@ -584,8 +439,109 @@ export default function Index() {
   );
 
   // Create a function that will render our row sub components
-  const renderRowSubComponent = React.useCallback(
-    ({ row }) => (
+  const renderRowSubComponent = React.useCallback(({ row }) => {
+    const columns = [
+      {
+        Header: 'Contrato',
+        id: 'contract',
+        width: 125,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => originalRow.Contract?.codigoSipac,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Função',
+        id: 'job',
+        accessor: (originalRow) => originalRow.WorkerJobtype?.job,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: 'Início',
+        id: 'startBr',
+        accessor: (originalRow) => originalRow.startBr,
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Fim',
+        accessor: 'endBr',
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: 'Lotado',
+        id: 'unidade',
+        width: 180,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) =>
+          `${originalRow.Unidade?.id}-${originalRow.Unidade?.sigla}`,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: ({ value, row }) => (
+          <div className="text-start">Contrato - Função - Inicio - Fim</div>
+        ),
+        id: 'mobile',
+        width: 100,
+        disableResizing: false,
+        disableSortBy: true,
+        defaultCanFilter: true,
+        isVisible: window.innerWidth < 768,
+        Cell: ({ value, row }) => (
+          <>
+            <Row>
+              <Col xs="12" className="text-start mb-0 pb-0">
+                {row.original.Contract?.codigoSipac}
+              </Col>
+            </Row>
+
+            <Row>
+              <Col xs="auto" className="mt-0 pt-0">
+                <Badge
+                  className="text-dark bg-light"
+                  style={{
+                    fontSize: '0.8em',
+                  }}
+                >
+                  {row.original.WorkerJobtype?.job}
+                </Badge>
+              </Col>
+              <Col xs="auto" className="mt-0 pt-0">
+                <Badge
+                  className="text-dark bg-success text-white"
+                  style={{
+                    fontSize: '0.8em',
+                  }}
+                >
+                  {row.original.startBr}
+                </Badge>
+              </Col>
+              <Col xs="auto" className="mt-0 pt-0">
+                <Badge
+                  className="text-dark bg-danger text-white"
+                  style={{
+                    fontSize: '0.8em',
+                  }}
+                >
+                  {row.original.endBr}
+                </Badge>
+              </Col>
+            </Row>
+          </>
+        ),
+      },
+    ];
+    return (
       <>
         <Row className="mb-2">
           <Col>
@@ -597,45 +553,7 @@ export default function Index() {
           <Col>
             <TableNestedrow
               style={{ padding: 0, margin: 0 }}
-              columns={[
-                {
-                  Header: 'Contrato',
-                  width: 125,
-                  disableResizing: true,
-                  disableSortBy: true,
-                  accessor: (originalRow) => originalRow.Contract?.codigoSipac,
-                },
-                {
-                  Header: 'JobId',
-                  accessor: (originalRow) => originalRow.WorkerJobtype?.job,
-                  disableSortBy: true,
-                  // eslint-disable-next-line react/destructuring-assignment
-                },
-                {
-                  Header: 'Início',
-                  accessor: 'startBr',
-                  width: 100,
-                  disableResizing: true,
-                  disableSortBy: true,
-                },
-                {
-                  Header: 'Fim',
-                  accessor: 'endBr',
-                  width: 100,
-                  disableResizing: true,
-                  disableSortBy: true,
-                  // eslint-disable-next-line react/destructuring-assignment
-                },
-                {
-                  Header: 'Lotado',
-                  width: 180,
-                  disableResizing: true,
-                  disableSortBy: true,
-                  accessor: (originalRow) =>
-                    `${originalRow.Unidade?.id}-${originalRow.Unidade?.sigla}`,
-                  // eslint-disable-next-line react/destructuring-assignment
-                },
-              ]}
+              columns={columns}
               data={row.original.WorkerContracts}
               defaultColumn={{
                 // Let's set up our default Filter UI
@@ -651,18 +569,22 @@ export default function Index() {
                     asc: true,
                   },
                 ],
-                hiddenColumns: columns
-                  .filter((col) => col.isVisible === false)
-                  .map((col) => col.accessor),
+                hiddenColumns: [
+                  ...columns
+                    .filter((col) => col.isVisible === false)
+                    .map((col) => col.id),
+                  ...columns
+                    .filter((col) => col.isVisible === false)
+                    .map((col) => col.accessor),
+                ],
               }}
               filterTypes={filterTypes}
             />
           </Col>
         </Row>
       </>
-    ),
-    []
-  );
+    );
+  }, []);
 
   const data = React.useMemo(() => workersFormated, [workersFormated]);
 
@@ -685,9 +607,12 @@ export default function Index() {
       },
     ],
     pageSize: 50,
-    hiddenColumns: columns
-      .filter((col) => col.isVisible === false)
-      .map((col) => col.accessor),
+    hiddenColumns: [
+      ...columns.filter((col) => col.isVisible === false).map((col) => col.id),
+      ...columns
+        .filter((col) => col.isVisible === false)
+        .map((col) => col.accessor),
+    ],
   };
 
   const filterTypes = React.useMemo(
@@ -833,6 +758,7 @@ export default function Index() {
       <Loading isLoading={isLoading} />
       <Container>
         <Row className="text-center py-3">
+          <h1>{window.innerWidth}</h1>
           <Card.Title>Colaboradores Cadastrados</Card.Title>
           <Card.Text>
             Listagem de todos os colabores que já foram registrados no sistema,
