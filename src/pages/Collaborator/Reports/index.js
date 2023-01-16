@@ -26,6 +26,22 @@ export default function index() {
                 <Nav.Link href="#2">Efetivo do dia</Nav.Link>
               </Link>
             </Nav.Item>
+            <Nav.Item>
+              <Link
+                className="text-decoration-none"
+                to="/collaborator/reports/frequency"
+              >
+                <Nav.Link href="#3">Registro de freqência</Nav.Link>
+              </Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Link
+                className="text-decoration-none"
+                to="/collaborator/reports/hourbank"
+              >
+                <Nav.Link href="#4">Banco de horas</Nav.Link>
+              </Link>
+            </Nav.Item>
           </Nav>
         </Container>
       </Card.Header>

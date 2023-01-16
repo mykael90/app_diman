@@ -12,6 +12,8 @@ import EPI from './Safety/EPI';
 import Reports from './Reports';
 import Active from './Reports/Active';
 import Effective from './Reports/Effective';
+import HourBank from './Reports/HourBank';
+import RegisterFrequency from './Reports/Frequency';
 
 import Record from './Record';
 import List from './Record/List';
@@ -40,6 +42,8 @@ export default function MaterialsRoutes() {
       <Route path="reports" element={<Reports />}>
         <Route path="active" element={<Active />} />{' '}
         <Route path="effective" element={<Effective />} />{' '}
+        <Route path="hourbank" element={<HourBank />} />{' '}
+        <Route path="frequency" element={<RegisterFrequency />} />{' '}
       </Route>
 
       <Route path="record" element={<Record />}>
