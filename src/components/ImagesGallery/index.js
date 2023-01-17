@@ -4,7 +4,7 @@ import { Row, Col, Card, Button } from 'react-bootstrap';
 import { FaSearchPlus, FaTrash } from 'react-icons/fa';
 
 function ImagesGallery({ files, removeFileFromArray }) {
-  console.log('imagesGallery', files);
+  // console.log('imagesGallery', files);
   return (
     <Row
       xs={2}

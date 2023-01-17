@@ -190,6 +190,9 @@ export default function Index() {
             'Content-Type': 'multipart/form-data',
           },
         });
+        // for (const pair of formData.entries()) {
+        //   console.log(`${pair[0]} - ${pair[1]}`);
+        // }
       } else {
         console.log(formattedValues);
         await axios.post(`/materials/in/general`, formattedValues);

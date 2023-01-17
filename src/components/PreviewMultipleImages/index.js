@@ -8,13 +8,13 @@ function PreviewMultipleImages({ files, setFiles }) {
   const handleMultipleImages = (evnt) => {
     const targetFiles = [...evnt.target.files];
     const newFiles = [...files];
-    console.log(newFiles, targetFiles);
+    // console.log(newFiles, targetFiles);
     targetFiles.forEach((file) => {
       const imageURL = URL.createObjectURL(file);
       const newObj = { file, imageURL };
       newFiles.push(newObj);
     });
-    console.log(newFiles);
+    // console.log(newFiles);
     setFiles([...newFiles]);
   };
 
