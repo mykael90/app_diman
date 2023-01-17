@@ -273,6 +273,22 @@ export default function Index() {
         isVisible: window.innerWidth > 768,
       },
       {
+        Header: 'Contrato',
+        id: 'contract',
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContracts.length;
+          if (index === 0) return 'INATIVO';
+          if (originalRow.WorkerContracts[index - 1]?.end) return 'DESLIGADO';
+          return originalRow.WorkerContracts[index - 1]?.Contract?.codigoSipac;
+        },
+        Filter: SelectColumnFilter,
+        filter: 'includes',
+        isVisible: window.innerWidth > 768,
+      },
+      {
         Header: 'Função',
         id: 'job',
         width: 200,
@@ -282,6 +298,23 @@ export default function Index() {
           const index = originalRow.WorkerContracts.length;
           if (index === 0) return 'INDEFINIDO';
           return originalRow.WorkerContracts[index - 1]?.WorkerJobtype?.job;
+        },
+        Filter: SelectColumnFilter,
+        filter: 'includes',
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Atuação',
+        id: 'acting',
+        width: 200,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContracts.length;
+          if (index === 0) return 'INDEFINIDO';
+          if (!originalRow.WorkerContracts[index - 1]?.acting)
+            return 'INDEFINIDO';
+          return originalRow.WorkerContracts[index - 1]?.acting;
         },
         Filter: SelectColumnFilter,
         filter: 'includes',
@@ -337,34 +370,18 @@ export default function Index() {
         filter: 'text',
         isVisible: window.innerWidth > 768,
       },
+      // {
+      //   Header: 'E-mail',
+      //   accessor: 'email',
+      //   width: 160,
+      //   disableResizing: true,
+      //   disableSortBy: true,
+      //   Filter: InputColumnFilter,
+      //   filter: 'text',
+      //   isVisible: window.innerWidth > 768,
+      // },
       {
-        Header: 'E-mail',
-        accessor: 'email',
-        width: 160,
-        disableResizing: true,
-        disableSortBy: true,
-        Filter: InputColumnFilter,
-        filter: 'text',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Contrato',
-        id: 'contract',
-        width: 100,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          if (index === 0) return 'INATIVO';
-          if (originalRow.WorkerContracts[index - 1]?.end) return 'DESLIGADO';
-          return originalRow.WorkerContracts[index - 1]?.Contract?.codigoSipac;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'includes',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Lotado',
+        Header: 'Unidade',
         id: 'unit',
         width: 120,
         disableResizing: true,
