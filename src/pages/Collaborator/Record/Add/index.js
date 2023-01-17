@@ -42,6 +42,9 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
   const [jobtypes, setJobtypes] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [unidades, setUnidades] = useState([]);
+  const [contractsDangers, setContractsDangers] = useState([]);
+  const [contractsRegimes, setContractsRegimes] = useState([]);
+  const [contractsUnhealthies, setContractsUnhealthies] = useState([]);
   const [photoURL, setPhotoURL] = useState(
     `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/default.png`
   );
@@ -58,6 +61,10 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
       {
         ContractId: '',
         WorkerJobtypeId: '',
+        WorkerContractRegimeId: '',
+        WorkerContractDangerId: '',
+        WorkerContractUnhealthyId: '',
+        acting: '',
         unidadeId: '',
         start: '',
         end: '',
@@ -159,10 +166,18 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
         const responseContract = await axios.get(`/workers/contracts`);
         const responseJob = await axios.get(`/workers/jobtypes`);
         const responseUnidades = await axios.get(`/unidades`);
+        const responseDangers = await axios.get(`/workers/contract/dangers`);
+        const responseRegimes = await axios.get(`/workers/contract/regimes`);
+        const responseUnhealthies = await axios.get(
+          `/workers/contract/unhealthies`
+        );
 
         setContracts(responseContract.data);
         setJobtypes(responseJob.data);
         setUnidades(responseUnidades.data);
+        setContractsDangers(responseDangers.data);
+        setContractsRegimes(responseRegimes.data);
+        setContractsUnhealthies(responseUnhealthies.data);
 
         setIsLoading(false);
       } catch (err) {
@@ -604,7 +619,7 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                                         as={Col}
                                         xs={12}
                                         md={12}
-                                        lg={8}
+                                        lg={4}
                                         className="pb-3"
                                         controlId={`WorkerContracts[${index}].ContractId`}
                                       >
@@ -669,19 +684,6 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                                               e.target.value.toUpperCase()
                                             );
                                           }}
-                                          // tem que usar a biblioteca lodash aqui para verificar se não é nulo antes de atribuir...
-                                          // isInvalid={
-                                          //   touched.WorkerContracts[index]
-                                          //     .WorkerJobtypeId &&
-                                          //   !!errors.WorkerContracts[index]
-                                          //     .WorkerJobtypeId
-                                          // }
-                                          // isValid={
-                                          //   touched.WorkerContracts[index]
-                                          //     .WorkerJobtypeId &&
-                                          //   !errors.WorkerContracts[index]
-                                          //     .WorkerJobtypeId
-                                          // }
                                           placeholder="Selecione a Função"
                                           onBlur={handleBlur}
                                           disabled={
@@ -695,6 +697,164 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                                               {job.job}
                                             </option>
                                           ))}
+                                        </Form.Select>
+                                      </Form.Group>
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={4}
+                                        controlId={`WorkerContracts[${index}].acting`}
+                                        className="pb-3"
+                                      >
+                                        <Form.Label>ATUAÇÃO</Form.Label>
+                                        <Form.Select
+                                          type="text"
+                                          value={item.acting}
+                                          onChange={(e) => {
+                                            handleChange(e);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value.toUpperCase()
+                                            );
+                                          }}
+                                          placeholder="Selecione a atuação"
+                                          onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.acting
+                                          }
+                                        >
+                                          <option>Selecione a atuação</option>
+
+                                          <option value="ALTA TENSÃO">
+                                            ALTA TENSÃO
+                                          </option>
+                                          <option value="LÓGICA DE DADOS">
+                                            LÓGICA DE DADOS
+                                          </option>
+                                          <option value="CENÁRIOS">
+                                            CENÁRIOS
+                                          </option>
+                                        </Form.Select>
+                                      </Form.Group>
+                                    </Row>
+                                    <Row className="d-flex justify-content-center align-items-center">
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={4}
+                                        controlId={`WorkerContracts[${index}].WorkerContractRegimeId`}
+                                        className="pb-3"
+                                      >
+                                        <Form.Label>REGIME</Form.Label>
+                                        <Form.Select
+                                          type="text"
+                                          value={item.WorkerContractRegimeId}
+                                          onChange={(e) => {
+                                            handleChange(e);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value.toUpperCase()
+                                            );
+                                          }}
+                                          placeholder="Selecione o regime"
+                                          onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.end
+                                          }
+                                        >
+                                          <option>Selecione o regime</option>
+                                          {contractsRegimes.map((regime) => (
+                                            <option
+                                              key={regime.id}
+                                              value={regime.id}
+                                            >
+                                              {regime.regime}
+                                            </option>
+                                          ))}
+                                        </Form.Select>
+                                      </Form.Group>
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={4}
+                                        controlId={`WorkerContracts[${index}].WorkerContractDangerId`}
+                                        className="pb-3"
+                                      >
+                                        <Form.Label>PERICULOSIDADE</Form.Label>
+                                        <Form.Select
+                                          type="text"
+                                          value={item.WorkerContractDangerId}
+                                          onChange={(e) => {
+                                            handleChange(e);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value.toUpperCase()
+                                            );
+                                          }}
+                                          placeholder="Selecione a periculosidade"
+                                          onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.end
+                                          }
+                                        >
+                                          <option>
+                                            Selecione a periculosidade
+                                          </option>
+                                          {contractsDangers.map((danger) => (
+                                            <option
+                                              key={danger.id}
+                                              value={danger.id}
+                                            >
+                                              {danger.danger}
+                                            </option>
+                                          ))}
+                                        </Form.Select>
+                                      </Form.Group>
+                                      <Form.Group
+                                        as={Col}
+                                        xs={12}
+                                        md={12}
+                                        lg={4}
+                                        controlId={`WorkerContracts[${index}].WorkerContractUnhealthyId`}
+                                        className="pb-3"
+                                      >
+                                        <Form.Label>INSALUBRIDADE</Form.Label>
+                                        <Form.Select
+                                          type="text"
+                                          value={item.WorkerContractUnhealthyId}
+                                          onChange={(e) => {
+                                            handleChange(e);
+                                            checkUpdate(
+                                              e.target.id,
+                                              e.target.value.toUpperCase()
+                                            );
+                                          }}
+                                          placeholder="Selecione a insalubridade"
+                                          onBlur={handleBlur}
+                                          disabled={
+                                            initialValues.WorkerContracts[index]
+                                              ?.end
+                                          }
+                                        >
+                                          <option>
+                                            Selecione a insalubridade
+                                          </option>
+                                          {contractsUnhealthies.map(
+                                            (unhealthy) => (
+                                              <option
+                                                key={unhealthy.id}
+                                                value={unhealthy.id}
+                                              >
+                                                {unhealthy.unhealthy}
+                                              </option>
+                                            )
+                                          )}
                                         </Form.Select>
                                       </Form.Group>
                                     </Row>
@@ -818,6 +978,7 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                                         />
                                       </Form.Group>
                                     </Row>
+
                                     <Row>
                                       <Form.Group
                                         xs={12}
