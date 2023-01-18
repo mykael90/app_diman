@@ -273,54 +273,6 @@ export default function Index() {
         isVisible: window.innerWidth > 768,
       },
       {
-        Header: 'Contrato',
-        id: 'contract',
-        width: 100,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          if (index === 0) return 'INATIVO';
-          if (originalRow.WorkerContracts[index - 1]?.end) return 'DESLIGADO';
-          return originalRow.WorkerContracts[index - 1]?.Contract?.codigoSipac;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'includes',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Função',
-        id: 'job',
-        width: 200,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          if (index === 0) return 'INDEFINIDO';
-          return originalRow.WorkerContracts[index - 1]?.WorkerJobtype?.job;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'includes',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Atuação',
-        id: 'acting',
-        width: 200,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          if (index === 0) return 'INDEFINIDO';
-          if (!originalRow.WorkerContracts[index - 1]?.acting)
-            return 'INDEFINIDO';
-          return originalRow.WorkerContracts[index - 1]?.acting;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'includes',
-        isVisible: window.innerWidth > 768,
-      },
-      {
         Header: 'Idade',
         id: 'age',
         width: 70,
@@ -353,21 +305,86 @@ export default function Index() {
         isVisible: window.innerWidth > 768,
       },
       {
-        Header: 'Telefone',
-        accessor: 'phone',
+        Header: 'Contrato',
+        id: 'contract',
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContracts.length;
+          if (index === 0) return 'INATIVO';
+          if (originalRow.WorkerContracts[index - 1]?.end) return 'DESLIGADO';
+          return originalRow.WorkerContracts[index - 1]?.Contract?.codigoSipac;
+        },
+        Filter: SelectColumnFilter,
+        filter: 'includes',
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Função',
+        id: 'job',
+        width: 200,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContracts.length;
+          if (index === 0) return 'INDEFINIDO';
+          return originalRow.WorkerContracts[index - 1]?.WorkerJobtype?.job;
+        },
+        Filter: SelectColumnFilter,
+        filter: 'exactText',
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Regime',
+        id: 'regime',
         width: 140,
         disableResizing: true,
         disableSortBy: true,
-        Cell: ({ value }) => {
-          if (!value) return null;
-          const custom = value.replace(
-            /(\d{2})(\d{1})(\d{4})(\d{4})/gm,
-            '($1) $2.$3-$4'
-          ); // deixar só os dois primeiros nomes
-          return <span> {custom}</span>;
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContracts.length;
+          if (index === 0) return '';
+          if (!originalRow.WorkerContracts[index - 1]?.WorkerContractRegime)
+            return '';
+          return originalRow.WorkerContracts[index - 1]?.WorkerContractRegime
+            .regime;
         },
-        Filter: InputColumnFilter,
-        filter: 'text',
+        Filter: SelectColumnFilter,
+        filter: 'exactText',
+        isVisible: window.innerWidth > 768,
+      },
+      // {
+      //   Header: 'Phone',
+      //   accessor: 'phone',
+      //   width: 140,
+      //   disableResizing: true,
+      //   disableSortBy: true,
+      //   Cell: ({ value }) => {
+      //     if (!value) return null;
+      //     const custom = value.replace(
+      //       /(\d{2})(\d{1})(\d{4})(\d{4})/gm,
+      //       '($1) $2.$3-$4'
+      //     ); // deixar só os dois primeiros nomes
+      //     return <span> {custom}</span>;
+      //   },
+      //   Filter: InputColumnFilter,
+      //   filter: 'text',
+      //   isVisible: window.innerWidth > 768,
+      // },
+      {
+        Header: 'Atuação',
+        id: 'acting',
+        width: 200,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => {
+          const index = originalRow.WorkerContracts.length;
+          if (index === 0) return '';
+          if (!originalRow.WorkerContracts[index - 1]?.acting) return '';
+          return originalRow.WorkerContracts[index - 1]?.acting;
+        },
+        Filter: SelectColumnFilter,
+        filter: 'exactText',
         isVisible: window.innerWidth > 768,
       },
       // {
