@@ -20,6 +20,7 @@ import Pavimento from '../pages/Infra/Pavimento';
 import Edificio from '../pages/Infra/Edificio';
 import Page404 from '../pages/Page404';
 import Providers from '../pages/Providers';
+import Adm from '../pages/Adm';
 import Unauthorized from '../components/Unauthorized';
 
 import Test from '../pages/Materials/Reports/Output/components/EditModal';
@@ -51,6 +52,7 @@ export default function RoutesPages() {
       <Route exact path="/infra/pavimento/*" element={<Pavimento />} />
       <Route exact path="/infra/edificio/*" element={<Edificio />} />
       <Route exact path="/providers/*" element={<Providers />} />
+      <Route exact path="/adm/*" element={<Adm />} />
 
       <Route path="/Unauthorized" element={<Unauthorized />} />
       {/* we want to protect these routes */}

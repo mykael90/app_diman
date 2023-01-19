@@ -24,6 +24,7 @@ import Restrict from './internal/Restrict';
 import InitialQuantity from './internal/InitialQuantity';
 import Reserve from './internal/Reserve';
 import ListReserves from './internal/ListReserves/ListReserves';
+import Transformation from './internal/Transformation';
 
 import Reports from './Reports';
 import Input from './Reports/Input';
@@ -85,6 +86,7 @@ export default function MaterialsRoutes() {
         <Route path="internal" element={<Internal />}>
           <Route path="restrict" element={<Restrict />} />{' '}
           <Route path="initialquantity" element={<InitialQuantity />} />{' '}
+          <Route path="transformation" element={<Transformation />} />{' '}
         </Route>
       </Route>
 

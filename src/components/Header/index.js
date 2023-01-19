@@ -281,7 +281,7 @@ export default function Header() {
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#30"
-                  onClick={() => navigate('/unidades')}
+                  onClick={() => navigate('/adm/unidades')}
                 >
                   Unidades
                 </NavDropdown.Item>

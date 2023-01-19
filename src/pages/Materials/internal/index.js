@@ -42,6 +42,14 @@ export default function index() {
                 <Nav.Link href="#4">Definir Saldo</Nav.Link>
               </Link>
             </Nav.Item>
+            <Nav.Item>
+              <Link
+                className="text-decoration-none"
+                to="/materials/internal/transformation"
+              >
+                <Nav.Link href="#5">Transformação</Nav.Link>
+              </Link>
+            </Nav.Item>
           </Nav>
         </Container>
       </Card.Header>

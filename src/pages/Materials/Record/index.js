@@ -20,7 +20,7 @@ export default function index() {
             </Nav.Item>
             <Nav.Item>
               <Link className="text-decoration-none" to="/materials/record/add">
-                <Nav.Link href="#2">Adicionar</Nav.Link>
+                <Nav.Link href="#2">Adicionar Provisório</Nav.Link>
               </Link>
             </Nav.Item>
             <Nav.Item>
@@ -28,7 +28,7 @@ export default function index() {
                 className="text-decoration-none"
                 to="/materials/record/remove"
               >
-                <Nav.Link href="#3">Remover</Nav.Link>
+                <Nav.Link href="#3">Importar Material SIPAC</Nav.Link>
               </Link>
             </Nav.Item>
           </Nav>
