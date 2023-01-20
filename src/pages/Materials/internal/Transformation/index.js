@@ -624,7 +624,7 @@ export default function Index() {
                                                 (
                                                   (values.MaterialOutItems[0]
                                                     .quantity /
-                                                    item.quantity) *
+                                                    e.target.value) *
                                                   values.MaterialOutItems[0]
                                                     .value
                                                 ).toFixed(2)
