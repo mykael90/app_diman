@@ -94,6 +94,7 @@ export default function Index() {
       .of(
         yup.object().shape({
           quantity: yup.number().required('Requerido').positive(),
+          newPrice: yup.number().required('Requerido').positive(),
         })
       )
       .required()
