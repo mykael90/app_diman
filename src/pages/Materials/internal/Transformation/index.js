@@ -168,6 +168,7 @@ export default function Index() {
     formattedValues.materialIntypeId = 7;
     formattedValues.MaterialInItems.forEach((item) => {
       Object.assign(item, { MaterialId: item.materialId }); // rename key
+      item.value = item.newPrice;
     });
 
     // DEFININDO SAÍDA DE MATERIAL
@@ -177,7 +178,7 @@ export default function Index() {
       Object.assign(item, { MaterialId: item.materialId }); // rename key
     });
 
-    // valor de entrada e saída deve ser o mesmo, afinal é uma operação interna
+    // valor de saída
     formattedValues.value = formattedValues.MaterialOutItems.reduce(
       (ac, item) => {
         ac += Number(item.quantity) * Number(item.value);
@@ -195,6 +196,14 @@ export default function Index() {
       console.log(resultOut);
 
       formattedValues.returnId = resultOut.data.id;
+      // valor de saída
+      formattedValues.value = formattedValues.MaterialInItems.reduce(
+        (ac, item) => {
+          ac += Number(item.quantity) * Number(item.value);
+          return ac;
+        },
+        0
+      );
 
       // ENTRADA
       await axios.post(`/materials/in/general`, formattedValues);
@@ -335,6 +344,21 @@ export default function Index() {
                                             className="fs-2"
                                           />
                                         </Form.Group>
+                                      </Row>
+                                      <Row>
+                                        <Col>
+                                          <Badge>
+                                            Saída Financeira:{' '}
+                                            <spam>
+                                              R${' '}
+                                              {item.value && item.quantity
+                                                ? (
+                                                    item.value * item.quantity
+                                                  ).toFixed(2)
+                                                : '0,00'}
+                                            </spam>
+                                          </Badge>
+                                        </Col>
                                       </Row>
                                       <Row className="d-flex justify-content-start align-items-center mt-2">
                                         <Form.Group
@@ -593,7 +617,19 @@ export default function Index() {
                                           <Form.Control
                                             type="number"
                                             value={item.quantity}
-                                            onChange={handleChange}
+                                            onChange={(e) => {
+                                              handleChange(e);
+                                              setFieldValue(
+                                                `MaterialInItems[${index}].newPrice`,
+                                                (
+                                                  (values.MaterialOutItems[0]
+                                                    .quantity /
+                                                    item.quantity) *
+                                                  values.MaterialOutItems[0]
+                                                    .value
+                                                ).toFixed(2)
+                                              );
+                                            }}
                                             onBlur={handleBlur}
                                             placeholder="QTD"
                                             size="sm"
@@ -601,6 +637,42 @@ export default function Index() {
                                             className="fs-2"
                                           />
                                         </Form.Group>
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={4}
+                                          controlId={`MaterialInItems[${index}].newPrice`}
+                                        >
+                                          <Form.Label className="fs-4">
+                                            NOVO PREÇO
+                                          </Form.Label>
+
+                                          <Form.Control
+                                            type="number"
+                                            value={item.newPrice}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            size="sm"
+                                            step="any"
+                                            className="fs-2"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                      <Row>
+                                        <Col>
+                                          <Badge>
+                                            Entrada Financeira:{' '}
+                                            <spam>
+                                              R${' '}
+                                              {item.newPrice && item.quantity
+                                                ? (
+                                                    item.newPrice *
+                                                    item.quantity
+                                                  ).toFixed(2)
+                                                : '0,00'}
+                                            </spam>
+                                          </Badge>
+                                        </Col>
                                       </Row>
                                       <Row className="d-flex justify-content-start align-items-center mt-2">
                                         <Form.Group
