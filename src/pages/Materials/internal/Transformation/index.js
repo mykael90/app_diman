@@ -170,14 +170,6 @@ export default function Index() {
       Object.assign(item, { MaterialId: item.materialId }); // rename key
     });
 
-    formattedValues.value = formattedValues.MaterialInItems.reduce(
-      (ac, item) => {
-        ac += Number(item.quantity) * Number(item.value);
-        return ac;
-      },
-      0
-    );
-
     // DEFININDO SAÍDA DE MATERIAL
     formattedValues.materialOuttypeId = 9; // SAÍDA PARA USO
 
@@ -185,6 +177,7 @@ export default function Index() {
       Object.assign(item, { MaterialId: item.materialId }); // rename key
     });
 
+    // valor de entrada e saída deve ser o mesmo, afinal é uma operação interna
     formattedValues.value = formattedValues.MaterialOutItems.reduce(
       (ac, item) => {
         ac += Number(item.quantity) * Number(item.value);
@@ -192,8 +185,6 @@ export default function Index() {
       },
       0
     );
-
-    console.log(formattedValues);
 
     try {
       setIsLoading(true);
