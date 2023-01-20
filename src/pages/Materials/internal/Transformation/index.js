@@ -40,9 +40,6 @@ const filterOptions = (row, filterValue) => {
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
-  const [providers, setProviders] = useState([]);
-  const [unidades, setUnidades] = useState([]);
-  const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef();
 
@@ -72,7 +69,9 @@ export default function Index() {
       materialId: row.value.materialId,
       name: row.value.name,
       unit: row.value.unit,
-      balancedQuantity: row.value.freeInventory,
+      freeInventory: row.value.freeInventory,
+      reserveInventory: row.value.reserveInventory,
+      restrictInventory: row.value.restrictInventory,
       value: row.value.value
         .replace(/\./g, '')
         .replace(/,/g, '.')
@@ -98,7 +97,16 @@ export default function Index() {
         })
       )
       .required()
-      .min(1, 'A lista de materiais não pode ser vazia'),
+      .min(1, 'Escolha o material a ser transformado na situação inicial'),
+    MaterialOutItems: yup
+      .array()
+      .of(
+        yup.object().shape({
+          quantity: yup.number().required('Requerido').positive(),
+        })
+      )
+      .required()
+      .min(1, 'Escolha o material a ser transformado na situação final'),
   });
 
   useEffect(() => {
@@ -126,14 +134,14 @@ export default function Index() {
   }, []);
 
   const handleQuantityChange = (e, balance, handleChange) => {
-    // if (Number(e.target.value) > Number(balance)) {
-    //   toast.error('A reserva não pode superar o saldo do material');
-    //   e.target.value = Number(balance);
-    //   handleChange(e);
-    //   return;
-    // } //LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
+    if (Number(e.target.value) > Number(balance)) {
+      toast.error('A quantidade não pode superar o saldo comum do material');
+      e.target.value = Number(balance);
+      handleChange(e);
+      return;
+    } // LIBERAR POR ENQUANTO QUE NAO TEM O SALDO INICIAL
     if (e.target.value < 0) {
-      toast.error('A reserva não pode ser negativa');
+      toast.error('A quantidade não pode ser negativa');
       e.target.value = 0;
       handleChange(e);
       return;
@@ -154,11 +162,10 @@ export default function Index() {
       }
     }); // LIMPANDO CHAVES `EMPTY STRINGS`
 
-    formattedValues.materialIntypeId = 5;
     formattedValues.userId = userId;
-    formattedValues.providerId = formattedValues.providerId?.value;
-    formattedValues.costUnit = formattedValues.costUnit?.value;
-    formattedValues.requiredBy = formattedValues.requiredBy?.value;
+
+    // DEFININDO ENTRADA DE MATERIAL
+    formattedValues.materialIntypeId = 7;
     formattedValues.MaterialInItems.forEach((item) => {
       Object.assign(item, { MaterialId: item.materialId }); // rename key
     });
@@ -171,10 +178,34 @@ export default function Index() {
       0
     );
 
+    // DEFININDO SAÍDA DE MATERIAL
+    formattedValues.materialOuttypeId = 9; // SAÍDA PARA USO
+
+    formattedValues.MaterialOutItems.forEach((item) => {
+      Object.assign(item, { MaterialId: item.materialId }); // rename key
+    });
+
+    formattedValues.value = formattedValues.MaterialOutItems.reduce(
+      (ac, item) => {
+        ac += Number(item.quantity) * Number(item.value);
+        return ac;
+      },
+      0
+    );
+
+    console.log(formattedValues);
+
     try {
       setIsLoading(true);
 
-      console.log(formattedValues);
+      // SAÍDA
+      const resultOut = await axios.post(`/materials/out/`, formattedValues);
+
+      console.log(resultOut);
+
+      formattedValues.returnId = resultOut.data.id;
+
+      // ENTRADA
       await axios.post(`/materials/in/general`, formattedValues);
 
       setIsLoading(false);
@@ -227,12 +258,284 @@ export default function Index() {
             }) => (
               <Form noValidate autoComplete="off">
                 <Row className="my-4">
-                  <Col xs={6}>
+                  <Col xs={12} lg={6}>
                     <Col
                       className="text-center"
                       style={{ background: primaryDarkColor, color: 'white' }}
                     >
                       <span className="fs-6">SITUAÇÃO INICIAL</span>
+                    </Col>
+                    <FieldArray name="MaterialOutItems">
+                      {(fieldArrayProps) => {
+                        const { remove, push } = fieldArrayProps;
+                        return (
+                          <>
+                            <div className="d-flex align-items-center pt-1 pb-1 mb-2 bg-white border-bottom">
+                              <Col>
+                                {' '}
+                                {values.MaterialOutItems.length ? null : (
+                                  <Select
+                                    inputId="searchMaterial"
+                                    options={inventoryData.map((material) => ({
+                                      value: material,
+                                      label: `(${material.materialId}) ${material.name}`,
+                                    }))}
+                                    value={values.searchMaterial}
+                                    onChange={(selected, action) => {
+                                      handlePushItem(
+                                        push,
+                                        selected,
+                                        values.MaterialOutItems
+                                      );
+                                      setFieldValue('searchMaterial', '');
+                                    }}
+                                    placeholder="Selecione o material"
+                                    onBlur={() =>
+                                      setFieldValue('searchMaterial', '')
+                                    }
+                                    escapeClearsValue
+                                    filterOption={filterOptions}
+                                  />
+                                )}
+                              </Col>
+                            </div>
+                            <div style={{ background: body2Color }}>
+                              {values.MaterialOutItems.length > 0 &&
+                                values.MaterialOutItems.map((item, index) => (
+                                  <div
+                                    key={index}
+                                    className="my-3 p-4 border"
+                                    // style={{ background: '#E9EFFA' }}
+                                  >
+                                    {/* <Row>
+                                      <Col className="fs-5 text-center">
+                                        <Badge bg="info" text="white">
+                                          Nº {index + 1}
+                                        </Badge>
+                                      </Col>
+                                    </Row> */}
+
+                                    <div key={index}>
+                                      <Row className="d-flex justify-content-center align-items-center mb-5">
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={4}
+                                          controlId={`MaterialOutItems[${index}].quantity`}
+                                        >
+                                          <Form.Label className="fs-4">
+                                            TRANSFORMAR
+                                          </Form.Label>
+
+                                          <Form.Control
+                                            type="number"
+                                            value={item.quantity}
+                                            onChange={(e) =>
+                                              handleQuantityChange(
+                                                e,
+                                                item.freeInventory,
+                                                handleChange
+                                              )
+                                            }
+                                            onBlur={handleBlur}
+                                            placeholder="QTD"
+                                            size="sm"
+                                            step="any"
+                                            className="fs-2"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                      <Row className="d-flex justify-content-start align-items-center mt-2">
+                                        <Form.Group
+                                          as={Col}
+                                          xs={6}
+                                          lg={4}
+                                          className="pb-3"
+                                          controlId={`MaterialOutItems[${index}].materialId`}
+                                        >
+                                          <Form.Label>CODIGO</Form.Label>
+
+                                          <Form.Control
+                                            type="text"
+                                            readOnly
+                                            value={item.materialId}
+                                            onChange={handleChange}
+                                            placeholder="Selecione o ID material"
+                                            onBlur={handleBlur}
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={4}
+                                          controlId={`MaterialOutItems[${index}].unit`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>UNIDADE</Form.Label>
+
+                                          <Form.Control
+                                            type="text"
+                                            readOnly
+                                            value={item.unit}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                      <Row className="d-flex justify-content-center align-items-center">
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          controlId={`MaterialOutItems[${index}].name`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>DESCRIÇÃO</Form.Label>
+
+                                          <Form.Control
+                                            type="text"
+                                            readOnly
+                                            value={item.name}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                      <Row className="d-flex justify-content-center align-items-center">
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={3}
+                                          controlId={`MaterialOutItems[${index}].value`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>PREÇO R$</Form.Label>
+
+                                          <Form.Control
+                                            type="text"
+                                            readOnly
+                                            value={item.value}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={3}
+                                          controlId={`MaterialOutItems[${index}].freeInventory`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>SALDO COMUM</Form.Label>
+                                          <Form.Control
+                                            type="number"
+                                            readOnly
+                                            value={item.freeInventory}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="SALDO"
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={3}
+                                          controlId={`MaterialOutItems[${index}].reserveInventory`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>SD RESERVADO</Form.Label>
+                                          <Form.Control
+                                            type="number"
+                                            readOnly
+                                            value={item.reserveInventory}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="SALDO"
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={3}
+                                          controlId={`MaterialOutItems[${index}].restrictInventory`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>SD RESTRITO</Form.Label>
+                                          <Form.Control
+                                            type="number"
+                                            readOnly
+                                            value={item.restrictInventory}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="SALDO"
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                      <Row className="d-flex justify-content-center align-items-center" />
+                                      <Row className="d-flex justify-content-center align-items-center">
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={1}
+                                          controlId={`MaterialOutItems[${index}].value`}
+                                          className="d-none"
+                                        >
+                                          <Form.Control
+                                            type="number"
+                                            plaintext
+                                            value={item.value}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="VALOR"
+                                            size="sm"
+                                            className="p-0 m-0 ps-2"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          </>
+                        );
+                      }}
+                    </FieldArray>
+                    <Row className="pt-4">
+                      <Col xs="auto">
+                        {touched.MaterialOutItems &&
+                        typeof errors.MaterialOutItems === 'string' ? (
+                          <Badge bg="danger">{errors.MaterialOutItems}</Badge>
+                        ) : touched.MaterialOutItems &&
+                          errors.MaterialOutItems ? (
+                          <Badge bg="danger">
+                            A quantidade/preço do item não pode ser igual ou
+                            infeior a 0
+                          </Badge>
+                        ) : null}
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col xs={12} lg={6}>
+                    <Col
+                      className="text-center"
+                      style={{ background: primaryDarkColor, color: 'white' }}
+                    >
+                      <span className="fs-6">SITUAÇÃO FINAL</span>
                     </Col>
                     <FieldArray name="MaterialInItems">
                       {(fieldArrayProps) => {
@@ -276,20 +579,43 @@ export default function Index() {
                                     className="my-3 p-4 border"
                                     // style={{ background: '#E9EFFA' }}
                                   >
-                                    <Row>
+                                    {/* <Row>
                                       <Col className="fs-5 text-center">
                                         <Badge bg="info" text="white">
                                           Nº {index + 1}
                                         </Badge>
                                       </Col>
-                                    </Row>
+                                    </Row> */}
 
                                     <div key={index}>
-                                      <Row className="d-flex justify-content-center align-items-center mt-2">
+                                      <Row className="d-flex justify-content-center align-items-center mb-5">
                                         <Form.Group
                                           as={Col}
                                           xs={12}
-                                          lg={6}
+                                          lg={4}
+                                          controlId={`MaterialInItems[${index}].quantity`}
+                                        >
+                                          <Form.Label className="fs-4">
+                                            EM
+                                          </Form.Label>
+
+                                          <Form.Control
+                                            type="number"
+                                            value={item.quantity}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="QTD"
+                                            size="sm"
+                                            step="any"
+                                            className="fs-2"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                      <Row className="d-flex justify-content-start align-items-center mt-2">
+                                        <Form.Group
+                                          as={Col}
+                                          xs={6}
+                                          lg={4}
                                           className="pb-3"
                                           controlId={`MaterialInItems[${index}].materialId`}
                                         >
@@ -297,7 +623,6 @@ export default function Index() {
 
                                           <Form.Control
                                             type="text"
-                                            plaintext
                                             readOnly
                                             value={item.materialId}
                                             onChange={handleChange}
@@ -307,62 +632,126 @@ export default function Index() {
                                             tabindex="-1"
                                           />
                                         </Form.Group>
-                                      </Row>
-                                      <Row className="d-flex justify-content-center align-items-center">
-                                        <Form.Group
-                                          as={Col}
-                                          controlId={`MaterialInItems[${index}].name`}
-                                          className="border-0 m-0 p-0"
-                                        >
-                                          {index === 0 ? (
-                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block">
-                                              DESCRIÇÃO
-                                            </Form.Label>
-                                          ) : null}
-                                          <div className="px-2">
-                                            {item.name}
-                                          </div>
-                                        </Form.Group>
-                                      </Row>
-                                      <Row className="d-flex justify-content-center align-items-center">
                                         <Form.Group
                                           as={Col}
                                           xs={12}
-                                          lg={1}
+                                          lg={4}
                                           controlId={`MaterialInItems[${index}].unit`}
-                                          className="border-0 m-0 p-0"
+                                          className="pb-3"
                                         >
-                                          {index === 0 ? (
-                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block">
-                                              UND
-                                            </Form.Label>
-                                          ) : null}
-                                          <div className="px-2">
-                                            {item.unit}
-                                          </div>
-                                        </Form.Group>
-                                      </Row>
-                                      <Row className="d-flex justify-content-center align-items-center">
-                                        <Form.Group
-                                          as={Col}
-                                          xs={12}
-                                          lg={1}
-                                          controlId={`MaterialInItems[${index}].balancedQuantity`}
-                                          className="d-none"
-                                        >
+                                          <Form.Label>UNIDADE</Form.Label>
+
                                           <Form.Control
-                                            type="number"
-                                            plaintext
-                                            value={item.balancedQuantity}
+                                            type="text"
+                                            readOnly
+                                            value={item.unit}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            placeholder="SALDO"
                                             size="sm"
-                                            className="p-0 m-0 ps-2"
                                             tabindex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
+                                      <Row className="d-flex justify-content-center align-items-center">
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          controlId={`MaterialInItems[${index}].name`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>DESCRIÇÃO</Form.Label>
+
+                                          <Form.Control
+                                            type="text"
+                                            readOnly
+                                            value={item.name}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                      <Row className="d-flex justify-content-center align-items-center">
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={3}
+                                          controlId={`MaterialInItems[${index}].value`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>PREÇO R$</Form.Label>
+
+                                          <Form.Control
+                                            type="text"
+                                            readOnly
+                                            value={item.value}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={3}
+                                          controlId={`MaterialInItems[${index}].freeInventory`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>SALDO COMUM</Form.Label>
+                                          <Form.Control
+                                            type="number"
+                                            readOnly
+                                            value={item.freeInventory}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="SALDO"
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={3}
+                                          controlId={`MaterialInItems[${index}].reserveInventory`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>SD RESERVADO</Form.Label>
+                                          <Form.Control
+                                            type="number"
+                                            readOnly
+                                            value={item.reserveInventory}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="SALDO"
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                        <Form.Group
+                                          as={Col}
+                                          xs={12}
+                                          lg={3}
+                                          controlId={`MaterialInItems[${index}].restrictInventory`}
+                                          className="pb-3"
+                                        >
+                                          <Form.Label>SD RESTRITO</Form.Label>
+                                          <Form.Control
+                                            type="number"
+                                            readOnly
+                                            value={item.restrictInventory}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="SALDO"
+                                            size="sm"
+                                            tabindex="-1"
+                                          />
+                                        </Form.Group>
+                                      </Row>
+                                      <Row className="d-flex justify-content-center align-items-center" />
                                       <Row className="d-flex justify-content-center align-items-center">
                                         <Form.Group
                                           as={Col}
@@ -384,317 +773,8 @@ export default function Index() {
                                           />
                                         </Form.Group>
                                       </Row>
-                                      <Row className="d-flex justify-content-center align-items-center">
-                                        <Col
-                                          xs={12}
-                                          lg={2}
-                                          className="d-flex justify-content-between"
-                                        >
-                                          <Form.Group
-                                            as={Col}
-                                            xs={10}
-                                            sm={4}
-                                            md="auto"
-                                            controlId={`MaterialInItems[${index}].quantity`}
-                                            className="border-0 m-0 p-0"
-                                            style={{ width: '70px' }}
-                                          >
-                                            {index === 0 ? (
-                                              <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block text-center">
-                                                QTD
-                                              </Form.Label>
-                                            ) : null}
-                                            <Form.Control
-                                              type="number"
-                                              plaintext
-                                              value={item.quantity}
-                                              onChange={(e) =>
-                                                handleQuantityChange(
-                                                  e,
-                                                  item.balancedQuantity,
-                                                  handleChange
-                                                )
-                                              }
-                                              onBlur={handleBlur}
-                                              placeholder="QTD"
-                                              size="sm"
-                                              className="p-0 m-0 ps-2 pe-2 text-end"
-                                              step="any"
-                                            />
-                                          </Form.Group>
-                                          <Col
-                                            as={Col}
-                                            xs="2"
-                                            sm="auto"
-                                            className="border-0 m-0 p-0 text-center"
-                                          >
-                                            {index === 0 ? (
-                                              <Row>
-                                                <Col
-                                                  xs="auto"
-                                                  className="d-flex"
-                                                >
-                                                  <div
-                                                    className="d-none d-lg-block"
-                                                    style={{
-                                                      width: '6px',
-                                                      height: '34px',
-                                                    }}
-                                                  />
-                                                </Col>
-                                              </Row>
-                                            ) : null}
-                                            <Row>
-                                              <Col xs="auto">
-                                                <Button
-                                                  onClick={() => remove(index)}
-                                                  variant="outline-danger"
-                                                  size="sm"
-                                                  className="border-0"
-                                                  tabindex="-1"
-                                                >
-                                                  <FaTrashAlt size={18} />
-                                                </Button>
-                                              </Col>
-                                            </Row>
-                                          </Col>
-                                        </Col>
-                                      </Row>
                                     </div>
                                   </div>
-                                ))}
-                            </div>
-                          </>
-                        );
-                      }}
-                    </FieldArray>
-                    <Row className="pt-4">
-                      <Col xs="auto">
-                        {touched.MaterialInItems &&
-                        typeof errors.MaterialInItems === 'string' ? (
-                          <Badge bg="danger">{errors.MaterialInItems}</Badge>
-                        ) : touched.MaterialInItems &&
-                          errors.MaterialInItems ? (
-                          <Badge bg="danger">
-                            A quantidade/preço do item não pode ser 0.
-                          </Badge>
-                        ) : null}
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col xs={6}>
-                    <Col
-                      className="text-center"
-                      style={{ background: primaryDarkColor, color: 'white' }}
-                    >
-                      <span className="fs-6">SITUAÇÃO FINAL</span>
-                    </Col>
-                    <FieldArray name="MaterialInItems">
-                      {(fieldArrayProps) => {
-                        const { remove, push } = fieldArrayProps;
-                        return (
-                          <>
-                            <div className="d-flex align-items-center pt-1 pb-1 mb-2 bg-white border-bottom">
-                              <Col>
-                                <Select
-                                  inputId="searchMaterial"
-                                  options={inventoryData.map((material) => ({
-                                    value: material,
-                                    label: `(${material.materialId}) ${material.name}`,
-                                  }))}
-                                  value={values.searchMaterial}
-                                  onChange={(selected, action) => {
-                                    handlePushItem(
-                                      push,
-                                      selected,
-                                      values.MaterialInItems
-                                    );
-                                    setFieldValue('searchMaterial', '');
-                                  }}
-                                  placeholder="Selecione o material"
-                                  onBlur={() =>
-                                    setFieldValue('searchMaterial', '')
-                                  }
-                                  escapeClearsValue
-                                  filterOption={filterOptions}
-                                />
-                              </Col>
-                            </div>
-                            <div style={{ background: body2Color }}>
-                              {values.MaterialInItems.length > 0 &&
-                                values.MaterialInItems.map((item, index) => (
-                                  <>
-                                    <Row className="d-block d-lg-none">
-                                      <Col className="fw-bold">
-                                        Item nº {index + 1}
-                                      </Col>
-                                    </Row>
-                                    <Row
-                                      key={item.materialId}
-                                      className="d-flex p-0 m-0 border-bottom"
-                                    >
-                                      <Form.Group
-                                        as={Col}
-                                        xs={12}
-                                        lg={2}
-                                        controlId={`MaterialInItems[${index}].materialId`}
-                                        className="border-0 m-0 p-0"
-                                      >
-                                        {index === 0 ? (
-                                          <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-none d-md-none d-lg-block">
-                                            CODIGO
-                                          </Form.Label>
-                                        ) : null}
-                                        <Form.Control
-                                          type="text"
-                                          plaintext
-                                          readOnly
-                                          value={item.materialId}
-                                          onChange={handleChange}
-                                          placeholder="Selecione o ID material"
-                                          onBlur={handleBlur}
-                                          size="sm"
-                                          className="p-0 m-0 ps-2"
-                                          tabindex="-1"
-                                        />
-                                      </Form.Group>
-                                      <Form.Group
-                                        as={Col}
-                                        controlId={`MaterialInItems[${index}].name`}
-                                        className="border-0 m-0 p-0"
-                                      >
-                                        {index === 0 ? (
-                                          <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block">
-                                            DESCRIÇÃO
-                                          </Form.Label>
-                                        ) : null}
-                                        <div className="px-2">{item.name}</div>
-                                      </Form.Group>
-                                      <Form.Group
-                                        as={Col}
-                                        xs={12}
-                                        lg={1}
-                                        controlId={`MaterialInItems[${index}].unit`}
-                                        className="border-0 m-0 p-0"
-                                      >
-                                        {index === 0 ? (
-                                          <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block">
-                                            UND
-                                          </Form.Label>
-                                        ) : null}
-                                        <div className="px-2">{item.unit}</div>
-                                      </Form.Group>
-                                      <Form.Group
-                                        as={Col}
-                                        xs={12}
-                                        lg={1}
-                                        controlId={`MaterialInItems[${index}].balancedQuantity`}
-                                        className="d-none"
-                                      >
-                                        <Form.Control
-                                          type="number"
-                                          plaintext
-                                          value={item.balancedQuantity}
-                                          onChange={handleChange}
-                                          onBlur={handleBlur}
-                                          placeholder="SALDO"
-                                          size="sm"
-                                          className="p-0 m-0 ps-2"
-                                          tabindex="-1"
-                                        />
-                                      </Form.Group>
-                                      <Form.Group
-                                        as={Col}
-                                        xs={12}
-                                        lg={1}
-                                        controlId={`MaterialInItems[${index}].value`}
-                                        className="d-none"
-                                      >
-                                        <Form.Control
-                                          type="number"
-                                          plaintext
-                                          value={item.value}
-                                          onChange={handleChange}
-                                          onBlur={handleBlur}
-                                          placeholder="VALOR"
-                                          size="sm"
-                                          className="p-0 m-0 ps-2"
-                                          tabindex="-1"
-                                        />
-                                      </Form.Group>
-                                      <Col
-                                        xs={12}
-                                        lg={2}
-                                        className="d-flex justify-content-between"
-                                      >
-                                        <Form.Group
-                                          as={Col}
-                                          xs={10}
-                                          sm={4}
-                                          md="auto"
-                                          controlId={`MaterialInItems[${index}].quantity`}
-                                          className="border-0 m-0 p-0"
-                                          style={{ width: '70px' }}
-                                        >
-                                          {index === 0 ? (
-                                            <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block text-center">
-                                              QTD
-                                            </Form.Label>
-                                          ) : null}
-                                          <Form.Control
-                                            type="number"
-                                            plaintext
-                                            value={item.quantity}
-                                            onChange={(e) =>
-                                              handleQuantityChange(
-                                                e,
-                                                item.balancedQuantity,
-                                                handleChange
-                                              )
-                                            }
-                                            onBlur={handleBlur}
-                                            placeholder="QTD"
-                                            size="sm"
-                                            className="p-0 m-0 ps-2 pe-2 text-end"
-                                            step="any"
-                                          />
-                                        </Form.Group>
-                                        <Col
-                                          as={Col}
-                                          xs="2"
-                                          sm="auto"
-                                          className="border-0 m-0 p-0 text-center"
-                                        >
-                                          {index === 0 ? (
-                                            <Row>
-                                              <Col xs="auto" className="d-flex">
-                                                <div
-                                                  className="d-none d-lg-block"
-                                                  style={{
-                                                    width: '6px',
-                                                    height: '34px',
-                                                  }}
-                                                />
-                                              </Col>
-                                            </Row>
-                                          ) : null}
-                                          <Row>
-                                            <Col xs="auto">
-                                              <Button
-                                                onClick={() => remove(index)}
-                                                variant="outline-danger"
-                                                size="sm"
-                                                className="border-0"
-                                                tabindex="-1"
-                                              >
-                                                <FaTrashAlt size={18} />
-                                              </Button>
-                                            </Col>
-                                          </Row>
-                                        </Col>
-                                      </Col>
-                                    </Row>
-                                  </>
                                 ))}
                             </div>
                           </>
