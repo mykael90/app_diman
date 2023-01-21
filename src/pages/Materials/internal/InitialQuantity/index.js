@@ -106,7 +106,7 @@ function EditableCell({
   };
 
   // We'll only update the external data when the input is blurred
-  const onBlur = (e) => {
+  const handleDo = (e) => {
     e.preventDefault();
     if (value) {
       handleUpdateInitialQuantity(e, original, value);
@@ -140,7 +140,7 @@ function EditableCell({
           <FaPencilAlt />
         </Button>
       </OverlayTrigger>
-      <Form className="d-flex" onSubmit={onBlur}>
+      <Form className="d-flex" onSubmit={handleDo}>
         <Form.Control
           type="number"
           size="sm"
@@ -629,6 +629,7 @@ export default function Index() {
           filterTypes={filterTypes}
           renderRowSubComponent={renderRowSubComponent}
           updateMyData={updateMyData}
+          skipPageReset={skipPageReset}
         />
       </Container>
     </>
