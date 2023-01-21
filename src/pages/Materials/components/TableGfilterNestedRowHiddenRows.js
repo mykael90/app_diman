@@ -92,6 +92,7 @@ export default function TableGfilterNestedRowHiddenRows({
   initialState,
   renderRowSubComponent,
   updateMyData,
+  updateMyDataDatabase,
   skipPageReset,
 }) {
   const {
@@ -132,6 +133,7 @@ export default function TableGfilterNestedRowHiddenRows({
       // That way we can call this function from our
       // cell renderer!
       updateMyData,
+      updateMyDataDatabase,
     },
     useFilters,
     useGlobalFilter,

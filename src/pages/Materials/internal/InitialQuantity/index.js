@@ -46,40 +46,10 @@ function EditableCell({
   row: { index, original },
   column: { id },
   updateMyData, // This is a custom function that we supplied to our table instance
-  handleUpdateDatabase, // nao ta funcionando, diz que nao é funcao, vou jogar a atualização aqui pra dentro
+  updateMyDataDatabase, // This is a custom function that we supplied to our table instance
 }) {
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
-  const userId = useSelector((state) => state.auth.user.id);
-
-  // fiz aqui pq referenciando com handleUpdateDatabase nao deu certo
-  const handleUpdateInitialQuantity = async (e, values, actualBalance) => {
-    e.preventDefault();
-    console.log(userId);
-    const { materialId } = values;
-    const updateInitialQuantity = {
-      userIdInitialQuantity: userId,
-      dateInitialQuantity: new Date().toISOString(),
-      initialQuantity: Number(actualBalance) - Number(values.balance),
-    };
-
-    try {
-      // FAZ A ATUALIZAÇÃO DA SEPARAÇÃO
-      await axios.put(
-        `/materials/inventory/${materialId}`,
-        updateInitialQuantity
-      );
-
-      // getData();
-
-      toast.success(`Saldo inicial atualizado com sucesso`);
-    } catch (err) {
-      // eslint-disable-next-line no-unused-expressions
-      err.response?.data?.errors
-        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-    }
-  };
 
   const handleUpdateAsk = (e, values) => {
     e.preventDefault();
@@ -109,7 +79,7 @@ function EditableCell({
   const handleDo = (e) => {
     e.preventDefault();
     if (value) {
-      handleUpdateInitialQuantity(e, original, value);
+      updateMyDataDatabase(e, original, value);
       updateMyData(index, id, value);
     }
     e.currentTarget.className += ' d-none';
@@ -283,6 +253,7 @@ const FilterForTotal = ({
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
+  const [originalData, setOriginalData] = useState([]);
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [materialIdModal, setMaterialIdModal] = useState('');
@@ -509,8 +480,8 @@ export default function Index() {
         width: 120,
         disableResizing: true,
         disableFilters: true,
-        Cell: (value, row, column, updateMyData, handleUpdateDatabase) =>
-          EditableCell(value, row, column, updateMyData, handleUpdateDatabase),
+        Cell: (value, row, column, updateMyData, updateMyDataDatabase) =>
+          EditableCell(value, row, column, updateMyData, updateMyDataDatabase),
       },
     ],
     []
@@ -629,6 +600,7 @@ export default function Index() {
           filterTypes={filterTypes}
           renderRowSubComponent={renderRowSubComponent}
           updateMyData={updateMyData}
+          updateMyDataDatabase={handleUpdateDatabase}
           skipPageReset={skipPageReset}
         />
       </Container>
