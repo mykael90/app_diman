@@ -125,6 +125,8 @@ export default function TableGfilterNestedRowHiddenRows({
       defaultColumn,
       globalFilter: 'text',
       filterTypes,
+      autoResetFilters: !skipPageReset,
+      autoResetGlobalFilter: !skipPageReset,
       initialState,
       autoResetPage: !skipPageReset,
       // updateMyData isn't part of the API, but

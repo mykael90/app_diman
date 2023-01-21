@@ -11,6 +11,8 @@ import {
   FaSearch,
   FaPencilAlt,
   FaCheck,
+  FaSearchPlus,
+  FaSearchMinus,
 } from 'react-icons/fa';
 
 import {
@@ -53,21 +55,12 @@ function EditableCell({
 
   const handleUpdateAsk = (e, values) => {
     e.preventDefault();
-    console.log(e);
-    console.log(e.currentTarget);
-    console.log(e.currentTarget.nextSibling);
-    // if (userId !== values.userId)
-    //   return toast.error(
-    //     `Reserva só pode ser cancelada pelo usuário que a criou.`
-    //   );
     const form = e.currentTarget.nextSibling.firstChild;
     const btn = e.currentTarget.nextSibling.firstChild.nextSibling;
     form.className = form.className.replace('d-none', 'd-block');
     btn.className = btn.className.replace('d-none', 'd-block');
     e.currentTarget.className += ' d-none';
     return true;
-
-    // e.currentTarget.remove();
   };
 
   const onChange = (e) => {
@@ -106,6 +99,7 @@ function EditableCell({
           }
               `}
           onClick={handleUpdateAsk}
+          tabIndex="-1"
         >
           <FaPencilAlt />
         </Button>
@@ -128,6 +122,7 @@ function EditableCell({
           className={
             original.dateInitialQuantity ? 'd-none border-0' : 'border-0'
           }
+          tabIndex="-1"
         >
           <FaCheck size={18} />
         </Button>
@@ -141,8 +136,6 @@ function DefaultColumnFilter() {
   return <> </>;
 } // as colunas padrao nao aplicam filtro
 
-// This is a custom filter UI for selecting
-// a unique option from a list
 function SelectColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
 }) {
@@ -151,20 +144,17 @@ function SelectColumnFilter({
   const options = React.useMemo(() => {
     const options = new Set();
     preFilteredRows.forEach((row) => {
-      options.add(row.values[id].toString().substring(0, 4));
+      options.add(row.values[id]);
     });
     return [...options.values()];
   }, [id, preFilteredRows]);
-
   // Render a multi-select box
   return (
     <Col>
       <OverlayTrigger
         placement="left"
         delay={{ show: 250, hide: 400 }}
-        overlay={(props) =>
-          renderTooltip(props, 'Filtragem por grupo de material')
-        }
+        overlay={(props) => renderTooltip(props, `Filter for ${id}`)}
       >
         <Dropdown>
           <Dropdown.Toggle
@@ -173,7 +163,7 @@ function SelectColumnFilter({
             id="dropdown-group"
             className="border-0"
           >
-            <FaSearch /> {filterValue}
+            {filterValue ? <span>{filterValue}</span> : <FaSearch />}
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
@@ -184,7 +174,7 @@ function SelectColumnFilter({
             >
               Remover Filtro
             </Dropdown.Item>
-            {options.map((option, i) => (
+            {options.sort().map((option, i) => (
               <Dropdown.Item
                 key={i}
                 onClick={() => {
@@ -198,6 +188,70 @@ function SelectColumnFilter({
         </Dropdown>
       </OverlayTrigger>
     </Col>
+  );
+}
+
+function InputColumnFilter({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  const options = React.useMemo(() => {
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id]);
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
+  // Render a multi-select box
+  return (
+    <Row>
+      <Col xs="auto" className="pe-0">
+        <OverlayTrigger
+          placement="left"
+          delay={{ show: 250, hide: 400 }}
+          overlay={(props) => renderTooltip(props, `Filter for ${id}`)}
+        >
+          <Button
+            variant="outline-primary"
+            size="sm"
+            id="dropdown-group"
+            className="border-0"
+            onClick={(e) => {
+              e.preventDefault();
+              const searchInput = e.currentTarget.parentElement.nextSibling;
+
+              if (searchInput.className.includes('d-none')) {
+                searchInput.className = searchInput.className.replace(
+                  'd-none',
+                  'd-inline'
+                );
+              } else {
+                searchInput.className = searchInput.className.replace(
+                  'd-inline',
+                  'd-none'
+                );
+                setFilter(undefined);
+              }
+
+              return true;
+            }}
+          >
+            {!filterValue ? <FaSearchPlus /> : <FaSearchMinus />}
+          </Button>
+        </OverlayTrigger>
+      </Col>
+      <Col className="ps-1 d-none">
+        <Form.Control
+          type="text"
+          size="sm"
+          value={filterValue || ''}
+          onChange={(e) => {
+            setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
+          }}
+        />
+      </Col>
+    </Row>
   );
 }
 
@@ -267,7 +321,6 @@ export default function Index() {
 
   const handleUpdateDatabase = async (e, values, actualBalance) => {
     e.preventDefault();
-    console.log('aqui');
     const { materialId } = values;
     const updateInitialQuantity = {
       userIdInitialQuantity: userId,
@@ -299,12 +352,13 @@ export default function Index() {
   };
 
   useEffect(() => {
-    async function getData() {
+    async function getOriginalData() {
       try {
         setIsLoading(true);
         const response = await axios.get(
           '/materials/raw/materialsrelevancebalance'
         );
+        setOriginalData(response.data);
         setData(response.data);
         setIsLoading(false);
       } catch (err) {
@@ -316,7 +370,7 @@ export default function Index() {
       }
     }
 
-    getData();
+    getOriginalData();
   }, []);
 
   // When our cell renderer calls updateMyData, we'll use
@@ -396,8 +450,10 @@ export default function Index() {
       {
         Header: 'Denominação',
         accessor: 'name',
+        disableSortBy: true,
         Cell: ({ value }) => <div className="text-start">{value}</div>,
-        disableFilters: true,
+        Filter: InputColumnFilter,
+        filter: 'text',
       },
       {
         Header: 'Unidade',
@@ -487,7 +543,7 @@ export default function Index() {
     []
   );
 
-  const dataTable = React.useMemo(() => data, [data]);
+  // const dataTable = React.useMemo(() => data, [data]);
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -594,7 +650,7 @@ export default function Index() {
 
         <TableGfilterNestedRowHiddenRows
           columns={columns}
-          data={dataTable}
+          data={data}
           defaultColumn={defaultColumn}
           initialState={initialState}
           filterTypes={filterTypes}
