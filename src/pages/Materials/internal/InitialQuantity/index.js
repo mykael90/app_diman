@@ -71,11 +71,15 @@ function EditableCell({
   // We'll only update the external data when the input is blurred
   const handleDo = (e) => {
     e.preventDefault();
-    if (value) {
+    if (value > original.balance) {
       updateMyDataDatabase(e, original, value);
       updateMyData(index, id, value);
+      e.currentTarget.className += ' d-none';
+    } else {
+      toast.error(
+        `Saldo real não pode ser inferior ao saldo teórico (${original.balance} ${original.unit})`
+      );
     }
-    e.currentTarget.className += ' d-none';
   };
 
   // If the initialValue is changed external, sync it up with our state
