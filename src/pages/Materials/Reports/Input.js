@@ -519,7 +519,7 @@ export default function Index() {
         disableResizing: true,
         Cell: ({ value }) => <div className="p-auto text-end">{value}</div>,
         Filter: InputValueColumnFilter,
-        disableSortBy: true,
+        // disableSortBy: true,
         filter: 'rangeValue',
       },
       {

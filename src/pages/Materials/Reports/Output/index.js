@@ -630,7 +630,7 @@ export default function Index() {
         disableResizing: true,
         // eslint-disable-next-line react/destructuring-assignment
         Cell: ({ value }) => <div className="text-end">{value}</div>,
-        disableSortBy: true,
+        // disableSortBy: true,
         Filter: InputValueColumnFilter,
         filter: 'rangeValue',
       },
