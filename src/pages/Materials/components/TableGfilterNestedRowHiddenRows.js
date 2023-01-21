@@ -84,6 +84,49 @@ export function GlobalFilter({
   );
 }
 
+function SortBy({ column: { isSorted, isSortedDesc, toggleSortBy } }) {
+  return (
+    <Col xs="auto" className="pe-0">
+      <span>
+        {' '}
+        {isSorted ? (
+          isSortedDesc ? (
+            <Button
+              title="Ordenado decrescente"
+              size="sm"
+              variant="outline-primary"
+              className="border-0"
+              onClick={() => toggleSortBy(!isSortedDesc)}
+            >
+              <FaSortAlphaUp />
+            </Button>
+          ) : (
+            <Button
+              title="Ordenado crescente"
+              size="sm"
+              variant="outline-primary"
+              className="border-0 "
+              onClick={() => toggleSortBy(!isSortedDesc)}
+            >
+              <FaSortAlphaDown />
+            </Button>
+          )
+        ) : (
+          <Button
+            title="Clique para ordenar"
+            size="sm"
+            variant="outline-primary"
+            className="border-0 "
+            onClick={() => toggleSortBy(false)}
+          >
+            <FaSort />
+          </Button>
+        )}
+      </span>
+    </Col>
+  );
+}
+
 export default function TableGfilterNestedRowHiddenRows({
   columns,
   data,
@@ -173,47 +216,13 @@ export default function TableGfilterNestedRowHiddenRows({
                 {headerGroup.headers.map((column) => (
                   <th
                     className="text-center align-middle"
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    {...column.getHeaderProps()}
                   >
                     {column.render('Header')}
-                    <div className="text-center">
+                    <Row className="text-center">
+                      {column.canSort ? <SortBy column={column} /> : null}
                       {column.canFilter ? column.render('Filter') : null}
-                    </div>
-                    {column.canSort ? (
-                      <span>
-                        {' '}
-                        {column.isSorted ? (
-                          column.isSortedDesc ? (
-                            <Button
-                              title="Ordenado decrescente"
-                              size="sm"
-                              variant="outline-primary"
-                              className="border-0"
-                            >
-                              <FaSortAlphaUp />
-                            </Button>
-                          ) : (
-                            <Button
-                              title="Ordenado crescente"
-                              size="sm"
-                              variant="outline-primary"
-                              className="border-0"
-                            >
-                              <FaSortAlphaDown />
-                            </Button>
-                          )
-                        ) : (
-                          <Button
-                            title="Clique para ordenar"
-                            size="sm"
-                            variant="outline-primary"
-                            className="border-0"
-                          >
-                            <FaSort />
-                          </Button>
-                        )}
-                      </span>
-                    ) : null}
+                    </Row>
                   </th>
                 ))}
               </tr>

@@ -13,6 +13,9 @@ import {
   FaCheck,
   FaSearchPlus,
   FaSearchMinus,
+  FaSortAlphaUp,
+  FaSortAlphaDown,
+  FaSort,
 } from 'react-icons/fa';
 
 import {
@@ -209,7 +212,7 @@ function InputColumnFilter({
   }, [id, preFilteredRows]);
   // Render a multi-select box
   return (
-    <Row>
+    <Col className="d-flex text-start">
       <Col xs="auto" className="pe-0">
         <OverlayTrigger
           placement="left"
@@ -255,7 +258,7 @@ function InputColumnFilter({
           }}
         />
       </Col>
-    </Row>
+    </Col>
   );
 }
 
@@ -307,6 +310,49 @@ const FilterForTotal = ({
     ),
     [filterValue, setFilter]
   );
+
+function SortBy({ column: { isSorted, isSortedDesc, toggleSortBy } }) {
+  return (
+    <Col xs="auto" className="pe-0">
+      <span>
+        {' '}
+        {isSorted ? (
+          isSortedDesc ? (
+            <Button
+              title="Ordenado decrescente"
+              size="sm"
+              variant="outline-primary"
+              className="border-0"
+              onClick={() => toggleSortBy(!isSortedDesc)}
+            >
+              <FaSortAlphaUp />
+            </Button>
+          ) : (
+            <Button
+              title="Ordenado crescente"
+              size="sm"
+              variant="outline-primary"
+              className="border-0 "
+              onClick={() => toggleSortBy(!isSortedDesc)}
+            >
+              <FaSortAlphaDown />
+            </Button>
+          )
+        ) : (
+          <Button
+            title="Clique para ordenar"
+            size="sm"
+            variant="outline-primary"
+            className="border-0 "
+            onClick={() => toggleSortBy(false)}
+          >
+            <FaSort />
+          </Button>
+        )}
+      </span>
+    </Col>
+  );
+}
 
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
@@ -454,7 +500,6 @@ export default function Index() {
       {
         Header: 'Denominação',
         accessor: 'name',
-        disableSortBy: true,
         Cell: ({ value }) => <div className="text-start">{value}</div>,
         Filter: InputColumnFilter,
         filter: 'text',
