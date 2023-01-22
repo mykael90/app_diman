@@ -1,6 +1,8 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+import usersRoletypes from '../../assets/JSON/data/usersRoletypes.json';
+
 import Frequency from './Frequency';
 import FacialRecognition from './Frequency/FacialRecognition';
 import FrequencyManual from './Frequency/Manual';
@@ -19,12 +21,10 @@ import Record from './Record';
 import List from './Record/List';
 import Add from './Record/Add';
 
-const ROLES = {
-  adm: 100,
-  adm_materials: 200,
-  super_materials: 201,
-  common_materials: 202,
-};
+const roles = usersRoletypes.reduce(
+  (acc, cur) => ({ ...acc, [cur.role]: cur.id }),
+  {}
+);
 
 export default function MaterialsRoutes() {
   return (

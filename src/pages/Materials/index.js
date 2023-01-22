@@ -1,6 +1,8 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+import usersRoletypes from '../../assets/JSON/data/usersRoletypes.json';
+
 import RequireAuth from '../../routes/RequireAuth';
 import Unauthorized from '../../components/Unauthorized';
 
@@ -43,12 +45,10 @@ import Definitions from './definitions';
 import Terminology from './definitions/Terminology';
 import ProccessFlow from './definitions/ProccessFlow';
 
-const ROLES = {
-  adm: 100,
-  adm_materials: 200,
-  super_materials: 201,
-  common_materials: 202,
-};
+const roles = usersRoletypes.reduce(
+  (acc, cur) => ({ ...acc, [cur.role]: cur.id }),
+  {}
+);
 
 export default function MaterialsRoutes() {
   return (
@@ -59,9 +59,9 @@ export default function MaterialsRoutes() {
         element={
           <RequireAuth
             allowedRoles={[
-              ROLES.adm,
-              ROLES.adm_materials,
-              ROLES.super_materials,
+              roles.adm,
+              roles.adm_materials,
+              roles.super_materials,
             ]}
           />
         }
