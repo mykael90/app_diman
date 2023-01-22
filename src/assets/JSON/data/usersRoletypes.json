@@ -1,0 +1,72 @@
+[
+	{
+		"id" : 100,
+		"role" : "adm",
+		"description" : "ADMINISTRADOR",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 200,
+		"role" : "adm_materials",
+		"description" : "ADMINISTRADOR MODULO MATERRIAIS",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 201,
+		"role" : "super_materials",
+		"description" : "SUPER USUARIO MODULO MATERIAIS",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 202,
+		"role" : "common_materials",
+		"description" : "USUARIO COMUM MODULO MATERIAIS",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 300,
+		"role" : "adm_workers",
+		"description" : "ADMINISTRADOR MODULO COLABORADORES",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 301,
+		"role" : "super_workers",
+		"description" : "SUPER USUARIO MODULO COLABORADORES",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 302,
+		"role" : "common_workers",
+		"description" : "USUARIO COMUM MODULO COLABORADORES",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 400,
+		"role" : "adm_suppliers",
+		"description" : "ADMINISTRADOR MODULO FORNECEDORES",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 401,
+		"role" : "super_suppliers",
+		"description" : "SUPER USUARIO MODULO FORNECEDORES",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	},
+	{
+		"id" : 402,
+		"role" : "common_suppliers",
+		"description" : "USUARIO COMUM MODULO FORNECEDORES",
+		"created_at" : "2022-10-11 19:36:27",
+		"updated_at" : "2022-10-11 19:36:27"
+	}
+]
