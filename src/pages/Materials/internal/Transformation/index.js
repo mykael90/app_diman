@@ -279,7 +279,7 @@ export default function Index() {
                                     inputId="searchMaterial"
                                     options={inventoryData.map((material) => ({
                                       value: material,
-                                      label: `(${material.materialId}) ${material.name}`,
+                                      label: `(${material.materialId}) ${material.name} - ${material.unit}`,
                                     }))}
                                     value={values.searchMaterial}
                                     onChange={(selected, action) => {
@@ -566,7 +566,7 @@ export default function Index() {
                                     inputId="searchMaterial"
                                     options={inventoryData.map((material) => ({
                                       value: material,
-                                      label: `(${material.materialId}) ${material.name}`,
+                                      label: `(${material.materialId}) ${material.name} - ${material.unit}`,
                                     }))}
                                     value={values.searchMaterial}
                                     onChange={(selected, action) => {

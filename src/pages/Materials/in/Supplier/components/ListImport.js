@@ -70,8 +70,8 @@ export default function Index(props) {
         materialId: row.values.id,
         name: row.values.name,
         unit: row.values.unit,
-        value: 0.0,
-        quantity: row.values.quantity ?? 0,
+        value: '',
+        quantity: row.values.quantity ?? '',
       });
 
       const newHiddenRows = [...hiddenRows, row.values.id];

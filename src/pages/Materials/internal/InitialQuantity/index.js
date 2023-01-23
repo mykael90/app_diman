@@ -143,6 +143,64 @@ function DefaultColumnFilter() {
   return <> </>;
 } // as colunas padrao nao aplicam filtro
 
+function SelectColumnIdFilter({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  const options = React.useMemo(() => {
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id].toString().substring(0, 4));
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
+
+  // Render a multi-select box
+  return (
+    <Col>
+      <OverlayTrigger
+        placement="left"
+        delay={{ show: 250, hide: 400 }}
+        overlay={(props) =>
+          renderTooltip(props, 'Filtragem por grupo de material')
+        }
+      >
+        <Dropdown>
+          <Dropdown.Toggle
+            variant="outline-primary"
+            size="sm"
+            id="dropdown-group"
+            className="border-0"
+          >
+            <FaSearch /> {filterValue}
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <Dropdown.Item
+              onClick={() => {
+                setFilter('');
+              }}
+            >
+              Remover Filtro
+            </Dropdown.Item>
+            {options.map((option, i) => (
+              <Dropdown.Item
+                key={i}
+                onClick={() => {
+                  setFilter(option || undefined);
+                }}
+              >
+                {option}{' '}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      </OverlayTrigger>
+    </Col>
+  );
+}
+
 function SelectColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
 }) {
@@ -479,7 +537,7 @@ export default function Index() {
         disableResizing: true,
         isVisible: window.innerWidth > 768,
         disableSortBy: true,
-        Filter: SelectColumnFilter,
+        Filter: SelectColumnIdFilter,
         filter: 'groupMaterial',
         Cell: ({ value, row }) => (
           <div
