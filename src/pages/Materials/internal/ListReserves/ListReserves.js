@@ -634,12 +634,12 @@ export default function Index() {
   );
 
   const initialState = {
-    sortBy: [
-      {
-        id: 'id',
-        desc: true,
-      },
-    ],
+    // sortBy: [
+    //   {
+    //     id: 'id',
+    //     desc: true,
+    //   },
+    // ],
     filters: [
       { id: window.innerWidth > 768 ? 'status' : 'mobile', value: 'EM ESPERA' },
     ],
