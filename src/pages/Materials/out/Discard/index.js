@@ -229,7 +229,7 @@ export default function Index() {
       setIsLoading(true);
 
       if (files.length > 0) {
-        await axios.post(`/materials/out`, formData, {
+        await axios.post(`/materials/out/general`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -239,7 +239,7 @@ export default function Index() {
         // }
       } else {
         console.log(formattedValues);
-        await axios.post(`/materials/out`, formattedValues);
+        await axios.post(`/materials/out/general`, formattedValues);
       }
 
       setIsLoading(false);
