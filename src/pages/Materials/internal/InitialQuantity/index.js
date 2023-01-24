@@ -74,7 +74,7 @@ function EditableCell({
   // We'll only update the external data when the input is blurred
   const handleDo = (e) => {
     e.preventDefault();
-    if (value > original.balance) {
+    if (value >= original.balance) {
       updateMyDataDatabase(e, original, value);
       updateMyData(index, id, value);
       e.currentTarget.className += ' d-none';
