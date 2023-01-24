@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { Container, Nav, NavDropdown } from 'react-bootstrap';
+import { Container, Nav, NavDropdown, Row, Col } from 'react-bootstrap';
 
 import * as actions from '../../store/modules/auth/actions';
 import { StyledNav, StyledNavbar } from './styled';
@@ -34,6 +34,14 @@ export default function Header() {
 
   return (
     <>
+      {process.env?.REACT_APP_BASE_ENV === 'development' ? (
+        <Row className="bg-warning">
+          <Col className="text-center text-dark fw-bold font-monospace py-1">
+            AMBIENTE DE DESENVOLVIMENTO
+          </Col>
+        </Row>
+      ) : null}
+
       <StyledNav className="d-print-none" />
 
       <StyledNavbar
