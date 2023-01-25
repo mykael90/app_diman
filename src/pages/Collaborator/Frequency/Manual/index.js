@@ -54,7 +54,7 @@ export default function Index() {
       let exists = false;
 
       list.every((item) => {
-        if (item.WorkerId === row.value) {
+        if (item.WorkerId === row.value.id) {
           exists = true;
           return false;
         }
@@ -69,8 +69,9 @@ export default function Index() {
 
     // adicionar na lista de saída
     push({
-      WorkerId: row.value,
+      WorkerId: row.value.id,
       name: row.label,
+      job: row.value.job,
       WorkerManualfrequencytypeId: '',
       hours: 9,
       obs: '',
@@ -395,7 +396,7 @@ export default function Index() {
                               options={workers.map((value) => ({
                                 label: value[0],
                                 options: value[1].map((item) => ({
-                                  value: item.id,
+                                  value: item,
                                   label: item.name,
                                 })),
                               }))}
@@ -472,7 +473,20 @@ export default function Index() {
                                     <Form.Group
                                       as={Col}
                                       lg={2}
-                                      controlId={`WorkerManualfrequencyItems[${index}].name`}
+                                      controlId={`WorkerManualfrequencyItems[${index}].obs`}
+                                      className="border-0 m-0 p-0"
+                                    >
+                                      {index === 0 ? (
+                                        <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-lg-block">
+                                          OBS
+                                        </Form.Label>
+                                      ) : null}
+                                      <div className="px-2">{item.obs}</div>
+                                    </Form.Group>
+                                    <Form.Group
+                                      as={Col}
+                                      lg={2}
+                                      controlId={`WorkerManualfrequencyItems[${index}].job`}
                                       className="border-0 m-0 p-0"
                                     >
                                       {index === 0 ? (
@@ -480,7 +494,7 @@ export default function Index() {
                                           FUNÇÃO
                                         </Form.Label>
                                       ) : null}
-                                      <div className="px-2">{item.name}</div>
+                                      <div className="px-2">{item.job}</div>
                                     </Form.Group>
                                     <Form.Group
                                       as={Col}
