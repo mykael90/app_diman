@@ -201,7 +201,7 @@ export default function Index() {
       }
     }); // LIMPANDO CHAVES `EMPTY STRINGS`
 
-    formattedValues.materialOuttypeId = 5; // SAÍDA POR DESCARTE
+    formattedValues.materialOuttypeId = 8; // SAÍDA POR EXTRAVIO
     formattedValues.userId = userId;
     formattedValues.workerId = formattedValues.workerId?.value;
     formattedValues.MaterialOutItems.forEach((item) => {
@@ -271,7 +271,7 @@ export default function Index() {
           className="px-0 mx-0 py-2 text-center"
           style={{ background: primaryDarkColor, color: 'white' }}
         >
-          <span className="fs-5">SAÍDA DE MATERIAL: DESCARTE</span>
+          <span className="fs-5">SAÍDA DE MATERIAL: EXTRAVIO</span>
         </Row>
         <Row className="px-0 pt-2">
           <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
@@ -300,7 +300,7 @@ export default function Index() {
                     // controlId="workerId"
                     className="pb-3"
                   >
-                    <Form.Label>PERCEBIDO POR: </Form.Label>
+                    <Form.Label>IDENTIFICADO POR: </Form.Label>
 
                     <Select
                       // id="workerId"
@@ -328,16 +328,16 @@ export default function Index() {
                 </Row>
                 <Row>
                   <Form.Group xs={12} className="pb-3" controlId="obs">
-                    <Form.Label>OBSERVAÇÕES GERAIS:</Form.Label>
+                    <Form.Label>REGISTRAR OCORRÊNCIA:</Form.Label>
                     <Form.Control
                       as="textarea"
-                      rows={5}
+                      rows={8}
                       type="text"
                       value={values.obs}
                       onChange={handleChange}
                       isInvalid={touched.obs && !!errors.obs}
                       // isValid={touched.obs && !errors.obs}
-                      placeholder="Detalhe a situação: Falha no material | Vencido | Obsoleto | Quebra por acidente"
+                      placeholder="Detalhe a situação: Quando foi percebido a falta; Se teve arrombamento; Se foi em horário de expediente; Etc"
                       onBlur={(e) => {
                         setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
                         handleBlur(e);
@@ -637,7 +637,7 @@ export default function Index() {
                   </Col>
                   <Col xs="auto" className="text-center pt-2 pb-4">
                     <Button variant="success" onClick={submitForm}>
-                      Confirmar descarte
+                      Confirmar extravio
                     </Button>
                   </Col>
                 </Row>

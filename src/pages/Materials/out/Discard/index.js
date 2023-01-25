@@ -91,6 +91,7 @@ export default function Index() {
   const schema = yup.object().shape({
     MaterialOutDiscardtypeId: yup.object().required('Requerido'),
     obs: yup.string().required('Requerido'),
+    place: yup.string().required('Requerido'),
     // eslint-disable-next-line react/forbid-prop-types
     MaterialOutItems: yup
       .array()
@@ -281,6 +282,7 @@ export default function Index() {
   const initialValues = {
     MaterialOutDiscardtypeId: '',
     workerId: '',
+    place: '',
     obs: '',
     MaterialOutItems: [],
   };
@@ -350,7 +352,7 @@ export default function Index() {
                     // controlId="workerId"
                     className="pb-3"
                   >
-                    <Form.Label>PERCEBIDO POR: </Form.Label>
+                    <Form.Label>IDENTIFICADO POR: </Form.Label>
 
                     <Select
                       // id="workerId"
@@ -374,6 +376,35 @@ export default function Index() {
                     {touched.workerId && !!errors.workerId ? (
                       <Badge bg="danger">{errors.workerId}</Badge>
                     ) : null}
+                  </Form.Group>
+                </Row>
+                <Row>
+                  <Form.Group
+                    as={Col}
+                    xs={12}
+                    className="pb-3"
+                    controlId="place"
+                  >
+                    <Form.Label>DESTINO DESCARTE:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={values.place}
+                      onChange={handleChange}
+                      isInvalid={touched.place && !!errors.place}
+                      // isValid={touched.place && !errors.place}
+                      onBlur={(e) => {
+                        setFieldValue('place', e.target.value.toUpperCase()); // UPPERCASE
+                        handleBlur(e);
+                      }}
+                      placeholder="Destino do descarte"
+                    />
+                    <Form.Control.Feedback
+                      tooltip
+                      type="invalid"
+                      style={{ position: 'static' }}
+                    >
+                      {errors.place}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Row>
                 <Row>

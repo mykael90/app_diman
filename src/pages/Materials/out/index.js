@@ -54,9 +54,7 @@ export default function index() {
                 to="/materials/out/loss"
                 style={{ color: 'inherit' }}
               >
-                <Nav.Link href="#6" disabled>
-                  Extravio
-                </Nav.Link>
+                <Nav.Link href="#6">Extravio</Nav.Link>
               </Link>
             </Nav.Item>
           </Nav>
