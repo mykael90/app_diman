@@ -437,7 +437,7 @@ export default function Index() {
                                       xs={12}
                                       lg={2}
                                       controlId={`WorkerManualfrequencyItems[${index}].WorkerId`}
-                                      className="border-0 m-0 p-0"
+                                      className="border-0 m-0 p-0 d-none"
                                     >
                                       {index === 0 ? (
                                         <Form.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-none d-md-none d-lg-block">
