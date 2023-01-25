@@ -13,17 +13,17 @@ export default function index() {
             <Nav.Item>
               <Link
                 className="text-decoration-none"
-                to="/collaborator/frequency/facialrecognition"
+                to="/collaborator/frequency/manual"
               >
-                <Nav.Link href="#1">Reconhecimento Facial</Nav.Link>
+                <Nav.Link href="#1">Inserção Manual</Nav.Link>
               </Link>
             </Nav.Item>
             <Nav.Item>
               <Link
                 className="text-decoration-none"
-                to="/collaborator/frequency/manual"
+                to="/collaborator/frequency/facialrecognition"
               >
-                <Nav.Link href="#2">Inserção Manual</Nav.Link>
+                <Nav.Link href="#2">Reconhecimento Facial</Nav.Link>
               </Link>
             </Nav.Item>
           </Nav>

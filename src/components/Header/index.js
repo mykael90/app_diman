@@ -74,9 +74,7 @@ export default function Header() {
               <NavDropdown title="COLABORADORES" id="collasible-nav-dropdown">
                 <NavDropdown.Item // teste
                   href="#1"
-                  onClick={() =>
-                    navigate('/collaborator/frequency/facialrecognition')
-                  }
+                  onClick={() => navigate('/collaborator/frequency/manual')}
                 >
                   Frequência
                 </NavDropdown.Item>
