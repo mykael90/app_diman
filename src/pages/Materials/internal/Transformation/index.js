@@ -317,7 +317,7 @@ export default function Index() {
                                     </Row> */}
 
                                     <div key={index}>
-                                      <Row className="d-flex justify-content-center align-items-center mb-5">
+                                      <Row className="d-flex justify-content-center align-items-center mb-4">
                                         <Form.Group
                                           as={Col}
                                           xs={12}
@@ -361,7 +361,23 @@ export default function Index() {
                                           </Badge>
                                         </Col>
                                       </Row>
-                                      <Row className="d-flex justify-content-start align-items-center mt-2">
+                                      <Row>
+                                        <Col>
+                                          <Badge>
+                                            Saldo comum após operação:{' '}
+                                            <spam>
+                                              {item.freeInventory &&
+                                              item.quantity
+                                                ? (
+                                                    item.freeInventory -
+                                                    item.quantity
+                                                  ).toFixed(2)
+                                                : item.freeInventory}
+                                            </spam>
+                                          </Badge>
+                                        </Col>
+                                      </Row>
+                                      <Row className="d-flex justify-content-start align-items-center mt-3">
                                         <Form.Group
                                           as={Col}
                                           xs={6}
@@ -379,7 +395,7 @@ export default function Index() {
                                             placeholder="Selecione o ID material"
                                             onBlur={handleBlur}
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -398,7 +414,7 @@ export default function Index() {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
@@ -418,7 +434,7 @@ export default function Index() {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
@@ -439,7 +455,7 @@ export default function Index() {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
 
@@ -459,7 +475,7 @@ export default function Index() {
                                             onBlur={handleBlur}
                                             placeholder="SALDO"
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -478,7 +494,7 @@ export default function Index() {
                                             onBlur={handleBlur}
                                             placeholder="SALDO"
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -497,7 +513,7 @@ export default function Index() {
                                             onBlur={handleBlur}
                                             placeholder="SALDO"
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
@@ -519,7 +535,7 @@ export default function Index() {
                                             placeholder="VALOR"
                                             size="sm"
                                             className="p-0 m-0 ps-2"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
@@ -604,7 +620,7 @@ export default function Index() {
                                     </Row> */}
 
                                     <div key={index}>
-                                      <Row className="d-flex justify-content-center align-items-center mb-5">
+                                      <Row className="d-flex justify-content-center align-items-center mb-4">
                                         <Form.Group
                                           as={Col}
                                           xs={12}
@@ -675,7 +691,23 @@ export default function Index() {
                                           </Badge>
                                         </Col>
                                       </Row>
-                                      <Row className="d-flex justify-content-start align-items-center mt-2">
+                                      <Row>
+                                        <Col>
+                                          <Badge>
+                                            Saldo comum após operação:{' '}
+                                            <spam>
+                                              {item.freeInventory &&
+                                              item.quantity
+                                                ? (
+                                                    Number(item.freeInventory) +
+                                                    item.quantity
+                                                  ).toFixed(2)
+                                                : item.freeInventory}
+                                            </spam>
+                                          </Badge>
+                                        </Col>
+                                      </Row>
+                                      <Row className="d-flex justify-content-start align-items-center mt-3">
                                         <Form.Group
                                           as={Col}
                                           xs={6}
@@ -693,7 +725,7 @@ export default function Index() {
                                             placeholder="Selecione o ID material"
                                             onBlur={handleBlur}
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -712,7 +744,7 @@ export default function Index() {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
@@ -732,7 +764,7 @@ export default function Index() {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
@@ -753,7 +785,7 @@ export default function Index() {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
 
@@ -773,7 +805,7 @@ export default function Index() {
                                             onBlur={handleBlur}
                                             placeholder="SALDO"
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -792,7 +824,7 @@ export default function Index() {
                                             onBlur={handleBlur}
                                             placeholder="SALDO"
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                         <Form.Group
@@ -811,7 +843,7 @@ export default function Index() {
                                             onBlur={handleBlur}
                                             placeholder="SALDO"
                                             size="sm"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
@@ -833,7 +865,7 @@ export default function Index() {
                                             placeholder="VALOR"
                                             size="sm"
                                             className="p-0 m-0 ps-2"
-                                            tabindex="-1"
+                                            tabIndex="-1"
                                           />
                                         </Form.Group>
                                       </Row>
@@ -883,7 +915,6 @@ export default function Index() {
             )}
           </Formik>
         </Row>
-        <tableExample />
       </Row>
     </>
   );
