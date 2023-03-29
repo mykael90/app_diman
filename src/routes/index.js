@@ -27,6 +27,7 @@ import Unauthorized from '../components/Unauthorized';
 
 import Test from '../pages/Materials/Reports/Output/components/EditModal';
 
+// TRANSFORMANDO O ARRAY userRoletypes PARA UM OBJETO ONDE ROLE É A CHAVE E O CÓDIGO É O VALOR
 const roles = usersRoletypes.reduce(
   (acc, cur) => ({ ...acc, [cur.role]: cur.id }),
   {}
