@@ -267,14 +267,14 @@ export default function Header() {
               <NavDropdown title="FROTA" id="collasible-nav-dropdown">
                 <NavDropdown.Item
                   href="#27"
-                  onClick={() => navigate('/frota/record/list')}
+                  onClick={() => navigate('/fleet/record/list')}
                 >
                   Cadastro
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#28"
-                  onClick={() => navigate('/frota/ocorrencia')}
+                  onClick={() => navigate('/fleet/ocorrencia')}
                 >
                   Ocorrência
                 </NavDropdown.Item>
