@@ -19,9 +19,9 @@ import Agua from '../pages/Infra/Agua';
 import Esgoto from '../pages/Infra/Esgoto';
 import Drenagem from '../pages/Infra/Drenagem';
 import Pavimento from '../pages/Infra/Pavimento';
-import Edificio from '../pages/Infra/Edificio';
 import Page404 from '../pages/Page404';
 import Providers from '../pages/Providers';
+import Infra from '../pages/Infra';
 import Adm from '../pages/Adm';
 import Unauthorized from '../components/Unauthorized';
 
@@ -49,8 +49,8 @@ export default function RoutesPages() {
       <Route exact path="/infra/esgoto/*" element={<Esgoto />} />
       <Route exact path="/infra/drenagem/*" element={<Drenagem />} />
       <Route exact path="/infra/pavimento/*" element={<Pavimento />} />
-      <Route exact path="/infra/edificio/*" element={<Edificio />} />
       <Route exact path="/providers/*" element={<Providers />} />
+      <Route exact path="/infra/*" element={<Infra />} />
       <Route exact path="/adm/*" element={<Adm />} />
 
       <Route path="/Unauthorized" element={<Unauthorized />} />

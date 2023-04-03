@@ -196,7 +196,7 @@ export default function Header() {
               <NavDropdown title="INFRA" id="collasible-nav-dropdown">
                 <NavDropdown.Item
                   href="#18"
-                  onClick={() => navigate('/infra/edificio')}
+                  onClick={() => navigate('/infra/edificio/list')}
                 >
                   Edifícios
                 </NavDropdown.Item>
