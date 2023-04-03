@@ -44,6 +44,7 @@ export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
   const [inventoryData, setinventoryData] = useState([]);
   const [workers, setWorkers] = useState([]);
+  const [discardTypes, setDiscardTypes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModalSearch, setShowModalSearch] = useState(false);
   const [files, setFiles] = useState([]);
@@ -88,7 +89,9 @@ export default function Index() {
   };
 
   const schema = yup.object().shape({
+    MaterialOutDiscardtypeId: yup.object().required('Requerido'),
     obs: yup.string().required('Requerido'),
+    place: yup.string().required('Requerido'),
     // eslint-disable-next-line react/forbid-prop-types
     MaterialOutItems: yup
       .array()
@@ -108,6 +111,21 @@ export default function Index() {
         setIsLoading(true);
         const response = await axios.get('/materials/inventory/');
         setinventoryData(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
+    async function getDiscardtypesData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/materials/out/discardtypes');
+        setDiscardTypes(response.data);
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -150,6 +168,7 @@ export default function Index() {
 
     getWorkersData();
     getMaterialsData();
+    getDiscardtypesData();
   }, []);
 
   const handleQuantityChange = (e, balance, handleChange) => {
@@ -204,6 +223,8 @@ export default function Index() {
     formattedValues.materialOuttypeId = 5; // SAÍDA POR DESCARTE
     formattedValues.userId = userId;
     formattedValues.workerId = formattedValues.workerId?.value;
+    formattedValues.MaterialOutDiscardtypeId =
+      formattedValues.MaterialOutDiscardtypeId?.value;
     formattedValues.MaterialOutItems.forEach((item) => {
       Object.assign(item, { MaterialId: item.materialId }); // rename key
     });
@@ -259,7 +280,9 @@ export default function Index() {
   };
 
   const initialValues = {
+    MaterialOutDiscardtypeId: '',
     workerId: '',
+    place: '',
     obs: '',
     MaterialOutItems: [],
   };
@@ -297,10 +320,39 @@ export default function Index() {
                   <Form.Group
                     as={Col}
                     xs={12}
+                    lg={3}
                     // controlId="workerId"
                     className="pb-3"
                   >
-                    <Form.Label>PERCEBIDO POR: </Form.Label>
+                    <Form.Label>OCORRÊNCIA:</Form.Label>
+                    <Select
+                      inputId="MaterialOutDiscardtypeId"
+                      options={discardTypes.map((item) => ({
+                        value: item.id,
+                        label: item.type,
+                      }))}
+                      value={values.MaterialOutDiscardtypeId}
+                      onChange={(selected) => {
+                        setFieldValue('MaterialOutDiscardtypeId', selected);
+                      }}
+                      placeholder="Selecione a ocorrência"
+                      onBlur={handleBlur}
+                    />
+                    {touched.MaterialOutDiscardtypeId &&
+                    !!errors.MaterialOutDiscardtypeId ? (
+                      <Badge bg="danger">
+                        {errors.MaterialOutDiscardtypeId}
+                      </Badge>
+                    ) : null}
+                  </Form.Group>
+                  <Form.Group
+                    as={Col}
+                    xs={12}
+                    lg={9}
+                    // controlId="workerId"
+                    className="pb-3"
+                  >
+                    <Form.Label>IDENTIFICADO POR: </Form.Label>
 
                     <Select
                       // id="workerId"
@@ -324,6 +376,35 @@ export default function Index() {
                     {touched.workerId && !!errors.workerId ? (
                       <Badge bg="danger">{errors.workerId}</Badge>
                     ) : null}
+                  </Form.Group>
+                </Row>
+                <Row>
+                  <Form.Group
+                    as={Col}
+                    xs={12}
+                    className="pb-3"
+                    controlId="place"
+                  >
+                    <Form.Label>DESTINO DESCARTE:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={values.place}
+                      onChange={handleChange}
+                      isInvalid={touched.place && !!errors.place}
+                      // isValid={touched.place && !errors.place}
+                      onBlur={(e) => {
+                        setFieldValue('place', e.target.value.toUpperCase()); // UPPERCASE
+                        handleBlur(e);
+                      }}
+                      placeholder="Destino do descarte"
+                    />
+                    <Form.Control.Feedback
+                      tooltip
+                      type="invalid"
+                      style={{ position: 'static' }}
+                    >
+                      {errors.place}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Row>
                 <Row>

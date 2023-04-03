@@ -11,19 +11,13 @@ export default function index() {
         <Container>
           <Nav variant="tabs" defaultActiveKey="#1">
             <Nav.Item>
-              <Link
-                className="text-decoration-none"
-                to="/collaborator/frequency/manual"
-              >
-                <Nav.Link href="#1">Inserção Manual</Nav.Link>
+              <Link className="text-decoration-none" to="/fleet/record/list">
+                <Nav.Link href="#1">Listagem</Nav.Link>
               </Link>
             </Nav.Item>
             <Nav.Item>
-              <Link
-                className="text-decoration-none"
-                to="/collaborator/frequency/facialrecognition"
-              >
-                <Nav.Link href="#2">Reconhecimento Facial</Nav.Link>
+              <Link className="text-decoration-none" to="/fleet/record/add">
+                <Nav.Link href="#2">Adicionar</Nav.Link>
               </Link>
             </Nav.Item>
           </Nav>

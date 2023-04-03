@@ -23,10 +23,12 @@ import Page404 from '../pages/Page404';
 import Providers from '../pages/Providers';
 import Infra from '../pages/Infra';
 import Adm from '../pages/Adm';
+import Fleet from '../pages/Fleet';
 import Unauthorized from '../components/Unauthorized';
 
 import Test from '../pages/Materials/Reports/Output/components/EditModal';
 
+// TRANSFORMANDO O ARRAY userRoletypes PARA UM OBJETO ONDE ROLE É A CHAVE E O CÓDIGO É O VALOR
 const roles = usersRoletypes.reduce(
   (acc, cur) => ({ ...acc, [cur.role]: cur.id }),
   {}
@@ -52,6 +54,7 @@ export default function RoutesPages() {
       <Route exact path="/providers/*" element={<Providers />} />
       <Route exact path="/infra/*" element={<Infra />} />
       <Route exact path="/adm/*" element={<Adm />} />
+      <Route exact path="/fleet/*" element={<Fleet />} />
 
       <Route path="/Unauthorized" element={<Unauthorized />} />
       {/* we want to protect these routes */}

@@ -232,6 +232,7 @@ export default function Index() {
         id: 'expander', // It needs an ID
         width: 30,
         disableResizing: true,
+        isVisible: window.innerWidth > 768,
         Cell: ({ row }) => (
           // Use Cell to render an expander for each row.
           // We can use the getToggleRowExpandedProps prop-getter
@@ -415,7 +416,7 @@ export default function Index() {
       },
       {
         Header: ({ value, row }) => (
-          <div className="text-start">Nome - Função - Contrato</div>
+          <div className="text-center">Nome - Função - Contrato</div>
         ),
         id: 'mobile',
         width: 100,
@@ -428,13 +429,24 @@ export default function Index() {
           return (
             <>
               <Row>
-                <Col xs="12" className="text-start mb-0 pb-0">
+                <Col className="d-flex justify-content-center">
+                  <Image
+                    crossOrigin=""
+                    src={row.original.urlPhoto}
+                    alt="Foto de perfil do colaborador"
+                    width="270"
+                    rounded="true"
+                  />
+                </Col>
+              </Row>
+              <Row className="d-flex justify-content-center py-2">
+                <Col xs="11" className="text-center bg-light mx-2">
                   {row.original.name}
                 </Col>
               </Row>
 
-              <Row>
-                <Col xs="auto" className="mt-0 pt-0">
+              <Row className="d-flex justify-content-center">
+                <Col xs="auto" className="mt-0 pt-0 text-center">
                   <Badge
                     className="text-dark bg-light"
                     style={{
@@ -463,6 +475,18 @@ export default function Index() {
                   </Badge>
                 </Col>
               </Row>
+              {/* <Row className="d-flex justify-content-end">
+                <Col xs="auto">
+                  <Button
+                    size="sm"
+                    variant="outline-secondary"
+                    className="border-0 m-0"
+                    onClick={(e) => handleShowModalEdit(row.original)}
+                  >
+                    <FaPencilAlt />
+                  </Button>
+                </Col>
+              </Row> */}
             </>
           );
         },

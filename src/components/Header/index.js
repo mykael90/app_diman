@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { Container, Nav, NavDropdown } from 'react-bootstrap';
+import { Container, Nav, NavDropdown, Row, Col } from 'react-bootstrap';
 
 import * as actions from '../../store/modules/auth/actions';
 import { StyledNav, StyledNavbar } from './styled';
@@ -34,6 +34,14 @@ export default function Header() {
 
   return (
     <>
+      {process.env?.REACT_APP_BASE_ENV === 'development' ? (
+        <Row className="bg-warning">
+          <Col className="text-center text-dark fw-bold font-monospace py-1">
+            AMBIENTE DE DESENVOLVIMENTO
+          </Col>
+        </Row>
+      ) : null}
+
       <StyledNav className="d-print-none" />
 
       <StyledNavbar
@@ -66,9 +74,7 @@ export default function Header() {
               <NavDropdown title="COLABORADORES" id="collasible-nav-dropdown">
                 <NavDropdown.Item // teste
                   href="#1"
-                  onClick={() =>
-                    navigate('/collaborator/frequency/facialrecognition')
-                  }
+                  onClick={() => navigate('/collaborator/frequency/manual')}
                 >
                   Frequência
                 </NavDropdown.Item>
@@ -261,14 +267,14 @@ export default function Header() {
               <NavDropdown title="FROTA" id="collasible-nav-dropdown">
                 <NavDropdown.Item
                   href="#27"
-                  onClick={() => navigate('/frota/record/list')}
+                  onClick={() => navigate('/fleet/record/list')}
                 >
                   Cadastro
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item
                   href="#28"
-                  onClick={() => navigate('/frota/ocorrencia')}
+                  onClick={() => navigate('/fleet/ocorrencia')}
                 >
                   Ocorrência
                 </NavDropdown.Item>
