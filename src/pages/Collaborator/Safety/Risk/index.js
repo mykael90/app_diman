@@ -27,31 +27,58 @@ const renderTooltip = (props, message) => (
 );
 
 const emptyValues = {
-  reqMaintenance: '',
-  title: '',
-  description: '',
-  start: '',
-  end: '',
-  place: '',
-  propertySipacId: '',
-  buildingSipacId: '',
-  extraActivity: null,
-  WorkerTasktype: '',
+  reqMaintenance: null,
+  title: null,
+  description: null,
+  start: null,
+  end: null,
+  place: null,
+  propertySipacId: null,
+  buildingSipacId: null,
+  extraActivity: false,
+  WorkerTasktypeId: null,
   WorkerTaskItem: [],
   WorkerTaskServant: [],
   WorkerTaskRisk: [],
 };
 
-const riskOptions = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-];
-
 const validationSchema = Yup.object().shape({
-  reqMaintenance: Yup.string().required('Número de requisição obrigatória'),
-  description: Yup.string().required('Description is required'),
-  // riskLevel: Yup.string().required('Risk level is required'),
+  reqMaintenance: Yup.string()
+    .required('Número de requisição obrigatória')
+    .nullable(true),
+  WorkerTasktypeId: Yup.number()
+    .required('Tipo de demanda obrigatória')
+    .nullable(true),
+  propertySipacId: Yup.number()
+    .required('Tipo de demanda obrigatória')
+    .nullable(true),
+  buildingSipacId: Yup.number()
+    .required('Tipo de demanda obrigatória')
+    .nullable(true),
+  title: Yup.string().required('Título obrigatório').nullable(true),
+  description: Yup.string().required('Descrição is required').nullable(true),
+  start: Yup.date()
+    .required('Início requerido')
+    // .min(
+    //   // the month is 0-indexed
+    //   new Date(2022, 9, 14).toISOString().split('T')[0],
+    //   'Escolha uma data superior a data de início do sistema'
+    // )
+    .min(
+      new Date().toISOString().split('T')[0],
+      'Escolha uma data futura para o início do agendamento'
+    ),
+  end: Yup.date()
+    .required('Fim requerido')
+    // .min(
+    //   // the month is 0-indexed
+    //   new Date(2022, 9, 14).toISOString().split('T')[0],
+    //   'Escolha uma data superior a data de início do sistema'
+    // )
+    .min(
+      new Date().toISOString().split('T')[0],
+      'Escolha uma data futura para o fim do agendamento'
+    ),
 });
 
 export default function RiskTaskForm({ initialValues = null }) {
@@ -59,6 +86,8 @@ export default function RiskTaskForm({ initialValues = null }) {
   const [workers, setWorkers] = useState([]);
   const [servants, setServants] = useState([]);
   const [risksTypes, setRisksTypes] = useState([]);
+  const [tasksTypes, setTasksTypes] = useState([]);
+  const [risksVisibility, setRisksVisibility] = useState(false);
   const [properties, setProperties] = useState([]);
   const [propertiesData, setPropertiesData] = useState([]);
 
@@ -69,9 +98,9 @@ export default function RiskTaskForm({ initialValues = null }) {
       // const workersOp = [];
       try {
         setIsLoading(true);
-        const response = await axios.get('/workers/actives');
         const response2 = await axios.get('/users');
         const response3 = await axios.get('/workerstasks/risks/types');
+        const response4 = await axios.get('/workerstasks/types');
 
         // const workersJobs = response.data
         //   .filter(
@@ -87,9 +116,40 @@ export default function RiskTaskForm({ initialValues = null }) {
         //   ]);
         // });
 
-        setWorkers(response.data);
         setServants(response2.data);
         setRisksTypes(response3.data);
+        setTasksTypes(response4.data);
+
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
+    async function getWorkersData() {
+      const workersOp = [];
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/workers/');
+        const workersJobs = response.data
+          .filter(
+            (value, index, arr) =>
+              arr.findIndex((item) => item.job === value.job) === index
+          )
+          .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
+
+        workersJobs.forEach((value) => {
+          workersOp.push([
+            value,
+            response.data.filter((item) => item.job === value),
+          ]);
+        });
+
+        setWorkers(workersOp);
 
         setIsLoading(false);
       } catch (err) {
@@ -133,15 +193,34 @@ export default function RiskTaskForm({ initialValues = null }) {
 
     getData();
     getPropertiesData();
+    getWorkersData();
   }, []);
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values, resetForm) => {
     if (isEditMode) {
       // In edit mode, merge the new values with the existing ones
       const mergedValues = { ...initialValues, ...values };
       console.log(mergedValues);
     } else {
-      console.log(values);
+      try {
+        setIsLoading(true);
+
+        console.log(values);
+        // RESERVA, ATUALIZA O INVENTARIO E JA BLOQUEIA
+        await axios.post(`/workerstasks`, values);
+
+        setIsLoading(false);
+        resetForm();
+
+        toast.success(`Tarefa agendada com sucesso`);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+        setIsLoading(false);
+      }
     }
   };
 
@@ -170,7 +249,9 @@ export default function RiskTaskForm({ initialValues = null }) {
             <Formik
               initialValues={initialValues || emptyValues}
               validationSchema={validationSchema}
-              onSubmit={handleSubmit}
+              onSubmit={(values, { resetForm }) =>
+                handleSubmit(values, resetForm)
+              }
               onReset={handleResetAll}
               enableReinitialize
             >
@@ -214,7 +295,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                     </BootstrapForm.Group>
 
                     <BootstrapForm.Group
-                      controlId="WorkerTasktype"
+                      controlId="WorkerTasktypeId"
                       as={Col}
                       xs={12}
                       md={3}
@@ -222,35 +303,45 @@ export default function RiskTaskForm({ initialValues = null }) {
                     >
                       <BootstrapForm.Label>Tipo</BootstrapForm.Label>
 
-                      <Field name="WorkerTasktype">
+                      <Field name="WorkerTasktypeId">
                         {({ field }) => (
                           <Select
+                            inputId="WorkerTasktypeId"
+                            placeholder="Selecione o tipo da demanda"
                             {...field}
                             className={
-                              errors.WorkerTasktype && touched.WorkerTasktype
+                              errors.WorkerTasktypeId &&
+                              touched.WorkerTasktypeId
                                 ? 'is-invalid'
                                 : null
                             }
-                            options={riskOptions}
+                            options={tasksTypes.map((option) => ({
+                              label: option.type,
+                              value: option.id,
+                            }))}
                             value={
-                              values.WorkerTasktype
-                                ? riskOptions.find(
+                              values.WorkerTasktypeId
+                                ? tasksTypes.find(
                                     (option) =>
-                                      option.value === values.WorkerTasktype
+                                      option.value === values.WorkerTasktypeId
                                   )
                                 : null
                             }
                             onChange={(selectedOption) =>
                               setFieldValue(
-                                'WorkerTasktype',
+                                'WorkerTasktypeId',
                                 selectedOption.value
                               )
                             }
+                            // onBlur={(e) => {
+                            //   console.log(e);
+                            //   setFieldTouched(e.target.id, true);
+                            // }}
                           />
                         )}
                       </Field>
                       <ErrorMessage
-                        name="riskLevel"
+                        name="WorkerTasktypeId"
                         component="div"
                         className="invalid-feedback"
                       />
@@ -266,12 +357,17 @@ export default function RiskTaskForm({ initialValues = null }) {
                       <BootstrapForm.Label>Título</BootstrapForm.Label>
 
                       <Field
+                        placeholder="Exemplo: Pintura de fachada de prédio da INFRA"
                         className={
                           errors.title && touched.title ? 'is-invalid' : null
                         }
                         type="text"
                         name="title"
                         as={BootstrapForm.Control}
+                        onBlur={(e) => {
+                          e.target.value = e.target.value.toUpperCase();
+                          setFieldTouched(e.target.id, true);
+                        }}
                       />
                       <ErrorMessage
                         name="title"
@@ -296,6 +392,11 @@ export default function RiskTaskForm({ initialValues = null }) {
                         value={values.description}
                         onChange={handleChange}
                         placeholder="Descrição sucinta da tarefa"
+                        onBlur={(e) => {
+                          e.target.value = e.target.value.toUpperCase();
+                          setFieldTouched(e.target.id, true);
+                          console.log(e);
+                        }}
                       />
                       <ErrorMessage
                         name="description"
@@ -319,6 +420,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                         {({ field }) => (
                           <Select
                             {...field}
+                            placeholder="Selecione o imóvel"
                             className={
                               errors.propertySipacId && touched.propertySipacId
                                 ? 'is-invalid'
@@ -372,6 +474,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                         {({ field }) => (
                           <Select
                             {...field}
+                            placeholder="Selecione as instalações físicas"
                             className={
                               errors.buildingSipacId && touched.buildingSipacId
                                 ? 'is-invalid'
@@ -422,6 +525,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                     >
                       <BootstrapForm.Label>Local</BootstrapForm.Label>
                       <Field
+                        placeholder="Localização do serviço no imóvel"
                         className={
                           errors.place && touched.place ? 'is-invalid' : null
                         }
@@ -516,65 +620,77 @@ export default function RiskTaskForm({ initialValues = null }) {
                   </Row>
 
                   <Row>
-                    <Col>Riscos</Col>
+                    <Col>
+                      <Button
+                        variant="outline-primary"
+                        onClick={() => setRisksVisibility(!risksVisibility)}
+                      >
+                        Selecionar riscos {risksVisibility ? '-' : '+'}
+                      </Button>
+                    </Col>
                   </Row>
-                  <FieldArray name="WorkerTaskRisk" className="p-0">
-                    {(fieldArrayProps) => {
-                      const { remove, push } = fieldArrayProps;
-                      return (
-                        <Row className="d-flex justify-content-between align-items-top border m-2 pt-2">
-                          {risksTypes.map((risk) => (
-                            <BootstrapForm.Group
-                              key={risk.id}
-                              controlId={`risk${risk.id}`}
-                              as={Col}
-                              xs={12}
-                              sm={6}
-                              md={4}
-                              className="pb-3 d-flex justify-content-between"
-                            >
-                              <div className="d-flex">
-                                <BootstrapForm.Check
-                                  // xs={6}
-                                  type="checkbox"
-                                  checked={
-                                    values.WorkerTaskRisk.findIndex(
-                                      (obj) =>
-                                        obj.WorkerTaskRisktypeId === risk.id
-                                    ) !== -1
-                                  }
-                                  name={`risk${risk.id}`}
-                                  className="pe-2"
-                                  onChange={(e) =>
-                                    e.target.checked
-                                      ? push({ WorkerTaskRisktypeId: risk.id })
-                                      : remove(
-                                          values.WorkerTaskRisk.findIndex(
-                                            (obj) =>
-                                              obj.WorkerTaskRisktypeId ===
-                                              risk.id
+
+                  {risksVisibility ? (
+                    <FieldArray name="WorkerTaskRisk" className="p-0">
+                      {(fieldArrayProps) => {
+                        const { remove, push } = fieldArrayProps;
+                        return (
+                          <Row className="d-flex justify-content-between align-items-top border m-2 pt-2">
+                            {risksTypes.map((risk) => (
+                              <BootstrapForm.Group
+                                key={risk.id}
+                                controlId={`risk${risk.id}`}
+                                as={Col}
+                                xs={12}
+                                sm={6}
+                                md={4}
+                                className="pb-3 d-flex justify-content-between"
+                              >
+                                <div className="d-flex">
+                                  <BootstrapForm.Check
+                                    // xs={6}
+                                    type="checkbox"
+                                    checked={
+                                      values.WorkerTaskRisk.findIndex(
+                                        (obj) =>
+                                          obj.WorkerTaskRisktypeId === risk.id
+                                      ) !== -1
+                                    }
+                                    name={`risk${risk.id}`}
+                                    className="pe-2"
+                                    onChange={(e) =>
+                                      e.target.checked
+                                        ? push({
+                                            WorkerTaskRisktypeId: risk.id,
+                                          })
+                                        : remove(
+                                            values.WorkerTaskRisk.findIndex(
+                                              (obj) =>
+                                                obj.WorkerTaskRisktypeId ===
+                                                risk.id
+                                            )
                                           )
-                                        )
-                                  }
-                                />
-                                <OverlayTrigger
-                                  placement="right"
-                                  delay={{ show: 250, hide: 400 }}
-                                  overlay={(props) =>
-                                    renderTooltip(props, risk.desc)
-                                  }
-                                >
-                                  <BootstrapForm.Label>
-                                    {risk.type}
-                                  </BootstrapForm.Label>
-                                </OverlayTrigger>
-                              </div>
-                            </BootstrapForm.Group>
-                          ))}
-                        </Row>
-                      );
-                    }}
-                  </FieldArray>
+                                    }
+                                  />
+                                  <OverlayTrigger
+                                    placement="right"
+                                    delay={{ show: 250, hide: 400 }}
+                                    overlay={(props) =>
+                                      renderTooltip(props, risk.desc)
+                                    }
+                                  >
+                                    <BootstrapForm.Label>
+                                      {risk.type}
+                                    </BootstrapForm.Label>
+                                  </OverlayTrigger>
+                                </div>
+                              </BootstrapForm.Group>
+                            ))}
+                          </Row>
+                        );
+                      }}
+                    </FieldArray>
+                  ) : null}
 
                   <Row className="d-flex justify-content-center align-items-center pt-3">
                     <Col
@@ -832,17 +948,13 @@ export default function RiskTaskForm({ initialValues = null }) {
                                 {' '}
                                 <Select
                                   inputId="searchWorker"
-                                  options={workers
-                                    .filter(
-                                      (item) =>
-                                        !values.WorkerTaskItem.find(
-                                          (element) => element.id === item.id
-                                        )
-                                    )
-                                    .map((item) => ({
-                                      label: item.name,
+                                  options={workers.map((value) => ({
+                                    label: value[0],
+                                    options: value[1].map((item) => ({
                                       value: item,
-                                    }))}
+                                      label: item.name,
+                                    })),
+                                  }))}
                                   // options={inventoryData.map((material) => ({
                                   //   value: material,
                                   //   label: `(${material.materialId}) ${material.name} - ${material.unit}`,
