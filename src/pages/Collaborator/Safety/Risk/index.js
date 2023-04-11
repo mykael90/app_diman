@@ -8,6 +8,8 @@ import {
   Col,
   Button,
   Badge,
+  OverlayTrigger,
+  Tooltip,
   Form as BootstrapForm,
 } from 'react-bootstrap';
 import Select from 'react-select';
@@ -17,6 +19,12 @@ import { toast } from 'react-toastify';
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 import { primaryDarkColor } from '../../../../config/colors';
+
+const renderTooltip = (props, message) => (
+  <Tooltip id="button-tooltip" {...props}>
+    {message}
+  </Tooltip>
+);
 
 const emptyValues = {
   reqMaintenance: '',
@@ -31,6 +39,7 @@ const emptyValues = {
   WorkerTasktype: '',
   WorkerTaskItem: [],
   WorkerTaskServant: [],
+  WorkerTaskRisk: [],
 };
 
 const riskOptions = [
@@ -49,6 +58,9 @@ export default function RiskTaskForm({ initialValues = null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [workers, setWorkers] = useState([]);
   const [servants, setServants] = useState([]);
+  const [risksTypes, setRisksTypes] = useState([]);
+  const [properties, setProperties] = useState([]);
+  const [propertiesData, setPropertiesData] = useState([]);
 
   const isEditMode = !!initialValues;
 
@@ -59,6 +71,7 @@ export default function RiskTaskForm({ initialValues = null }) {
         setIsLoading(true);
         const response = await axios.get('/workers/actives');
         const response2 = await axios.get('/users');
+        const response3 = await axios.get('/workerstasks/risks/types');
 
         // const workersJobs = response.data
         //   .filter(
@@ -76,6 +89,7 @@ export default function RiskTaskForm({ initialValues = null }) {
 
         setWorkers(response.data);
         setServants(response2.data);
+        setRisksTypes(response3.data);
 
         setIsLoading(false);
       } catch (err) {
@@ -87,7 +101,38 @@ export default function RiskTaskForm({ initialValues = null }) {
       }
     }
 
+    async function getPropertiesData() {
+      const propertiesOp = [];
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/properties/');
+        const propertiesCities = response.data
+          .filter(
+            (value, index, arr) =>
+              arr.findIndex((item) => item.municipio === value.municipio) ===
+              index
+          )
+          .map((value) => value.municipio); // RETORNA OS DIFERENTES TRABALHOS
+
+        propertiesCities.forEach((value) => {
+          propertiesOp.push([
+            value,
+            response.data.filter((item) => item.municipio === value),
+          ]);
+        });
+        setProperties(propertiesOp);
+        setPropertiesData(response.data);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
     getData();
+    getPropertiesData();
   }, []);
 
   const handleSubmit = (values) => {
@@ -137,6 +182,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                 handleReset,
                 handleChange,
                 handleBlur,
+                setFieldTouched,
               }) => (
                 <Form as BootstrapForm onReset={handleReset}>
                   <Row className="d-flex justify-content-center align-items-top">
@@ -218,6 +264,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       className="pb-3"
                     >
                       <BootstrapForm.Label>Título</BootstrapForm.Label>
+
                       <Field
                         className={
                           errors.title && touched.title ? 'is-invalid' : null
@@ -228,6 +275,137 @@ export default function RiskTaskForm({ initialValues = null }) {
                       />
                       <ErrorMessage
                         name="title"
+                        component="div"
+                        className="invalid-feedback"
+                      />
+                    </BootstrapForm.Group>
+                  </Row>
+
+                  <Row className="d-flex justify-content-center align-items-top">
+                    <BootstrapForm.Group
+                      controlId="description"
+                      as={Col}
+                      xs={12}
+                      className="pb-3"
+                    >
+                      <BootstrapForm.Label>Descrição</BootstrapForm.Label>
+                      <BootstrapForm.Control
+                        as="textarea"
+                        rows={2}
+                        type="text"
+                        value={values.description}
+                        onChange={handleChange}
+                        placeholder="Descrição sucinta da tarefa"
+                      />
+                      <ErrorMessage
+                        name="description"
+                        component="div"
+                        className="invalid-feedback"
+                      />
+                    </BootstrapForm.Group>
+                  </Row>
+
+                  <Row className="d-flex justify-content-center align-items-top">
+                    <BootstrapForm.Group
+                      controlId="propertySipacId"
+                      as={Col}
+                      xs={12}
+                      md={4}
+                      className="pb-3"
+                    >
+                      <BootstrapForm.Label>Imóvel</BootstrapForm.Label>
+
+                      <Field name="propertySipacId">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className={
+                              errors.propertySipacId && touched.propertySipacId
+                                ? 'is-invalid'
+                                : null
+                            }
+                            options={properties.map((value) => ({
+                              label: value[0],
+                              options: value[1].map((item) => ({
+                                value: item.id,
+                                label: item.nomeImovel,
+                              })),
+                            }))}
+                            value={
+                              values.propertySipacId
+                                ? properties.find(
+                                    (option) =>
+                                      option.value === values.propertySipacId
+                                  )
+                                : null
+                            }
+                            onChange={(selectedOption) => {
+                              setFieldValue(
+                                'propertySipacId',
+                                selectedOption.value
+                              );
+                              setFieldValue('buildingSipacId', '');
+                              setFieldTouched('buildingSipacId', false);
+                            }}
+                          />
+                        )}
+                      </Field>
+                      <ErrorMessage
+                        name="propertySipacId"
+                        component="div"
+                        className="invalid-feedback"
+                      />
+                    </BootstrapForm.Group>
+
+                    <BootstrapForm.Group
+                      controlId="buildingSipacId"
+                      as={Col}
+                      xs={12}
+                      md={8}
+                      className="pb-3"
+                    >
+                      <BootstrapForm.Label>
+                        Instalação Física
+                      </BootstrapForm.Label>
+
+                      <Field name="buildingSipacId">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className={
+                              errors.buildingSipacId && touched.buildingSipacId
+                                ? 'is-invalid'
+                                : null
+                            }
+                            options={propertiesData
+                              .filter((property) =>
+                                values.propertySipacId
+                                  ? property.id === values.propertySipacId
+                                  : false
+                              )[0]
+                              ?.buildingsSipac.map((building) => ({
+                                value: building.id,
+                                label: building.name,
+                              }))}
+                            value={
+                              values.buildingSipacId
+                                ? propertiesData.find(
+                                    (option) =>
+                                      option.value === values.buildingSipacId
+                                  )
+                                : null
+                            }
+                            onChange={(selectedOption) =>
+                              setFieldValue(
+                                'buildingSipacId',
+                                selectedOption.value
+                              )
+                            }
+                          />
+                        )}
+                      </Field>
+                      <ErrorMessage
+                        name="buildingSipacId"
                         component="div"
                         className="invalid-feedback"
                       />
@@ -337,121 +515,68 @@ export default function RiskTaskForm({ initialValues = null }) {
                     </BootstrapForm.Group>
                   </Row>
 
-                  <Row className="d-flex justify-content-center align-items-top">
-                    <BootstrapForm.Group
-                      controlId="description"
-                      as={Col}
-                      xs={12}
-                      className="pb-3"
-                    >
-                      <BootstrapForm.Label>Descrição</BootstrapForm.Label>
-                      <BootstrapForm.Control
-                        as="textarea"
-                        rows={2}
-                        type="text"
-                        value={values.description}
-                        onChange={handleChange}
-                        placeholder="Descrição sucinta da tarefa"
-                      />
-                      <ErrorMessage
-                        name="description"
-                        component="div"
-                        className="invalid-feedback"
-                      />
-                    </BootstrapForm.Group>
+                  <Row>
+                    <Col>Riscos</Col>
                   </Row>
+                  <FieldArray name="WorkerTaskRisk" className="p-0">
+                    {(fieldArrayProps) => {
+                      const { remove, push } = fieldArrayProps;
+                      return (
+                        <Row className="d-flex justify-content-between align-items-top border m-2 pt-2">
+                          {risksTypes.map((risk) => (
+                            <BootstrapForm.Group
+                              key={risk.id}
+                              controlId={`risk${risk.id}`}
+                              as={Col}
+                              xs={12}
+                              sm={6}
+                              md={4}
+                              className="pb-3 d-flex justify-content-between"
+                            >
+                              <div className="d-flex">
+                                <BootstrapForm.Check
+                                  // xs={6}
+                                  type="checkbox"
+                                  checked={
+                                    values.WorkerTaskRisk.findIndex(
+                                      (obj) =>
+                                        obj.WorkerTaskRisktypeId === risk.id
+                                    ) !== -1
+                                  }
+                                  name={`risk${risk.id}`}
+                                  className="pe-2"
+                                  onChange={(e) =>
+                                    e.target.checked
+                                      ? push({ WorkerTaskRisktypeId: risk.id })
+                                      : remove(
+                                          values.WorkerTaskRisk.findIndex(
+                                            (obj) =>
+                                              obj.WorkerTaskRisktypeId ===
+                                              risk.id
+                                          )
+                                        )
+                                  }
+                                />
+                                <OverlayTrigger
+                                  placement="right"
+                                  delay={{ show: 250, hide: 400 }}
+                                  overlay={(props) =>
+                                    renderTooltip(props, risk.desc)
+                                  }
+                                >
+                                  <BootstrapForm.Label>
+                                    {risk.type}
+                                  </BootstrapForm.Label>
+                                </OverlayTrigger>
+                              </div>
+                            </BootstrapForm.Group>
+                          ))}
+                        </Row>
+                      );
+                    }}
+                  </FieldArray>
 
-                  <Row className="d-flex justify-content-center align-items-top">
-                    <BootstrapForm.Group
-                      controlId="propertySipacId"
-                      as={Col}
-                      xs={12}
-                      md={4}
-                      className="pb-3"
-                    >
-                      <BootstrapForm.Label>Imóvel</BootstrapForm.Label>
-
-                      <Field name="propertySipacId">
-                        {({ field }) => (
-                          <Select
-                            {...field}
-                            className={
-                              errors.propertySipacId && touched.propertySipacId
-                                ? 'is-invalid'
-                                : null
-                            }
-                            options={riskOptions}
-                            value={
-                              values.propertySipacId
-                                ? riskOptions.find(
-                                    (option) =>
-                                      option.value === values.propertySipacId
-                                  )
-                                : null
-                            }
-                            onChange={(selectedOption) =>
-                              setFieldValue(
-                                'propertySipacId',
-                                selectedOption.value
-                              )
-                            }
-                          />
-                        )}
-                      </Field>
-                      <ErrorMessage
-                        name="propertySipacId"
-                        component="div"
-                        className="invalid-feedback"
-                      />
-                    </BootstrapForm.Group>
-
-                    <BootstrapForm.Group
-                      controlId="buildingSipacId"
-                      as={Col}
-                      xs={12}
-                      md={8}
-                      className="pb-3"
-                    >
-                      <BootstrapForm.Label>
-                        Instalação Física
-                      </BootstrapForm.Label>
-
-                      <Field name="buildingSipacId">
-                        {({ field }) => (
-                          <Select
-                            {...field}
-                            className={
-                              errors.buildingSipacId && touched.buildingSipacId
-                                ? 'is-invalid'
-                                : null
-                            }
-                            options={riskOptions}
-                            value={
-                              values.buildingSipacId
-                                ? riskOptions.find(
-                                    (option) =>
-                                      option.value === values.buildingSipacId
-                                  )
-                                : null
-                            }
-                            onChange={(selectedOption) =>
-                              setFieldValue(
-                                'buildingSipacId',
-                                selectedOption.value
-                              )
-                            }
-                          />
-                        )}
-                      </Field>
-                      <ErrorMessage
-                        name="buildingSipacId"
-                        component="div"
-                        className="invalid-feedback"
-                      />
-                    </BootstrapForm.Group>
-                  </Row>
-
-                  <Row className="d-flex justify-content-center align-items-center">
+                  <Row className="d-flex justify-content-center align-items-center pt-3">
                     <Col
                       xs={12}
                       className="text-center"
@@ -685,7 +810,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       }}
                     </FieldArray>
                   </Row>
-                  <Row className="d-flex justify-content-center align-items-center">
+                  <Row className="d-flex justify-content-center align-items-center pt-3">
                     <Col
                       xs={12}
                       className="text-center"
@@ -909,12 +1034,18 @@ export default function RiskTaskForm({ initialValues = null }) {
                     </FieldArray>
                   </Row>
 
-                  <Button variant="primary" type="submit">
-                    {isEditMode ? 'Save' : 'Add'}
-                  </Button>
-                  <Button variant="danger" type="reset">
-                    Reset
-                  </Button>
+                  <Row className="justify-content-center pt-2 pb-4">
+                    <Col xs="auto" className="text-center">
+                      <Button variant="danger" type="reset">
+                        Limpar
+                      </Button>
+                    </Col>
+                    <Col xs="auto" className="text-center">
+                      <Button variant="success" type="submit">
+                        {isEditMode ? 'Alterar' : 'Cadastrar'}
+                      </Button>
+                    </Col>
+                  </Row>
                 </Form>
               )}
             </Formik>
