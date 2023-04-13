@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import {
@@ -27,36 +28,32 @@ const renderTooltip = (props, message) => (
 );
 
 const emptyValues = {
-  reqMaintenance: null,
-  title: null,
-  description: null,
-  start: null,
-  end: null,
-  place: null,
-  propertySipacId: null,
-  buildingSipacId: null,
+  reqMaintenance: '',
+  title: '',
+  description: '',
+  start: '',
+  end: '',
+  place: '',
+  propertySipacId: '',
+  buildingSipacId: '',
   extraActivity: false,
-  WorkerTasktypeId: null,
-  WorkerTaskItem: [],
-  WorkerTaskServant: [],
-  WorkerTaskRisk: [],
+  WorkerTasktypeId: '',
+  WorkerTaskItems: [],
+  WorkerTaskServants: [],
+  WorkerTaskRisks: [],
+  WorkerTaskStatuses: [],
 };
 
 const validationSchema = Yup.object().shape({
-  reqMaintenance: Yup.string()
-    .required('Número de requisição obrigatória')
-    .nullable(true),
-  WorkerTasktypeId: Yup.number()
-    .required('Tipo de demanda obrigatória')
-    .nullable(true),
-  propertySipacId: Yup.number()
-    .required('Tipo de demanda obrigatória')
-    .nullable(true),
-  buildingSipacId: Yup.number()
-    .required('Tipo de demanda obrigatória')
-    .nullable(true),
-  title: Yup.string().required('Título obrigatório').nullable(true),
-  description: Yup.string().required('Descrição is required').nullable(true),
+  reqMaintenance: Yup.string().matches(
+    /^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/,
+    'Entrada inválida'
+  ),
+  WorkerTasktypeId: Yup.number().required('Tipo de demanda obrigatória'),
+  propertySipacId: Yup.object().required('Imóvel obritatório'),
+  buildingSipacId: Yup.number().required('Instalação Física obrigatória'),
+  title: Yup.string().required('Título obrigatório'),
+  // description: Yup.string().required('Descrição is required'),
   start: Yup.date()
     .required('Início requerido')
     // .min(
@@ -81,7 +78,32 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
+const formatReq = (req) => {
+  if (!req) return;
+  const currentYear = new Date().getFullYear();
+  return req.includes('/') ? req : `${req}/${currentYear}`;
+};
+
+const cleanEmpty = (obj) => {
+  if (Array.isArray(obj)) {
+    return (
+      obj
+        .map((v) => (v && typeof v === 'object' ? cleanEmpty(v) : v))
+        // eslint-disable-next-line eqeqeq
+        .filter((v) => !(v == null || v == ''))
+    );
+  }
+  return (
+    Object.entries(obj)
+      .map(([k, v]) => [k, v && typeof v === 'object' ? cleanEmpty(v) : v])
+      // eslint-disable-next-line no-return-assign, eqeqeq, no-param-reassign
+      .reduce((a, [k, v]) => (v == null || v == '' ? a : ((a[k] = v), a)), {})
+  );
+};
+// LIMPANDO CHAVES NULL, UNDEFINED, EMPTY STRINGS
+
 export default function RiskTaskForm({ initialValues = null }) {
+  const userId = useSelector((state) => state.auth.user.id);
   const [isLoading, setIsLoading] = useState(false);
   const [workers, setWorkers] = useState([]);
   const [servants, setServants] = useState([]);
@@ -197,35 +219,45 @@ export default function RiskTaskForm({ initialValues = null }) {
   }, []);
 
   const handleSubmit = async (values, resetForm) => {
-    if (isEditMode) {
-      // In edit mode, merge the new values with the existing ones
-      const mergedValues = { ...initialValues, ...values };
-      console.log(mergedValues);
-    } else {
-      try {
-        setIsLoading(true);
+    const formattedValues = {
+      ...cleanEmpty(values),
+    };
 
-        console.log(values);
+    formattedValues.propertySipacId = values.propertySipacId.id;
+
+    formattedValues.WorkerTaskStatuses?.push({
+      UserId: userId,
+      WorkerTaskStatustypeId: 1,
+    });
+
+    try {
+      setIsLoading(true);
+      if (isEditMode) {
+        // In edit mode, merge the new values with the existing ones
+        const mergedValues = { ...initialValues, ...values };
+        console.log(mergedValues);
+      } else {
+        console.log(formattedValues);
         // RESERVA, ATUALIZA O INVENTARIO E JA BLOQUEIA
-        await axios.post(`/workerstasks`, values);
+        await axios.post(`/workerstasks`, formattedValues);
 
         setIsLoading(false);
         resetForm();
 
         toast.success(`Tarefa agendada com sucesso`);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-
-        setIsLoading(false);
       }
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
     }
   };
 
   const handleResetAll = (values) => {
-    console.log(values);
+    // console.log(values);
     // colocar outras coisas após o reset que precisar
   };
 
@@ -271,7 +303,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       controlId="reqMaintenance"
                       as={Col}
                       xs={12}
-                      md={3}
+                      md={2}
                       className="pb-3"
                     >
                       <BootstrapForm.Label>Req. Manutenção</BootstrapForm.Label>
@@ -282,10 +314,14 @@ export default function RiskTaskForm({ initialValues = null }) {
                             ? 'is-invalid'
                             : null
                         }
-                        type="text"
+                        type="tel"
                         name="reqMaintenance"
                         as={BootstrapForm.Control}
                         placeholder="Código"
+                        onBlur={(e) => {
+                          setFieldValue(e.target.id, formatReq(e.target.value));
+                          handleBlur(e);
+                        }}
                       />
                       <ErrorMessage
                         name="reqMaintenance"
@@ -298,7 +334,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       controlId="WorkerTasktypeId"
                       as={Col}
                       xs={12}
-                      md={3}
+                      md={4}
                       className="pb-3"
                     >
                       <BootstrapForm.Label>Tipo</BootstrapForm.Label>
@@ -357,7 +393,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       <BootstrapForm.Label>Título</BootstrapForm.Label>
 
                       <Field
-                        placeholder="Exemplo: Pintura de fachada de prédio da INFRA"
+                        placeholder="Exemplo: Pintura de prédio da INFRA"
                         className={
                           errors.title && touched.title ? 'is-invalid' : null
                         }
@@ -365,8 +401,11 @@ export default function RiskTaskForm({ initialValues = null }) {
                         name="title"
                         as={BootstrapForm.Control}
                         onBlur={(e) => {
-                          e.target.value = e.target.value.toUpperCase();
                           setFieldTouched(e.target.id, true);
+                          setFieldValue(
+                            e.target.id,
+                            e.target.value.toUpperCase()
+                          );
                         }}
                       />
                       <ErrorMessage
@@ -393,9 +432,11 @@ export default function RiskTaskForm({ initialValues = null }) {
                         onChange={handleChange}
                         placeholder="Descrição sucinta da tarefa"
                         onBlur={(e) => {
-                          e.target.value = e.target.value.toUpperCase();
                           setFieldTouched(e.target.id, true);
-                          console.log(e);
+                          setFieldValue(
+                            e.target.id,
+                            e.target.value.toUpperCase()
+                          );
                         }}
                       />
                       <ErrorMessage
@@ -412,7 +453,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       as={Col}
                       xs={12}
                       md={4}
-                      className="pb-3"
+                      className="pb-1"
                     >
                       <BootstrapForm.Label>Imóvel</BootstrapForm.Label>
 
@@ -429,7 +470,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                             options={properties.map((value) => ({
                               label: value[0],
                               options: value[1].map((item) => ({
-                                value: item.id,
+                                value: item,
                                 label: item.nomeImovel,
                               })),
                             }))}
@@ -464,7 +505,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       as={Col}
                       xs={12}
                       md={8}
-                      className="pb-3"
+                      className="pb-1"
                     >
                       <BootstrapForm.Label>
                         Instalação Física
@@ -483,7 +524,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                             options={propertiesData
                               .filter((property) =>
                                 values.propertySipacId
-                                  ? property.id === values.propertySipacId
+                                  ? property.id === values.propertySipacId.id
                                   : false
                               )[0]
                               ?.buildingsSipac.map((building) => ({
@@ -515,6 +556,29 @@ export default function RiskTaskForm({ initialValues = null }) {
                     </BootstrapForm.Group>
                   </Row>
 
+                  {values.propertySipacId ? (
+                    <Row className="pb-3 mx-2">
+                      <Col className="border">
+                        Município:{' '}
+                        <spam className="fw-bold">
+                          {values.propertySipacId.municipio}
+                        </spam>
+                      </Col>
+                      <Col className="border">
+                        Tipo de imóvel:{' '}
+                        <spam className="fw-bold">
+                          {values.propertySipacId.tipoImovel}
+                        </spam>
+                      </Col>
+                      <Col className="border">
+                        RIP de imóvel:{' '}
+                        <spam className="fw-bold">
+                          {values.propertySipacId.rip}
+                        </spam>
+                      </Col>
+                    </Row>
+                  ) : null}
+
                   <Row className="d-flex justify-content-center align-items-top">
                     <BootstrapForm.Group
                       controlId="place"
@@ -525,13 +589,20 @@ export default function RiskTaskForm({ initialValues = null }) {
                     >
                       <BootstrapForm.Label>Local</BootstrapForm.Label>
                       <Field
-                        placeholder="Localização do serviço no imóvel"
+                        placeholder="Localização do serviço no imóvel. Exemplo: Auditório principal"
                         className={
                           errors.place && touched.place ? 'is-invalid' : null
                         }
                         type="text"
                         name="place"
                         as={BootstrapForm.Control}
+                        onBlur={(e) => {
+                          setFieldTouched(e.target.id, true);
+                          setFieldValue(
+                            e.target.id,
+                            e.target.value.toUpperCase()
+                          );
+                        }}
                       />
                       <ErrorMessage
                         name="place"
@@ -631,7 +702,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                   </Row>
 
                   {risksVisibility ? (
-                    <FieldArray name="WorkerTaskRisk" className="p-0">
+                    <FieldArray name="WorkerTaskRisks" className="p-0">
                       {(fieldArrayProps) => {
                         const { remove, push } = fieldArrayProps;
                         return (
@@ -651,7 +722,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                     // xs={6}
                                     type="checkbox"
                                     checked={
-                                      values.WorkerTaskRisk.findIndex(
+                                      values.WorkerTaskRisks.findIndex(
                                         (obj) =>
                                           obj.WorkerTaskRisktypeId === risk.id
                                       ) !== -1
@@ -664,7 +735,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                             WorkerTaskRisktypeId: risk.id,
                                           })
                                         : remove(
-                                            values.WorkerTaskRisk.findIndex(
+                                            values.WorkerTaskRisks.findIndex(
                                               (obj) =>
                                                 obj.WorkerTaskRisktypeId ===
                                                 risk.id
@@ -701,7 +772,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       <span className="fs-6">SERVIDORES RELACIONADOS</span>
                     </Col>
 
-                    <FieldArray name="WorkerTaskServant" className="p-0">
+                    <FieldArray name="WorkerTaskServants" className="p-0">
                       {(fieldArrayProps) => {
                         const { remove, push } = fieldArrayProps;
                         return (
@@ -721,7 +792,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                     )
                                     .filter(
                                       (item) =>
-                                        !values.WorkerTaskServant.find(
+                                        !values.WorkerTaskServants.find(
                                           (element) => element.id === item.id
                                         )
                                     )
@@ -757,8 +828,8 @@ export default function RiskTaskForm({ initialValues = null }) {
                             </Row>
                             <Row className="d-flex justify-content-center align-items-center">
                               <Col xs={12}>
-                                {values.WorkerTaskServant?.length > 0 &&
-                                  values.WorkerTaskServant?.map(
+                                {values.WorkerTaskServants?.length > 0 &&
+                                  values.WorkerTaskServants?.map(
                                     (item, index) => (
                                       <>
                                         <Row className="d-block d-lg-none">
@@ -774,8 +845,8 @@ export default function RiskTaskForm({ initialValues = null }) {
                                             as={Col}
                                             xs={12}
                                             lg={1}
-                                            controlId={`WorkerTaskServant[${index}].id`}
-                                            className="border-0 m-0 p-0"
+                                            controlId={`WorkerTaskServants[${index}].id`}
+                                            className="border-0 m-0 p-0 d-none"
                                           >
                                             {index === 0 ? (
                                               <BootstrapForm.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-none d-md-none d-lg-block">
@@ -798,7 +869,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                             as={Col}
                                             xs={12}
                                             lg={6}
-                                            controlId={`WorkerTaskServant[${index}].name`}
+                                            controlId={`WorkerTaskServants[${index}].name`}
                                             className="border-0 m-0 p-0"
                                           >
                                             {index === 0 ? (
@@ -822,7 +893,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                             as={Col}
                                             xs={12}
                                             lg={4}
-                                            controlId={`WorkerTaskServant[${index}].name`}
+                                            controlId={`WorkerTaskServants[${index}].name`}
                                             className="border-0 m-0 p-0"
                                           >
                                             {index === 0 ? (
@@ -902,7 +973,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                     variant="outline-primary"
                                     onClick={(e) => {
                                       if (
-                                        values.WorkerTaskServant.find(
+                                        values.WorkerTaskServants.find(
                                           ({ end }) => end == null
                                         )
                                       ) {
@@ -935,7 +1006,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                       <span className="fs-6">PROFISSIONAIS ESCALADOS</span>
                     </Col>
 
-                    <FieldArray name="WorkerTaskItem" className="p-0">
+                    <FieldArray name="WorkerTaskItems" className="p-0">
                       {(fieldArrayProps) => {
                         const { remove, push } = fieldArrayProps;
                         return (
@@ -983,8 +1054,8 @@ export default function RiskTaskForm({ initialValues = null }) {
                             </Row>
                             <Row className="d-flex justify-content-center align-items-center">
                               <Col xs={12}>
-                                {values.WorkerTaskItem?.length > 0 &&
-                                  values.WorkerTaskItem?.map((item, index) => (
+                                {values.WorkerTaskItems?.length > 0 &&
+                                  values.WorkerTaskItems?.map((item, index) => (
                                     <>
                                       <Row className="d-block d-lg-none">
                                         <Col className="fw-bold">
@@ -999,8 +1070,8 @@ export default function RiskTaskForm({ initialValues = null }) {
                                           as={Col}
                                           xs={12}
                                           lg={1}
-                                          controlId={`WorkerTaskItem[${index}].id`}
-                                          className="border-0 m-0 p-0"
+                                          controlId={`WorkerTaskItems[${index}].id`}
+                                          className="border-0 m-0 p-0 d-none"
                                         >
                                           {index === 0 ? (
                                             <BootstrapForm.Label className="d-flex ps-2 py-1 border-bottom d-none d-sm-none d-md-none d-lg-block">
@@ -1023,7 +1094,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                           as={Col}
                                           xs={12}
                                           lg={6}
-                                          controlId={`WorkerTaskItem[${index}].name`}
+                                          controlId={`WorkerTaskItems[${index}].name`}
                                           className="border-0 m-0 p-0"
                                         >
                                           {index === 0 ? (
@@ -1047,7 +1118,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                           as={Col}
                                           xs={12}
                                           lg={4}
-                                          controlId={`WorkerTaskItem[${index}].name`}
+                                          controlId={`WorkerTaskItems[${index}].name`}
                                           className="border-0 m-0 p-0"
                                         >
                                           {index === 0 ? (
@@ -1121,7 +1192,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                     variant="outline-primary"
                                     onClick={(e) => {
                                       if (
-                                        values.WorkerTaskItem.find(
+                                        values.WorkerTaskItems.find(
                                           ({ end }) => end == null
                                         )
                                       ) {
