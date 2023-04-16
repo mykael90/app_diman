@@ -12,7 +12,13 @@ import {
   Form as BootstrapForm,
 } from 'react-bootstrap';
 import Select from 'react-select';
-import { FaPhone, FaPlus, FaTrashAlt } from 'react-icons/fa';
+import {
+  FaPhone,
+  FaPlus,
+  FaAngleDoubleDown,
+  FaRegClone,
+  FaTrashAlt,
+} from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 import axios from '../../../../services/axios';
@@ -46,93 +52,126 @@ function Recursive({
         };
         return (
           <>
-            <Row className="pb-3">
-              {level === 0 ? (
+            {level === 0 ? (
+              <Row className="pb-3">
                 <Col xs="auto">
                   <Button
                     variant="outline-primary"
                     size="sm"
                     onClick={() => push({ name: '', email: '', sections: [] })}
-                    style={{ marginLeft: `${level * 20}px` }}
+                    // style={{ marginLeft: `${level * 20}px` }}
                   >
                     <FaPlus /> Divisão
                   </Button>
                 </Col>
-              ) : null}
-            </Row>
-            <Row>
-              <Row>
-                {values.sections.map((section, index) => (
-                  <Row
-                    key={index}
-                    style={{ background: 'rgba(69, 98, 150, 0.25)' }}
-                  >
-                    <Row>
-                      <BootstrapForm.Group
-                        as={Col}
-                        xs={4}
-                        controlId={`${nameArray}.${index}.name`}
-                        // className="border-0 m-0 p-0 d-none"
-                      >
-                        <BootstrapForm.Label
-                        // htmlFor={`${nameArray}.${index}.name`}
-                        // style={{ marginLeft: `${level * 20}px` }}
-                        >
-                          Name
-                        </BootstrapForm.Label>
-                        <Field
-                          // id={`${nameArray}.${index}.name`}
-                          name={`${nameArray}.${index}.name`}
-                          type="text"
-                          as={BootstrapForm.Control}
-                          size="sm"
-                        />
-                      </BootstrapForm.Group>
-                      <BootstrapForm.Group
-                        as={Col}
-                        xs={4}
-                        controlId={`${nameArray}.${index}.email`}
-                        //  className="border-0 m-0 p-0 d-none"
-                      >
-                        <BootstrapForm.Label
-                        // htmlFor={`${nameArray}.${index}.email`}
-                        >
-                          Email
-                        </BootstrapForm.Label>
-                        <Field
-                          // id={`${nameArray}.${index}.email`}
-                          name={`${nameArray}.${index}.email`}
-                          type="email"
-                          as={BootstrapForm.Control}
-                          size="sm"
-                        />
-                      </BootstrapForm.Group>
-                      <Col xs={4}>
-                        <Button type="button" onClick={() => remove(index)}>
-                          Remove Section
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={() => addChild(section, index)}
-                        >
-                          Add Child
-                        </Button>
-                      </Col>
-                    </Row>
-                    <Row>
-                      {' '}
-                      {section.sections.length > 0 ? (
-                        <Recursive
-                          values={section}
-                          setFieldValue={setFieldValue}
-                          level={level + 1}
-                          nameArray={`${nameArray}.${index}.sections`}
-                        />
-                      ) : null}
-                    </Row>
-                  </Row>
-                ))}
               </Row>
+            ) : null}
+            <Row>
+              {values.sections.map((section, index) => (
+                <div
+                  key={index}
+                  style={{ background: 'rgba(69, 98, 150, 0.25)' }}
+                >
+                  <Row
+                    className={`${level === 0 ? 'pt-3' : 'pt-1'}`}
+                    style={{ paddingLeft: `${level * 20}px` }}
+                  >
+                    <BootstrapForm.Group
+                      as={Col}
+                      xs={4}
+                      controlId={`${nameArray}.${index}.name`}
+                      // className="border-0 m-0 p-0 d-none"
+                    >
+                      <BootstrapForm.Label className="d-none">
+                        Name
+                      </BootstrapForm.Label>
+                      <Field name={`${nameArray}.${index}.name`}>
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            inputId={`${nameArray}.${index}.name`}
+                            options={[
+                              { label: 'PAVIMENTO', value: 1 },
+                              { label: 'SALA', value: 2 },
+                            ]}
+                            size="sm"
+                            value={
+                              section.name
+                                ? [
+                                    { label: 'PAVIMENTO', value: 1 },
+                                    { label: 'SALA', value: 2 },
+                                  ].find(
+                                    (option) => option.value === section.name
+                                  )
+                                : null
+                            }
+                            onChange={(selectedOption) =>
+                              setFieldValue(
+                                `${nameArray}.${index}.name`,
+                                selectedOption.value
+                              )
+                            }
+                            placeholder="Tipo"
+                          />
+                        )}
+                      </Field>
+                    </BootstrapForm.Group>
+                    <BootstrapForm.Group
+                      as={Col}
+                      xs={4}
+                      controlId={`${nameArray}.${index}.email`}
+                    >
+                      <BootstrapForm.Label className="d-none">
+                        Email
+                      </BootstrapForm.Label>
+                      <Field
+                        name={`${nameArray}.${index}.email`}
+                        type="email"
+                        as={BootstrapForm.Control}
+                        // size="sm"
+                        placeholder="Nome"
+                      />
+                    </BootstrapForm.Group>
+                    <Col xs={4}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline-danger"
+                        className="border-0 m-0"
+                        onClick={() => remove(index)}
+                      >
+                        <FaTrashAlt />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline-secondary"
+                        className="border-0 m-0"
+                        onClick={() => addChild(section, index)}
+                      >
+                        <FaAngleDoubleDown />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline-secondary"
+                        className="border-0 m-0"
+                        onClick={() => push(section)}
+                      >
+                        <FaRegClone />
+                      </Button>
+                    </Col>
+                  </Row>{' '}
+                  {section.sections.length > 0 ? (
+                    <Recursive
+                      values={section}
+                      setFieldValue={setFieldValue}
+                      level={level + 1}
+                      nameArray={`${nameArray}.${index}.sections`}
+                    />
+                  ) : null}
+                </div>
+              ))}
             </Row>
           </>
         );
