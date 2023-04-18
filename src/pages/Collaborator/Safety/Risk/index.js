@@ -273,7 +273,8 @@ export default function RiskTaskForm({ initialValues = null }) {
               style={{ background: primaryDarkColor, color: 'white' }}
             >
               <span className="fs-5">
-                {isEditMode ? 'Editar' : 'Adicionar'} Tarefa
+                {isEditMode ? 'EDITAR' : 'CADASTRAR'} AGENDAMENTO DE SERVIÇO
+                EXTRA, EXTERNO OU DE RISCO
               </span>
             </Col>
           </Row>
@@ -820,7 +821,13 @@ export default function RiskTaskForm({ initialValues = null }) {
                                   escapeClearsValue
                                   onChange={(e) => {
                                     console.log(e.value);
-                                    push(e.value);
+                                    push({
+                                      UserId: e.value.id,
+                                      name: e.value.name,
+                                      position:
+                                        e.value.UserPositions[0]
+                                          .UserPositiontype.position,
+                                    });
                                   }}
                                   // filterOption={filterOptions}
                                 />
@@ -838,14 +845,14 @@ export default function RiskTaskForm({ initialValues = null }) {
                                           </Col>
                                         </Row>
                                         <Row
-                                          key={item.id}
+                                          key={item.UserId}
                                           className="d-flex p-0 m-0 border-bottom"
                                         >
                                           <BootstrapForm.Group
                                             as={Col}
                                             xs={12}
                                             lg={1}
-                                            controlId={`WorkerTaskServants[${index}].id`}
+                                            controlId={`WorkerTaskServants[${index}].UserId`}
                                             className="border-0 m-0 p-0 d-none"
                                           >
                                             {index === 0 ? (
@@ -857,7 +864,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                               type="text"
                                               plaintext
                                               readOnly
-                                              value={item.id}
+                                              value={item.UserId}
                                               size="sm"
                                               className="p-0 m-0 ps-2"
                                               tabindex="-1"
@@ -893,7 +900,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                             as={Col}
                                             xs={12}
                                             lg={4}
-                                            controlId={`WorkerTaskServants[${index}].name`}
+                                            controlId={`WorkerTaskServants[${index}].position`}
                                             className="border-0 m-0 p-0"
                                           >
                                             {index === 0 ? (
@@ -905,10 +912,7 @@ export default function RiskTaskForm({ initialValues = null }) {
                                               type="text"
                                               plaintext
                                               readOnly
-                                              value={
-                                                item.UserPositions[0]
-                                                  .UserPositiontype.position
-                                              }
+                                              value={item.position}
                                               size="sm"
                                               className="p-0 m-0 ps-2"
                                               tabindex="-1"
