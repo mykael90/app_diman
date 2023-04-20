@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-nested-ternary */
@@ -10,6 +11,7 @@ import {
   FaSearch,
   FaSearchPlus,
   FaSearchMinus,
+  FaExclamationTriangle,
 } from 'react-icons/fa';
 
 import {
@@ -34,6 +36,26 @@ import TableGfilterNestedRowHiddenRows from '../../../../Materials/components/Ta
 import TableNestedrow from '../../../../Materials/components/TableNestedRow';
 
 import ModalEdit from './components/ModalEdit';
+
+const renderTooltip = (props, message) => (
+  <Tooltip id="button-tooltip" {...props}>
+    {message}
+  </Tooltip>
+);
+
+const renderTooltipImage = (props, message, src) => (
+  <Tooltip id="button-tooltip" className="opacity-100" {...props}>
+    <Image
+      crossOrigin=""
+      src={src}
+      alt="Foto de perfil do colaborador"
+      width="150"
+      rounded="true"
+    />
+
+    <div>{message}</div>
+  </Tooltip>
+);
 
 // trigger to custom filter
 function DefaultColumnFilter() {
@@ -159,26 +181,6 @@ function InputColumnFilter({
   );
 }
 
-const renderTooltip = (props, message) => (
-  <Tooltip id="button-tooltip" {...props}>
-    {message}
-  </Tooltip>
-);
-
-const renderTooltipImage = (props, message, src) => (
-  <Tooltip id="button-tooltip" className="opacity-100" {...props}>
-    <Image
-      crossOrigin=""
-      src={src}
-      alt="Foto de perfil do colaborador"
-      width="150"
-      rounded="true"
-    />
-
-    <div>{message}</div>
-  </Tooltip>
-);
-
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [workersTasks, setWorkersTasks] = useState([]);
@@ -222,38 +224,70 @@ export default function Index() {
 
   const columns = React.useMemo(
     () => [
-      // {
-      //   // Make an expander cell
-      //   Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
-      //     <span {...getToggleAllRowsExpandedProps()}>
-      //       {isAllRowsExpanded ? '▽' : '▷'}
-      //     </span>
-      //   ),
-      //   id: 'expander', // It needs an ID
-      //   width: 30,
-      //   disableResizing: true,
-      //   Cell: ({ row }) => (
-      //     // Use Cell to render an expander for each row.
-      //     // We can use the getToggleRowExpandedProps prop-getter
-      //     // to build the expander.
-      //     <span {...row.getToggleRowExpandedProps()}>
-      //       {row.isExpanded ? '▽' : '▷'}
-      //     </span>
-      //   ),
-      // },
+      {
+        // Make an expander cell
+        Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+          <span {...getToggleAllRowsExpandedProps()}>
+            {isAllRowsExpanded ? '▽' : '▷'}
+          </span>
+        ),
+        id: 'expander', // It needs an ID
+        width: 30,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          // Use Cell to render an expander for each row.
+          // We can use the getToggleRowExpandedProps prop-getter
+          // to build the expander.
+          <span {...row.getToggleRowExpandedProps()}>
+            {row.isExpanded ? '▽' : '▷'}
+          </span>
+        ),
+      },
 
       {
         Header: 'Req. Man.',
         accessor: 'reqMaintenance',
         width: 120,
         disableResizing: true,
-        Cell: ({ value, row }) => <div>{value}</div>,
+        // eslint-disable-next-line react/no-unstable-nested-components
+        Cell: ({ value, row }) => (
+          <div>
+            {value}{' '}
+            {row.original.WorkerTaskRisks.length ? (
+              <OverlayTrigger
+                placement="right"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) =>
+                  renderTooltip(
+                    props,
+                    <>
+                      <div className="pb-1 fw-bold">RISCOS</div>
+                      {row.original.WorkerTaskRisks.map((risk) => (
+                        <div className="pb-1 text-start">
+                          {risk.WorkerTaskRisktype.type}
+                        </div>
+                      ))}
+                    </>
+                  )
+                }
+              >
+                <Button
+                  size="sm"
+                  variant="outline-warning"
+                  className="border-0 m-0"
+                >
+                  <FaExclamationTriangle />
+                </Button>
+              </OverlayTrigger>
+            ) : null}
+          </div>
+        ),
         disableSortBy: true,
         Filter: InputColumnFilter,
         filter: 'text',
       },
       {
-        Header: ({ value, row }) => <div className="text-start">Título</div>,
+        Header: 'Título',
         accessor: 'title',
         disableSortBy: true,
         width: 250,
@@ -261,7 +295,6 @@ export default function Index() {
         Filter: InputColumnFilter,
         filter: 'text',
         isVisible: window.innerWidth > 768,
-        Cell: ({ value }) => <div className="text-start">{value}</div>,
       },
       {
         Header: ({ value, row }) => <div className="text-start">Imóvel</div>,
@@ -273,7 +306,14 @@ export default function Index() {
         width: 200,
         disableResizing: true,
         isVisible: window.innerWidth > 768,
-        Cell: ({ value }) => <div className="text-start">{value}</div>,
+        Cell: ({ value, row }) => (
+          <div className="text-start">
+            {value}{' '}
+            <Badge variant="secondary">
+              {row.original.PropertySipac?.municipio}
+            </Badge>
+          </div>
+        ),
       },
       {
         Header: ({ value, row }) => (
@@ -290,26 +330,32 @@ export default function Index() {
         Cell: ({ value }) => <div className="text-start">{value}</div>,
       },
       {
-        Header: 'Pvtos',
-        accessor: 'floors',
+        Header: 'Status',
+        id: 'status',
+        accessor: (originalRow) =>
+          originalRow.WorkerTaskStatuses[0]?.WorkerTaskStatustype?.type,
         disableSortBy: true,
-        width: 80,
-        disableResizing: true,
         Filter: InputColumnFilter,
         filter: 'text',
+        width: 150,
+        disableResizing: true,
         isVisible: window.innerWidth > 768,
-        Cell: ({ value }) => <div className="text-start">{value}</div>,
+        Cell: ({ value, row }) => (
+          <>
+            <div>{value} EM</div>
+            <div>{row.original.WorkerTaskStatuses[0]?.createdAtBr}</div>
+          </>
+        ),
       },
       {
-        Header: 'Área',
-        accessor: 'area',
+        Header: 'Data',
+        accessor: (originalRow) => originalRow.startBr,
         disableSortBy: true,
-        width: 90,
+        width: 100,
         disableResizing: true,
         Filter: InputColumnFilter,
         filter: 'text',
         isVisible: window.innerWidth > 768,
-        Cell: ({ value }) => <div className="text-start">{value}</div>,
       },
       // {
       //   Header: 'Idade',
@@ -533,147 +579,147 @@ export default function Index() {
   );
 
   // Create a function that will render our row sub components
-  // const renderRowSubComponent = React.useCallback(({ row }) => {
-  //   const columns = [
-  //     {
-  //       Header: 'Contrato',
-  //       id: 'contract',
-  //       width: 125,
-  //       disableResizing: true,
-  //       disableSortBy: true,
-  //       accessor: (originalRow) => originalRow.Contract?.codigoSipac,
-  //       isVisible: window.innerWidth > 768,
-  //     },
-  //     {
-  //       Header: 'Função',
-  //       id: 'job',
-  //       accessor: (originalRow) => originalRow.WorkerJobtype?.job,
-  //       disableSortBy: true,
-  //       isVisible: window.innerWidth > 768,
-  //       // eslint-disable-next-line react/destructuring-assignment
-  //     },
-  //     {
-  //       Header: 'Início',
-  //       id: 'startBr',
-  //       accessor: (originalRow) => originalRow.startBr,
-  //       width: 100,
-  //       disableResizing: true,
-  //       disableSortBy: true,
-  //       isVisible: window.innerWidth > 768,
-  //     },
-  //     {
-  //       Header: 'Fim',
-  //       accessor: 'endBr',
-  //       width: 100,
-  //       disableResizing: true,
-  //       disableSortBy: true,
-  //       isVisible: window.innerWidth > 768,
-  //       // eslint-disable-next-line react/destructuring-assignment
-  //     },
-  //     {
-  //       Header: 'Lotado',
-  //       id: 'unidade',
-  //       width: 200,
-  //       disableResizing: true,
-  //       disableSortBy: true,
-  //       accessor: (originalRow) =>
-  //         `${originalRow.Unidade?.id}-${originalRow.Unidade?.sigla}`,
-  //       isVisible: window.innerWidth > 768,
-  //       // eslint-disable-next-line react/destructuring-assignment
-  //     },
-  //     {
-  //       Header: ({ value, row }) => (
-  //         <div className="text-start">Contrato - Função - Inicio - Fim</div>
-  //       ),
-  //       id: 'mobile',
-  //       width: 100,
-  //       disableResizing: false,
-  //       disableSortBy: true,
-  //       defaultCanFilter: true,
-  //       isVisible: window.innerWidth < 768,
-  //       Cell: ({ value, row }) => (
-  //         <Row>
-  //           <Col xs="auto" className="text-start mb-0 pb-0">
-  //             {row.original.Contract?.codigoSipac}
-  //           </Col>
-  //           <Col xs="auto" className="mt-0 pt-0">
-  //             <Badge
-  //               className="text-dark bg-light"
-  //               style={{
-  //                 fontSize: '0.8em',
-  //               }}
-  //             >
-  //               {row.original.WorkerJobtype?.job}
-  //             </Badge>
-  //           </Col>
-  //           <Col xs="auto" className="mt-0 pt-0">
-  //             <Badge
-  //               className="text-dark bg-success text-white"
-  //               style={{
-  //                 fontSize: '0.8em',
-  //               }}
-  //             >
-  //               {row.original.startBr}
-  //             </Badge>
-  //           </Col>
-  //           <Col xs="auto" className="mt-0 pt-0">
-  //             <Badge
-  //               className="text-dark bg-danger text-white"
-  //               style={{
-  //                 fontSize: '0.8em',
-  //               }}
-  //             >
-  //               {row.original.endBr}
-  //             </Badge>
-  //           </Col>
-  //         </Row>
-  //       ),
-  //     },
-  //   ];
-  //   return (
-  //     <>
-  //       <Row className="mb-2">
-  //         <Col>
-  //           {' '}
-  //           <Badge>CONTRATOS VINCULADOS AO COLABORADOR</Badge>
-  //         </Col>
-  //       </Row>
-  //       <Row>
-  //         <Col>
-  //           <TableNestedrow
-  //             style={{ padding: 0, margin: 0 }}
-  //             columns={columns}
-  //             data={row.original.WorkerContracts}
-  //             defaultColumn={{
-  //               // Let's set up our default Filter UI
-  //               // Filter: DefaultColumnFilter,
-  //               minWidth: 30,
-  //               width: 50,
-  //               maxWidth: 800,
-  //             }}
-  //             initialState={{
-  //               // sortBy: [
-  //               //   {
-  //               //     id: 'name',
-  //               //     asc: true,
-  //               //   },
-  //               // ],
-  //               hiddenColumns: [
-  //                 ...columns
-  //                   .filter((col) => col.isVisible === false)
-  //                   .map((col) => col.id),
-  //                 ...columns
-  //                   .filter((col) => col.isVisible === false)
-  //                   .map((col) => col.accessor),
-  //               ],
-  //             }}
-  //             filterTypes={filterTypes}
-  //           />
-  //         </Col>
-  //       </Row>
-  //     </>
-  //   );
-  // }, []);
+  const renderRowSubComponent = React.useCallback(({ row }) => {
+    const columns = [
+      {
+        Header: 'Contrato',
+        id: 'contract',
+        width: 125,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => originalRow.Contract?.codigoSipac,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Função',
+        id: 'job',
+        accessor: (originalRow) => originalRow.WorkerJobtype?.job,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: 'Início',
+        id: 'startBr',
+        accessor: (originalRow) => originalRow.startBr,
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Fim',
+        accessor: 'endBr',
+        width: 100,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: 'Lotado',
+        id: 'unidade',
+        width: 200,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) =>
+          `${originalRow.Unidade?.id}-${originalRow.Unidade?.sigla}`,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: ({ value, row }) => (
+          <div className="text-start">Contrato - Função - Inicio - Fim</div>
+        ),
+        id: 'mobile',
+        width: 100,
+        disableResizing: false,
+        disableSortBy: true,
+        defaultCanFilter: true,
+        isVisible: window.innerWidth < 768,
+        Cell: ({ value, row }) => (
+          <Row>
+            <Col xs="auto" className="text-start mb-0 pb-0">
+              {row.original.Contract?.codigoSipac}
+            </Col>
+            <Col xs="auto" className="mt-0 pt-0">
+              <Badge
+                className="text-dark bg-light"
+                style={{
+                  fontSize: '0.8em',
+                }}
+              >
+                {row.original.WorkerJobtype?.job}
+              </Badge>
+            </Col>
+            <Col xs="auto" className="mt-0 pt-0">
+              <Badge
+                className="text-dark bg-success text-white"
+                style={{
+                  fontSize: '0.8em',
+                }}
+              >
+                {row.original.startBr}
+              </Badge>
+            </Col>
+            <Col xs="auto" className="mt-0 pt-0">
+              <Badge
+                className="text-dark bg-danger text-white"
+                style={{
+                  fontSize: '0.8em',
+                }}
+              >
+                {row.original.endBr}
+              </Badge>
+            </Col>
+          </Row>
+        ),
+      },
+    ];
+    return (
+      <>
+        <Row className="mb-2">
+          <Col>
+            {' '}
+            <Badge>CONTRATOS VINCULADOS AO COLABORADOR</Badge>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <TableNestedrow
+              style={{ padding: 0, margin: 0 }}
+              columns={columns}
+              data={row.original.WorkerContracts}
+              defaultColumn={{
+                // Let's set up our default Filter UI
+                // Filter: DefaultColumnFilter,
+                minWidth: 30,
+                width: 50,
+                maxWidth: 800,
+              }}
+              initialState={{
+                // sortBy: [
+                //   {
+                //     id: 'name',
+                //     asc: true,
+                //   },
+                // ],
+                hiddenColumns: [
+                  ...columns
+                    .filter((col) => col.isVisible === false)
+                    .map((col) => col.id),
+                  ...columns
+                    .filter((col) => col.isVisible === false)
+                    .map((col) => col.accessor),
+                ],
+              }}
+              filterTypes={filterTypes}
+            />
+          </Col>
+        </Row>
+      </>
+    );
+  }, []);
 
   const data = React.useMemo(() => workersTasks, [workersTasks]);
 
@@ -867,7 +913,7 @@ export default function Index() {
           defaultColumn={defaultColumn}
           initialState={initialState}
           filterTypes={filterTypes}
-          // renderRowSubComponent={renderRowSubComponent}
+          renderRowSubComponent={renderRowSubComponent}
         />
       </Container>
     </>
