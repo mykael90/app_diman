@@ -247,7 +247,7 @@ export default function Index() {
       {
         Header: 'Req. Man.',
         accessor: 'reqMaintenance',
-        width: 120,
+        width: 100,
         disableResizing: true,
         // eslint-disable-next-line react/no-unstable-nested-components
         Cell: ({ value, row }) => (
@@ -264,7 +264,7 @@ export default function Index() {
                       <div className="pb-1 fw-bold">RISCOS</div>
                       {row.original.WorkerTaskRisks.map((risk) => (
                         <div className="pb-1 text-start">
-                          {risk.WorkerTaskRisktype.type}
+                          &bull; {risk.WorkerTaskRisktype.type}
                         </div>
                       ))}
                     </>
@@ -290,31 +290,31 @@ export default function Index() {
         Header: 'Título',
         accessor: 'title',
         disableSortBy: true,
-        width: 250,
-        disableResizing: true,
-        Filter: InputColumnFilter,
-        filter: 'text',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: ({ value, row }) => <div className="text-start">Imóvel</div>,
-        id: 'nomeImovel',
-        accessor: (originalRow) => originalRow.PropertySipac?.nomeImovel,
-        disableSortBy: true,
-        Filter: InputColumnFilter,
-        filter: 'text',
         width: 200,
         disableResizing: true,
+        Filter: InputColumnFilter,
+        filter: 'text',
         isVisible: window.innerWidth > 768,
-        Cell: ({ value, row }) => (
-          <div className="text-start">
-            {value}{' '}
-            <Badge variant="secondary">
-              {row.original.PropertySipac?.municipio}
-            </Badge>
-          </div>
-        ),
       },
+      // {
+      //   Header: ({ value, row }) => <div className="text-start">Imóvel</div>,
+      //   id: 'nomeImovel',
+      //   accessor: (originalRow) => originalRow.PropertySipac?.nomeImovel,
+      //   disableSortBy: true,
+      //   Filter: InputColumnFilter,
+      //   filter: 'text',
+      //   width: 200,
+      //   disableResizing: true,
+      //   isVisible: window.innerWidth > 768,
+      //   Cell: ({ value, row }) => (
+      //     <div className="text-start">
+      //       {value}{' '}
+      //       <Badge variant="secondary">
+      //         {row.original.PropertySipac?.municipio}
+      //       </Badge>
+      //     </div>
+      //   ),
+      // },
       {
         Header: ({ value, row }) => (
           <div className="text-start">Instalaçao Física</div>
@@ -322,12 +322,37 @@ export default function Index() {
         id: 'building',
         accessor: (originalRow) => originalRow.BuildingSipac?.name,
         disableSortBy: true,
-        width: 300,
+        Filter: InputColumnFilter,
+        filter: 'text',
+        isVisible: window.innerWidth > 768,
+        Cell: ({ value, row }) => (
+          <>
+            <div className="text-start">{value}</div>
+            <div className="text-start fw-bold" style={{ fontSize: '0.8em' }}>
+              {row.original.PropertySipac?.nomeImovel} -{' '}
+              <Badge bg="secondary">
+                {row.original.PropertySipac?.municipio}
+              </Badge>
+            </div>
+          </>
+        ),
+      },
+
+      {
+        Header: 'Data Serviço',
+        accessor: (originalRow) => originalRow.startBr,
+        disableSortBy: true,
+        width: 150,
         disableResizing: true,
         Filter: InputColumnFilter,
         filter: 'text',
         isVisible: window.innerWidth > 768,
-        Cell: ({ value }) => <div className="text-start">{value}</div>,
+        Cell: ({ value, row }) => (
+          <>
+            <div>De: {value}</div>
+            <div>Até: {row.original.endBr}</div>
+          </>
+        ),
       },
       {
         Header: 'Status',
@@ -342,20 +367,10 @@ export default function Index() {
         isVisible: window.innerWidth > 768,
         Cell: ({ value, row }) => (
           <>
-            <div>{value} EM</div>
+            <div>{value}</div>
             <div>{row.original.WorkerTaskStatuses[0]?.createdAtBr}</div>
           </>
         ),
-      },
-      {
-        Header: 'Data',
-        accessor: (originalRow) => originalRow.startBr,
-        disableSortBy: true,
-        width: 100,
-        disableResizing: true,
-        Filter: InputColumnFilter,
-        filter: 'text',
-        isVisible: window.innerWidth > 768,
       },
       // {
       //   Header: 'Idade',
@@ -580,143 +595,214 @@ export default function Index() {
 
   // Create a function that will render our row sub components
   const renderRowSubComponent = React.useCallback(({ row }) => {
-    const columns = [
+    const columns1 = [
       {
-        Header: 'Contrato',
-        id: 'contract',
-        width: 125,
+        Header: 'Nome',
+        id: 'nome',
+        disableSortBy: true,
+        accessor: (originalRow) => originalRow.User?.name,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Cargo',
+        id: 'cargo',
+        accessor: (originalRow) =>
+          originalRow.User?.UserPositions[0]?.UserPositiontype?.position,
+        width: 300,
         disableResizing: true,
         disableSortBy: true,
-        accessor: (originalRow) => originalRow.Contract?.codigoSipac,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+    ];
+    const columns2 = [
+      {
+        Header: 'Nome',
+        id: 'nome',
+        disableSortBy: true,
+        accessor: (originalRow) => originalRow.Worker?.name,
         isVisible: window.innerWidth > 768,
       },
       {
         Header: 'Função',
         id: 'job',
-        accessor: (originalRow) => originalRow.WorkerJobtype?.job,
-        disableSortBy: true,
-        isVisible: window.innerWidth > 768,
-        // eslint-disable-next-line react/destructuring-assignment
-      },
-      {
-        Header: 'Início',
-        id: 'startBr',
-        accessor: (originalRow) => originalRow.startBr,
-        width: 100,
-        disableResizing: true,
-        disableSortBy: true,
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Fim',
-        accessor: 'endBr',
-        width: 100,
-        disableResizing: true,
-        disableSortBy: true,
-        isVisible: window.innerWidth > 768,
-        // eslint-disable-next-line react/destructuring-assignment
-      },
-      {
-        Header: 'Lotado',
-        id: 'unidade',
+        accessor: (originalRow) =>
+          originalRow.Worker?.WorkerContracts[0]?.WorkerJobtype?.job,
         width: 200,
         disableResizing: true,
         disableSortBy: true,
-        accessor: (originalRow) =>
-          `${originalRow.Unidade?.id}-${originalRow.Unidade?.sigla}`,
         isVisible: window.innerWidth > 768,
         // eslint-disable-next-line react/destructuring-assignment
       },
       {
-        Header: ({ value, row }) => (
-          <div className="text-start">Contrato - Função - Inicio - Fim</div>
-        ),
-        id: 'mobile',
-        width: 100,
-        disableResizing: false,
+        Header: 'Empresa',
+        id: 'empresa',
+        accessor: (originalRow) =>
+          originalRow.Worker?.WorkerContracts[0]?.Contract?.Provider
+            ?.nomeFantasia,
+        width: 300,
+        disableResizing: true,
         disableSortBy: true,
-        defaultCanFilter: true,
-        isVisible: window.innerWidth < 768,
-        Cell: ({ value, row }) => (
-          <Row>
-            <Col xs="auto" className="text-start mb-0 pb-0">
-              {row.original.Contract?.codigoSipac}
-            </Col>
-            <Col xs="auto" className="mt-0 pt-0">
-              <Badge
-                className="text-dark bg-light"
-                style={{
-                  fontSize: '0.8em',
-                }}
-              >
-                {row.original.WorkerJobtype?.job}
-              </Badge>
-            </Col>
-            <Col xs="auto" className="mt-0 pt-0">
-              <Badge
-                className="text-dark bg-success text-white"
-                style={{
-                  fontSize: '0.8em',
-                }}
-              >
-                {row.original.startBr}
-              </Badge>
-            </Col>
-            <Col xs="auto" className="mt-0 pt-0">
-              <Badge
-                className="text-dark bg-danger text-white"
-                style={{
-                  fontSize: '0.8em',
-                }}
-              >
-                {row.original.endBr}
-              </Badge>
-            </Col>
-          </Row>
-        ),
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+    ];
+    const columns3 = [
+      {
+        Header: 'Status',
+        id: 'status',
+        disableSortBy: true,
+        width: 200,
+        disableResizing: true,
+        accessor: (originalRow) => originalRow.WorkerTaskStatustype?.type,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Usuário',
+        id: 'user',
+        accessor: (originalRow) => originalRow.User?.username,
+        width: 200,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
+      },
+      {
+        Header: 'Data',
+        id: 'data',
+        accessor: (originalRow) => originalRow.createdAtBr,
+        width: 300,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+        // eslint-disable-next-line react/destructuring-assignment
       },
     ];
     return (
       <>
-        <Row className="mb-2">
-          <Col>
-            {' '}
-            <Badge>CONTRATOS VINCULADOS AO COLABORADOR</Badge>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <TableNestedrow
-              style={{ padding: 0, margin: 0 }}
-              columns={columns}
-              data={row.original.WorkerContracts}
-              defaultColumn={{
-                // Let's set up our default Filter UI
-                // Filter: DefaultColumnFilter,
-                minWidth: 30,
-                width: 50,
-                maxWidth: 800,
-              }}
-              initialState={{
-                // sortBy: [
-                //   {
-                //     id: 'name',
-                //     asc: true,
-                //   },
-                // ],
-                hiddenColumns: [
-                  ...columns
-                    .filter((col) => col.isVisible === false)
-                    .map((col) => col.id),
-                  ...columns
-                    .filter((col) => col.isVisible === false)
-                    .map((col) => col.accessor),
-                ],
-              }}
-              filterTypes={filterTypes}
-            />
-          </Col>
-        </Row>
+        <div>
+          <Row className="mb-2">
+            <Col>
+              {' '}
+              <Badge>REGISTROS DO SERVIÇO</Badge>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <TableNestedrow
+                style={{ padding: 0, margin: 0 }}
+                columns={columns3}
+                data={row.original.WorkerTaskStatuses}
+                defaultColumn={{
+                  // Let's set up our default Filter UI
+                  // Filter: DefaultColumnFilter,
+                  minWidth: 30,
+                  width: 50,
+                  maxWidth: 800,
+                }}
+                initialState={{
+                  // sortBy: [
+                  //   {
+                  //     id: 'name',
+                  //     asc: true,
+                  //   },
+                  // ],
+                  hiddenColumns: [
+                    ...columns
+                      .filter((col) => col.isVisible === false)
+                      .map((col) => col.id),
+                    ...columns
+                      .filter((col) => col.isVisible === false)
+                      .map((col) => col.accessor),
+                  ],
+                }}
+                filterTypes={filterTypes}
+              />
+            </Col>
+          </Row>
+        </div>
+        <div>
+          <Row className="mb-2">
+            <Col>
+              {' '}
+              <Badge>SERVIDORES RELACIONADOS</Badge>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <TableNestedrow
+                style={{ padding: 0, margin: 0 }}
+                columns={columns1}
+                data={row.original.WorkerTaskServants}
+                defaultColumn={{
+                  // Let's set up our default Filter UI
+                  // Filter: DefaultColumnFilter,
+                  minWidth: 30,
+                  width: 50,
+                  maxWidth: 800,
+                }}
+                initialState={{
+                  // sortBy: [
+                  //   {
+                  //     id: 'name',
+                  //     asc: true,
+                  //   },
+                  // ],
+                  hiddenColumns: [
+                    ...columns
+                      .filter((col) => col.isVisible === false)
+                      .map((col) => col.id),
+                    ...columns
+                      .filter((col) => col.isVisible === false)
+                      .map((col) => col.accessor),
+                  ],
+                }}
+                filterTypes={filterTypes}
+              />
+            </Col>
+          </Row>
+        </div>
+        <div>
+          <Row className="mb-2">
+            <Col>
+              {' '}
+              <Badge>TRABALHADORES ESCALADOS</Badge>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <TableNestedrow
+                style={{ padding: 0, margin: 0 }}
+                columns={columns2}
+                data={row.original.WorkerTaskItems}
+                defaultColumn={{
+                  // Let's set up our default Filter UI
+                  // Filter: DefaultColumnFilter,
+                  minWidth: 30,
+                  width: 50,
+                  maxWidth: 800,
+                }}
+                initialState={{
+                  // sortBy: [
+                  //   {
+                  //     id: 'name',
+                  //     asc: true,
+                  //   },
+                  // ],
+                  hiddenColumns: [
+                    ...columns
+                      .filter((col) => col.isVisible === false)
+                      .map((col) => col.id),
+                    ...columns
+                      .filter((col) => col.isVisible === false)
+                      .map((col) => col.accessor),
+                  ],
+                }}
+                filterTypes={filterTypes}
+              />
+            </Col>
+          </Row>
+        </div>
       </>
     );
   }, []);

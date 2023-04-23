@@ -222,6 +222,15 @@ export default function RiskTaskForm({ initialValues = null }) {
             response.data.filter((item) => item.municipio === value),
           ]);
         });
+
+        // removendo o array de CAMPUS UNIVERSITARIO DE NATAL para nao ficar em duplicidade
+        propertiesOp[0][1].shift();
+
+        // colocando um grupo de CAMPUS CENTRAL pra facilitar a seleçào
+        propertiesOp.unshift([
+          'CAMPUS CENTRAL',
+          [response.data[0], response.data[28]],
+        ]);
         setProperties(propertiesOp);
         setPropertiesData(response.data);
       } catch (err) {
@@ -561,7 +570,9 @@ export default function RiskTaskForm({ initialValues = null }) {
                               )[0]
                               ?.buildingsSipac.map((building) => ({
                                 value: building,
-                                label: building.name,
+                                label: `${building.name} ${
+                                  building.zone ? `(ZONA ${building.zone})` : ''
+                                }`,
                               }))}
                             value={
                               values.buildingSipacId
