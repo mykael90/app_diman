@@ -39,6 +39,7 @@ const formatGroupLabel = (data) => (
 
 export default function Index() {
   const userId = useSelector((state) => state.auth.user.id);
+  const [data, setData] = useState([]);
   const [workers, setWorkers] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [unidades, setUnidades] = useState([]);
@@ -105,8 +106,6 @@ export default function Index() {
       try {
         setIsLoading(true);
         const response = await axios.get('/workers/actives');
-        const responseContract = await axios.get(`/workers/contracts`);
-        const responseUnidades = await axios.get('/unidades/');
 
         const workersJobs = response.data
           .filter(
@@ -121,10 +120,29 @@ export default function Index() {
             response.data.filter((item) => item.job === value),
           ]);
         });
+        setData(response.data);
+        const differentsContracts = Array.from(
+          new Set(
+            response.data.map((w) =>
+              JSON.stringify(w.WorkerContracts[0]?.Contract)
+            )
+          )
+        ).map((json) => JSON.parse(json));
+        const differentsUnidades = Array.from(
+          new Set(
+            response.data.map((w) =>
+              JSON.stringify(
+                w.WorkerContracts[0]?.Unidade
+                  ? w.WorkerContracts[0]?.Unidade
+                  : ''
+              )
+            )
+          )
+        ).map((json) => JSON.parse(json));
 
         setWorkers(workersOp);
-        setContracts(responseContract.data);
-        setUnidades(responseUnidades.data);
+        setContracts(differentsContracts.filter((item) => item));
+        setUnidades(differentsUnidades.filter((item) => item));
 
         setIsLoading(false);
       } catch (err) {
@@ -285,12 +303,19 @@ export default function Index() {
                         value: contract.id,
                         label: `${contract.codigoSipac} - ${contract.objeto} `,
                       }))}
-                      value={values.ContractId}
+                      value={
+                        values.ContractId
+                          ? unidades.find(
+                              (option) => option.value === values.ContractId
+                            )
+                          : null
+                      }
                       onChange={(selected) => {
-                        setFieldValue('ContractId', selected);
+                        setFieldValue('ContractId', selected.value);
                       }}
                       placeholder="Selecione o responsável"
                       onBlur={handleBlur}
+                      isDisabled={values.WorkerManualfrequencyItems.length}
                     />
                     {touched.ContractId && !!errors.ContractId ? (
                       <Badge bg="danger">{errors.ContractId}</Badge>
@@ -308,14 +333,27 @@ export default function Index() {
                       inputId="UnidadeId"
                       options={unidades.map((unidade) => ({
                         value: unidade.id,
-                        label: `${unidade.nomeUnidade} `,
+                        label: `${unidade.id} - ${unidade.nomeUnidade} `,
                       }))}
-                      value={values.UnidadeId}
+                      value={
+                        values.UnidadeId
+                          ? unidades.find(
+                              (option) => option.value === values.UnidadeId
+                            )
+                          : null
+                      }
                       onChange={(selected) => {
-                        setFieldValue('UnidadeId', selected);
+                        setFieldValue('UnidadeId', selected.value);
+                        setFieldValue(
+                          'date',
+                          new Date().toISOString().split('T')[0]
+                        );
                       }}
                       placeholder="Selecione a unidade"
-                      onBlur={handleBlur}
+                      onBlur={(e) => {
+                        handleBlur(e);
+                      }}
+                      isDisabled={values.WorkerManualfrequencyItems.length}
                     />
                     {touched.UnidadeId && !!errors.UnidadeId ? (
                       <Badge bg="danger">{errors.UnidadeId}</Badge>
@@ -395,13 +433,30 @@ export default function Index() {
                               inputId="searchWorker"
                               options={workers.map((value) => ({
                                 label: value[0],
-                                options: value[1].map((item) => ({
-                                  value: item,
-                                  label: item.name,
-                                })),
+                                options: value[1]
+                                  .filter(
+                                    // filtrando por contrato e unidade
+                                    (v) =>
+                                      v.WorkerContracts[0]?.unidadeId ===
+                                        values.UnidadeId &&
+                                      v.WorkerContracts[0]?.ContractId ===
+                                        values.ContractId
+                                  )
+                                  .filter(
+                                    // nao pode adicionar o mesmo item 2x
+                                    (item) =>
+                                      !values.WorkerManualfrequencyItems.find(
+                                        (element) =>
+                                          element.WorkerId === item.id
+                                      )
+                                  )
+                                  .map((item) => ({
+                                    value: item,
+                                    label: item.name,
+                                  })),
                               }))}
                               formatGroupLabel={formatGroupLabel}
-                              value={values.searchWorker}
+                              value={null}
                               onChange={(selected, action) => {
                                 console.log(selected);
                                 console.log(values.WorkerManualfrequencyItems);

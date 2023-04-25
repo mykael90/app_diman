@@ -144,20 +144,6 @@ export default function RiskTaskForm({ initialValues = null }) {
         const response3 = await axios.get('/workerstasks/risks/types');
         const response4 = await axios.get('/workerstasks/types');
 
-        // const workersJobs = response.data
-        //   .filter(
-        //     (value, index, arr) =>
-        //       arr.findIndex((item) => item.job === value.job) === index
-        //   )
-        //   .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
-
-        // workersJobs.forEach((value) => {
-        //   workersOp.push([
-        //     value,
-        //     response.data.filter((item) => item.job === value),
-        //   ]);
-        // });
-
         setServants(response2.data);
         setRisksTypes(response3.data);
         setTasksTypes(response4.data);
@@ -402,10 +388,6 @@ export default function RiskTaskForm({ initialValues = null }) {
                                 selectedOption.value
                               )
                             }
-                            // onBlur={(e) => {
-                            //   console.log(e);
-                            //   setFieldTouched(e.target.id, true);
-                            // }}
                           />
                         )}
                       </Field>
@@ -723,11 +705,6 @@ export default function RiskTaskForm({ initialValues = null }) {
                       <BootstrapForm.Label>Atividade extra</BootstrapForm.Label>
                       <Field
                         xs={6}
-                        // className={
-                        //   errors.extraActivity && touched.extraActivity
-                        //     ? 'is-invalid'
-                        //     : null
-                        // }
                         type="switch"
                         name="extraActivity"
                         as={BootstrapForm.Check}
@@ -830,9 +807,9 @@ export default function RiskTaskForm({ initialValues = null }) {
                         return (
                           <>
                             <Row className="d-flex justify-content-center align-items-center pt-1 pb-1 mb-2 bg-white border-bottom">
-                              <Col xs="12" md="auto" className="ps-0 pe-2">
+                              {/* <Col xs="12" md="auto" className="ps-0 pe-2">
                                 PESQUISA DE SERVIDOR:
-                              </Col>
+                              </Col> */}
                               <Col className="p-0">
                                 {' '}
                                 <Select
@@ -853,23 +830,8 @@ export default function RiskTaskForm({ initialValues = null }) {
                                       label: item.name,
                                       value: item,
                                     }))}
-                                  // options={inventoryData.map((material) => ({
-                                  //   value: material,
-                                  //   label: `(${material.materialId}) ${material.name} - ${material.unit}`,
-                                  // }))}
                                   value={null}
-                                  // onChange={(selected, action) => {
-                                  //   handlePushItem(
-                                  //     push,
-                                  //     selected,
-                                  //     values.MaterialReserveItems
-                                  //   );
-                                  //   setFieldValue('searchMaterial', '');
-                                  // }}
                                   placeholder="Selecione o servidor"
-                                  // onBlur={() =>
-                                  //   setFieldValue('searchMaterial', '')
-                                  // }
                                   escapeClearsValue
                                   onChange={(e) => {
                                     console.log(e.value);
@@ -881,7 +843,6 @@ export default function RiskTaskForm({ initialValues = null }) {
                                           .UserPositiontype.position,
                                     });
                                   }}
-                                  // filterOption={filterOptions}
                                 />
                               </Col>
                             </Row>
@@ -1020,32 +981,6 @@ export default function RiskTaskForm({ initialValues = null }) {
                                       </>
                                     )
                                   )}
-                                {/* {id ? (
-                              <Row className="mt-2">
-                                <Col xs="auto">
-                                  {' '}
-                                  <Button
-                                    size="sm"
-                                    variant="outline-primary"
-                                    onClick={(e) => {
-                                      if (
-                                        values.WorkerTaskServants.find(
-                                          ({ end }) => end == null
-                                        )
-                                      ) {
-                                        toast.error(
-                                          'Para vincular um novo contrato ao colaborador, o contrato ativo precisa ser encerrado!'
-                                        );
-                                      } else {
-                                        push(e);
-                                      }
-                                    }}
-                                  >
-                                    <FaPlus /> Novo contrato
-                                  </Button>
-                                </Col>
-                              </Row>
-                            ) : null} */}
                               </Col>
                             </Row>
                           </>
@@ -1068,9 +1003,9 @@ export default function RiskTaskForm({ initialValues = null }) {
                         return (
                           <>
                             <Row className="d-flex justify-content-center align-items-center pt-1 pb-1 mb-2 bg-white border-bottom">
-                              <Col xs="12" md="auto" className="ps-0 pe-2">
+                              {/* <Col xs="12" md="auto" className="ps-0 pe-2">
                                 PESQUISA DE PROFISSIONAL:
-                              </Col>
+                              </Col> */}
                               <Col className="p-0">
                                 {' '}
                                 <Select
@@ -1082,33 +1017,16 @@ export default function RiskTaskForm({ initialValues = null }) {
                                       label: item.name,
                                     })),
                                   }))}
-                                  // options={inventoryData.map((material) => ({
-                                  //   value: material,
-                                  //   label: `(${material.materialId}) ${material.name} - ${material.unit}`,
-                                  // }))}
                                   value={null}
-                                  // onChange={(selected, action) => {
-                                  //   handlePushItem(
-                                  //     push,
-                                  //     selected,
-                                  //     values.MaterialReserveItems
-                                  //   );
-                                  //   setFieldValue('searchMaterial', '');
-                                  // }}
                                   placeholder="Selecione o profissional"
-                                  // onBlur={() =>
-                                  //   setFieldValue('searchMaterial', '')
-                                  // }
                                   escapeClearsValue
                                   onChange={(e) => {
-                                    console.log(e.value);
                                     push({
                                       WorkerId: e.value.id,
                                       name: e.value.name,
                                       job: e.value.job,
                                     });
                                   }}
-                                  // filterOption={filterOptions}
                                 />
                               </Col>
                             </Row>
@@ -1243,32 +1161,6 @@ export default function RiskTaskForm({ initialValues = null }) {
                                       </Row>
                                     </>
                                   ))}
-                                {/* {id ? (
-                              <Row className="mt-2">
-                                <Col xs="auto">
-                                  {' '}
-                                  <Button
-                                    size="sm"
-                                    variant="outline-primary"
-                                    onClick={(e) => {
-                                      if (
-                                        values.WorkerTaskItems.find(
-                                          ({ end }) => end == null
-                                        )
-                                      ) {
-                                        toast.error(
-                                          'Para vincular um novo contrato ao colaborador, o contrato ativo precisa ser encerrado!'
-                                        );
-                                      } else {
-                                        push(e);
-                                      }
-                                    }}
-                                  >
-                                    <FaPlus /> Novo contrato
-                                  </Button>
-                                </Col>
-                              </Row>
-                            ) : null} */}
                               </Col>
                             </Row>
                           </>
