@@ -12,6 +12,7 @@ import {
   FaSearchPlus,
   FaSearchMinus,
   FaExclamationTriangle,
+  FaEllipsisH,
 } from 'react-icons/fa';
 
 import {
@@ -296,25 +297,6 @@ export default function Index() {
         filter: 'text',
         isVisible: window.innerWidth > 768,
       },
-      // {
-      //   Header: ({ value, row }) => <div className="text-start">Imóvel</div>,
-      //   id: 'nomeImovel',
-      //   accessor: (originalRow) => originalRow.PropertySipac?.nomeImovel,
-      //   disableSortBy: true,
-      //   Filter: InputColumnFilter,
-      //   filter: 'text',
-      //   width: 200,
-      //   disableResizing: true,
-      //   isVisible: window.innerWidth > 768,
-      //   Cell: ({ value, row }) => (
-      //     <div className="text-start">
-      //       {value}{' '}
-      //       <Badge variant="secondary">
-      //         {row.original.PropertySipac?.municipio}
-      //       </Badge>
-      //     </div>
-      //   ),
-      // },
       {
         Header: ({ value, row }) => (
           <div className="text-start">Instalaçao Física</div>
@@ -567,28 +549,49 @@ export default function Index() {
       //     );
       //   },
       // },
-      // {
-      //   // Make an expander cell
-      //   Header: () => null, // No header
-      //   id: 'actions', // It needs an ID
-      //   width: 40,
-      //   disableResizing: true,
-      //   Cell: ({ row }) => (
-      //     // Use Cell to render an expander for each row.
-      //     // We can use the getToggleRowExpandedProps prop-getter
-      //     // to build the expander.
-      //     // <Link to={`/collaborator/record/update/${row.original.id}`}>
-      //     <Button
-      //       size="sm"
-      //       variant="outline-secondary"
-      //       className="border-0 m-0"
-      //       onClick={(e) => handleShowModalEdit(row.original)}
-      //     >
-      //       <FaPencilAlt />
-      //     </Button>
-      //     // </Link>
-      //   ),
-      // },
+      {
+        // Make an action cell
+        Header: 'Ações', // No header
+        id: 'actions', // It needs an ID
+        width: 80,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          <Row className="d-flex flex-nowrap">
+            <Col xs="auto" className="text-center ms-2 m-0 p-0 px-1">
+              <OverlayTrigger
+                placement="left"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Editar serviço')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  className="border-0 m-0"
+                  onClick={(e) => handleShowModalEdit(row.original)}
+                >
+                  <FaPencilAlt />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+            <Col xs="auto" className="text-center  m-0 p-0 px-1">
+              <OverlayTrigger
+                placement="right"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Atualizar status')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-primary"
+                  className="border-0 m-0"
+                  onClick={(e) => handleShowModalEdit(row.original)}
+                >
+                  <FaEllipsisH />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+          </Row>
+        ),
+      },
     ],
     []
   );
