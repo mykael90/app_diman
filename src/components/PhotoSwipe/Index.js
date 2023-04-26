@@ -1,26 +1,34 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Image } from 'react-bootstrap';
-import Gallery from 'react-photoswipe-gallery';
+import { Gallery, Item } from 'react-photoswipe-gallery';
+import 'photoswipe/dist/photoswipe.css';
 
 function GalleryComponent() {
+  const smallItemStyles = {
+    cursor: 'pointer',
+    objectFit: 'cover',
+    width: '100%',
+    maxHeight: '100%',
+  };
+
   // Define an array of images to be displayed
   const images = [
     {
       src: 'https://placeimg.com/640/480/nature',
-      w: 640,
-      h: 480,
+      w: `640`,
+      h: `480`,
       title: 'Nature',
     },
     {
       src: 'https://placeimg.com/640/480/arch',
-      w: 640,
-      h: 480,
+      w: `640`,
+      h: `480`,
       title: 'Architecture',
     },
     {
       src: 'https://placeimg.com/640/480/animals',
-      w: 640,
-      h: 480,
+      w: `640`,
+      h: `480`,
       title: 'Animals',
     },
   ];
@@ -33,28 +41,53 @@ function GalleryComponent() {
     setCurrentIndex(index);
   };
 
+  const options = {
+    arrowPrev: true,
+    arrowNext: true,
+    zoom: true,
+    close: true,
+    counter: false,
+    bgOpacity: 0.2,
+    padding: { top: 20, bottom: 40, left: 100, right: 100 },
+  };
+
   return (
     <Container fluid>
       <Row>
         <Gallery
-          items={images}
-          options={{
-            closeOnScroll: false,
-            history: false,
-            showHideOpacity: true,
-            index: currentIndex,
-          }}
+          withDownloadButton
+          withCaption
+          // items={images}
+          // options={options}
         >
-          {images.map((image, index) => (
-            <Col key={index} xs={6} md={4} lg={3}>
-              <Image
-                src={image.src}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '240px 171px 171px',
+              gridTemplateRows: '114px 114px',
+              gridGap: 12,
+            }}
+          >
+            {images.map((image, index) => (
+              <Item
+                original={image.src}
+                thumbnail={image.src}
                 alt={image.title}
-                thumbnail
-                onClick={() => handleThumbnailClick(index)}
-              />
-            </Col>
-          ))}
+                width={image.w}
+                height={image.h}
+              >
+                {({ ref, open }) => (
+                  <img
+                    style={smallItemStyles}
+                    src={image.src}
+                    ref={ref}
+                    onClick={open}
+                    alt={image.title}
+                  />
+                )}
+              </Item>
+            ))}
+          </div>
         </Gallery>
       </Row>
     </Container>
