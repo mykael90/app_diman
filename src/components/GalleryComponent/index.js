@@ -61,7 +61,7 @@ function GalleryContent({ images }) {
   );
 }
 
-function GalleryComponent({ images, hasDimensions = true }) {
+export default function GalleryComponent({ images, hasDimensions = true }) {
   const [data, setData] = useState([]);
 
   // Define an array of images to be displayed
@@ -111,5 +111,3 @@ function GalleryComponent({ images, hasDimensions = true }) {
     </Gallery>
   );
 }
-
-export default GalleryComponent;

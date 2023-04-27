@@ -35,7 +35,7 @@ import {
   Image,
 } from 'react-bootstrap';
 
-import PhotoSwipe from '../../../../components/PhotoSwipe';
+import GalleryComponent from '../../../../components/GalleryComponent';
 
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
@@ -1019,7 +1019,7 @@ export default function Index() {
         ) : null}
 
         {row.original.MaterialOutFiles.length ? (
-          <PhotoSwipe
+          <GalleryComponent
             images={row.original.MaterialOutFiles}
             hasDimensions={false}
           />
