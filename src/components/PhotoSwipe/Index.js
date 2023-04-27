@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Image as ImageBS } from 'react-bootstrap';
+import { Row, Col, Image as ImageBS } from 'react-bootstrap';
 import { Gallery, Item, useGallery } from 'react-photoswipe-gallery';
 import 'photoswipe/dist/photoswipe.css';
 
@@ -32,35 +32,32 @@ function GalleryContent({ images }) {
   // }, [open]);
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '240px 171px 171px',
-        gridTemplateRows: '114px 114px',
-        gridGap: 12,
-      }}
-    >
+    <Row className="d-flex align-items-center justify-content-center pb-3">
       {images.map((image, index) => (
-        <Item
-          key={index}
-          original={image.src}
-          thumbnail={image.src}
-          alt={image.filename}
-          width={image.w}
-          height={image.h}
-        >
-          {({ ref, open }) => (
-            <ImageBS
-              style={smallItemStyles}
-              src={image.src}
-              ref={ref}
-              onClick={open}
-              alt={image.filename}
-            />
-          )}
-        </Item>
+        <Col xs="auto">
+          <Item
+            key={index}
+            original={image.src}
+            thumbnail={image.src}
+            alt={image.filename}
+            width={image.w}
+            height={image.h}
+          >
+            {({ ref, open }) => (
+              <ImageBS
+                src={image.src}
+                ref={ref}
+                onClick={open}
+                alt={image.filename}
+                width="150"
+                thumbnail
+                style={{ cursor: 'zoom-in' }}
+              />
+            )}
+          </Item>
+        </Col>
       ))}
-    </div>
+    </Row>
   );
 }
 
@@ -105,17 +102,13 @@ function GalleryComponent({ images, hasDimensions = true }) {
   };
 
   return (
-    <Container>
-      <Row>
-        <Gallery
-          withDownloadButton
-          withCaption
-          // options={options}
-        >
-          <GalleryContent images={data} />
-        </Gallery>
-      </Row>
-    </Container>
+    <Gallery
+      withDownloadButton
+      withCaption
+      // options={options}
+    >
+      <GalleryContent images={data} />
+    </Gallery>
   );
 }
 
