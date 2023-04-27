@@ -49,19 +49,19 @@ export default function RoutesPages() {
                 src: 'https://placeimg.com/640/480/nature',
                 // w: '640',
                 // h: '480',
-                title: 'Nature',
+                filename: 'Nature',
               },
               {
                 src: 'https://placeimg.com/640/480/arch',
                 // w: '640',
                 // h: '480',
-                title: 'Architecture',
+                filename: 'Architecture',
               },
               {
                 src: 'https://placeimg.com/640/480/animals',
                 // w: '640',
                 // h: '480',
-                title: 'Animals',
+                filename: 'Animals',
               },
             ]}
             hasDimensions={false}

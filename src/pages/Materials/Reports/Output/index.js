@@ -35,6 +35,8 @@ import {
   Image,
 } from 'react-bootstrap';
 
+import PhotoSwipe from '../../../../components/PhotoSwipe';
+
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
@@ -1014,6 +1016,13 @@ export default function Index() {
               renderRowSubComponent={renderRowSubSub1Component}
             />
           </>
+        ) : null}
+
+        {row.original.MaterialOutFiles.length ? (
+          <PhotoSwipe
+            images={row.original.MaterialOutFiles}
+            hasDimensions={false}
+          />
         ) : null}
       </>
     ),
