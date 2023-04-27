@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Image } from 'react-bootstrap';
-import { Gallery, Item } from 'react-photoswipe-gallery';
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col, Image as ImageBS } from 'react-bootstrap';
+import { Gallery, Item, useGallery } from 'react-photoswipe-gallery';
 import 'photoswipe/dist/photoswipe.css';
 
-function GalleryComponent() {
+function getImageDemensions(imageSrc) {
+  const image = new Image();
+  return new Promise((resolve, reject) => {
+    image.src = imageSrc;
+    image.addEventListener(
+      'load',
+      () => {
+        resolve(image);
+      },
+      false
+    );
+  });
+}
+
+function GalleryContent({ images }) {
   const smallItemStyles = {
     cursor: 'pointer',
     objectFit: 'cover',
@@ -11,35 +25,74 @@ function GalleryComponent() {
     maxHeight: '100%',
   };
 
+  const { open } = useGallery();
+
+  // useEffect(() => {
+  //   open(1); // you can open second slide by calling open(1) in useEffect
+  // }, [open]);
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '240px 171px 171px',
+        gridTemplateRows: '114px 114px',
+        gridGap: 12,
+      }}
+    >
+      {images.map((image, index) => (
+        <Item
+          key={index}
+          original={image.src}
+          thumbnail={image.src}
+          alt={image.title}
+          width={image.w}
+          height={image.h}
+        >
+          {({ ref, open }) => (
+            <ImageBS
+              style={smallItemStyles}
+              src={image.src}
+              ref={ref}
+              onClick={open}
+              alt={image.title}
+            />
+          )}
+        </Item>
+      ))}
+    </div>
+  );
+}
+
+function GalleryComponent({ images, hasDimensions = true }) {
+  const [data, setData] = useState([]);
+
   // Define an array of images to be displayed
-  const images = [
-    {
-      src: 'https://placeimg.com/640/480/nature',
-      w: `640`,
-      h: `480`,
-      title: 'Nature',
-    },
-    {
-      src: 'https://placeimg.com/640/480/arch',
-      w: `640`,
-      h: `480`,
-      title: 'Architecture',
-    },
-    {
-      src: 'https://placeimg.com/640/480/animals',
-      w: `640`,
-      h: `480`,
-      title: 'Animals',
-    },
-  ];
 
-  // Define state to keep track of the currently selected image
-  const [currentIndex, setCurrentIndex] = useState(0);
+  async function imageDimensions() {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const image of images) {
+      // eslint-disable-next-line no-await-in-loop
+      const dataImage = await getImageDemensions(image.src);
+      image.w = dataImage.naturalWidth.toString();
+      image.h = dataImage.naturalHeight.toString();
+    }
+    // setData(images);
+    return images;
+  }
 
-  // Define a function to handle the thumbnail click event
-  const handleThumbnailClick = (index) => {
-    setCurrentIndex(index);
-  };
+  async function putDimensions() {
+    const response = await imageDimensions();
+    setData(response);
+  }
+
+  useEffect(() => {
+    if (!hasDimensions) {
+      putDimensions();
+    } else {
+      setData(images);
+    }
+  }, []);
 
   const options = {
     arrowPrev: true,
@@ -52,42 +105,14 @@ function GalleryComponent() {
   };
 
   return (
-    <Container fluid>
+    <Container>
       <Row>
         <Gallery
           withDownloadButton
           withCaption
-          // items={images}
           // options={options}
         >
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '240px 171px 171px',
-              gridTemplateRows: '114px 114px',
-              gridGap: 12,
-            }}
-          >
-            {images.map((image, index) => (
-              <Item
-                original={image.src}
-                thumbnail={image.src}
-                alt={image.title}
-                width={image.w}
-                height={image.h}
-              >
-                {({ ref, open }) => (
-                  <img
-                    style={smallItemStyles}
-                    src={image.src}
-                    ref={ref}
-                    onClick={open}
-                    alt={image.title}
-                  />
-                )}
-              </Item>
-            ))}
-          </div>
+          <GalleryContent images={data} />
         </Gallery>
       </Row>
     </Container>

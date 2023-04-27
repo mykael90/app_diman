@@ -40,7 +40,34 @@ export default function RoutesPages() {
     <Routes>
       {/* public routes */}
       <Route path="/lightbox" element={<LightBox />} />
-      <Route path="/photoswipe" element={<PhotoSwipe />} />
+      <Route
+        path="/photoswipe"
+        element={
+          <PhotoSwipe
+            images={[
+              {
+                src: 'https://placeimg.com/640/480/nature',
+                // w: '640',
+                // h: '480',
+                title: 'Nature',
+              },
+              {
+                src: 'https://placeimg.com/640/480/arch',
+                // w: '640',
+                // h: '480',
+                title: 'Architecture',
+              },
+              {
+                src: 'https://placeimg.com/640/480/animals',
+                // w: '640',
+                // h: '480',
+                title: 'Animals',
+              },
+            ]}
+            hasDimensions={false}
+          />
+        }
+      />
 
       <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
