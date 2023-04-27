@@ -4,7 +4,6 @@ import RequireAuth from './RequireAuth';
 
 import usersRoletypes from '../assets/JSON/data/usersRoletypes.json';
 
-import PhotoSwipe from '../components/PhotoSwipe';
 import LightBox from '../components/LightBox';
 import Aluno from '../pages/Aluno';
 import Alunos from '../pages/Alunos';
@@ -40,34 +39,6 @@ export default function RoutesPages() {
     <Routes>
       {/* public routes */}
       <Route path="/lightbox" element={<LightBox />} />
-      <Route
-        path="/photoswipe"
-        element={
-          <PhotoSwipe
-            images={[
-              {
-                src: 'https://placeimg.com/640/480/nature',
-                // w: '640',
-                // h: '480',
-                filename: 'Nature',
-              },
-              {
-                src: 'https://placeimg.com/640/480/arch',
-                // w: '640',
-                // h: '480',
-                filename: 'Architecture',
-              },
-              {
-                src: 'https://placeimg.com/640/480/animals',
-                // w: '640',
-                // h: '480',
-                filename: 'Animals',
-              },
-            ]}
-            hasDimensions={false}
-          />
-        }
-      />
 
       <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
