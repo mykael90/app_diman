@@ -45,7 +45,7 @@ function GalleryContent({ images }) {
           key={index}
           original={image.src}
           thumbnail={image.src}
-          alt={image.title}
+          alt={image.filename}
           width={image.w}
           height={image.h}
         >
@@ -55,7 +55,7 @@ function GalleryContent({ images }) {
               src={image.src}
               ref={ref}
               onClick={open}
-              alt={image.title}
+              alt={image.filename}
             />
           )}
         </Item>
