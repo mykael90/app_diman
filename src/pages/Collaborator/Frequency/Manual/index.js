@@ -18,6 +18,25 @@ import {
 } from '../../../../config/colors';
 import Loading from '../../../../components/Loading';
 
+const convertEmptyToNull = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map((value) => convertEmptyToNull(value));
+  }
+
+  if (typeof obj === 'object' && obj !== null) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => {
+        if (Array.isArray(value) && value.length === 0) {
+          return [key, value];
+        }
+        return [key, convertEmptyToNull(value) ?? null];
+      })
+    );
+  }
+
+  return obj ?? null;
+};
+
 const filterOptions = (row, filterValue) => {
   const arrayFilter = String(filterValue).split(' ');
 
@@ -157,88 +176,24 @@ export default function Index() {
     getData();
   }, []);
 
-  const toFormData = ((f) => f(f))((h) => (f) => f((x) => h(h)(f)(x)))(
-    (f) => (fd) => (pk) => (d) => {
-      if (d instanceof Object) {
-        Object.keys(d).forEach((k) => {
-          const v = d[k];
-          if (pk) k = `${pk}[${k}]`;
-          if (
-            v instanceof Object &&
-            !(v instanceof Date) &&
-            !(v instanceof File)
-          ) {
-            return f(fd)(k)(v);
-          }
-          fd.append(k, v);
-        });
-      }
-      return fd;
-    }
-  )(new FormData())();
-
   const handleStore = async (values, resetForm) => {
     const formattedValues = {
-      ...Object.fromEntries(
-        Object.entries(values).filter(([_, v]) => v != null)
-      ),
-    }; // LIMPANDO CHAVES NULL E UNDEFINED
+      ...convertEmptyToNull(values),
+    };
 
-    Object.keys(formattedValues).forEach((key) => {
-      if (formattedValues[key] === '') {
-        delete formattedValues[key];
-      }
-    }); // LIMPANDO CHAVES `EMPTY STRINGS`
+    formattedValues.UserId = userId;
 
-    formattedValues.materialOuttypeId = 3; // SAÍDA POR DEVOLUÇÃO
-    formattedValues.userId = userId;
-    formattedValues.ContractId = formattedValues.ContractId?.value;
-    formattedValues.workerId = formattedValues.workerId?.value;
-    formattedValues.WorkerManualfrequencyItems.forEach((item) => {
-      Object.assign(item, { MaterialId: item.WorkerId }); // rename key
-    });
-
-    formattedValues.value = formattedValues.WorkerManualfrequencyItems.reduce(
-      (ac, item) => {
-        ac += Number(item.hours) * Number(item.value);
-        return ac;
-      },
-      0
-    );
-
-    let formData;
-    if (files.length > 0) {
-      formData = toFormData(formattedValues);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const file of files) {
-        formData.append('documents', file.file);
-      }
-    }
+    console.log(formattedValues);
 
     try {
       setIsLoading(true);
 
-      if (files.length > 0) {
-        // await axios.post(`/workers/manualfrequency`, formData, {
-        //   headers: {
-        //     'Content-Type': 'multipart/form-data',
-        //   },
-        // });
-        // for (const pair of formData.entries()) {
-        //   console.log(`${pair[0]} - ${pair[1]}`);
-        // }
-      } else {
-        console.log(formattedValues);
-        // await axios.post(`/workers/manualfrequency`, formattedValues);
-      }
+      await axios.post(`/workersmanualfrequencies`, formattedValues);
 
       setIsLoading(false);
-      setFiles([]);
       resetForm();
 
-      toast.success(
-        `Registro de frequência em desenolvimento, em breve estará disponível!`
-      );
+      toast.success(`Registro realizado com sucesso!`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       console.log(err);
@@ -267,7 +222,9 @@ export default function Index() {
             className=" text-center"
             style={{ background: primaryDarkColor, color: 'white' }}
           >
-            <span className="fs-5">REGISTRO DE FREQUÊNCIA: MANUAL</span>
+            <span className="fs-5">
+              REGISTRO DE OCORRÊNCIA DE PONTO: MANUAL
+            </span>
           </Col>
         </Row>
         <Row className="px-0 pt-2">
@@ -698,7 +655,7 @@ export default function Index() {
                   </Col>
                   <Col xs="auto" className="text-center pt-2 pb-4">
                     <Button variant="success" onClick={submitForm}>
-                      Confirmar frequência
+                      Registrar
                     </Button>
                   </Col>
                 </Row>

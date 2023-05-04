@@ -35,15 +35,6 @@ import {
   Image,
 } from 'react-bootstrap';
 
-import LightGallery from 'lightgallery/react';
-// If you want you can use SCSS instead of css
-import 'lightgallery/scss/lightgallery.scss';
-import 'lightgallery/scss/lg-zoom.scss';
-
-// import plugins if you need
-import lgThumbnail from 'lightgallery/plugins/thumbnail';
-import lgZoom from 'lightgallery/plugins/zoom';
-
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
