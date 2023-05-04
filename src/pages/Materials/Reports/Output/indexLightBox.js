@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import {
@@ -34,6 +34,15 @@ import {
   Form,
   Image,
 } from 'react-bootstrap';
+
+import LightGallery from 'lightgallery/react';
+// If you want you can use SCSS instead of css
+import 'lightgallery/scss/lightgallery.scss';
+import 'lightgallery/scss/lg-zoom.scss';
+
+// import plugins if you need
+import lgThumbnail from 'lightgallery/plugins/thumbnail';
+import lgZoom from 'lightgallery/plugins/zoom';
 
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
@@ -542,24 +551,57 @@ export default function Index() {
             }
           }
 
+          const getItems = useCallback(
+            () =>
+              row.original.MaterialOutFiles.map((item) => (
+                <a
+                  key={item.order}
+                  // data-lg-size={item.size}
+                  // className="gallery-item"
+                  href={`${process.env.REACT_APP_BASE_AXIOS_REST}/uploads/materials/out/images/${item.filename}`}
+                >
+                  <img
+                    alt={`Imagem ${item.order}`}
+                    // style={{ maxWidth: '280px' }}
+                    className="d-none"
+                    src={`${process.env.REACT_APP_BASE_AXIOS_REST}/uploads/materials/out/images/${item.filename}`}
+                    crossOrigin="anonymous"
+                  />
+                  {item.order === 1 ? (
+                    <OverlayTrigger
+                      placement="left"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={(props) => renderTooltip(props, 'Ver fotos')}
+                    >
+                      <Button
+                        // size="sm"
+                        variant="outline-primary"
+                        className="border-0 m-0"
+                      >
+                        <FaImages />
+                      </Button>
+                    </OverlayTrigger>
+                  ) : null}
+                </a>
+              )),
+            []
+          );
+
           return (
             <>
               <TipoSaida param={value} />
               {row.original.MaterialOutFiles.length ? (
                 <div>
-                  <OverlayTrigger
-                    placement="left"
-                    delay={{ show: 250, hide: 400 }}
-                    overlay={(props) => renderTooltip(props, 'Contém fotos!')}
-                  >
-                    <Button
-                      // size="sm"
-                      variant="outline-info"
-                      className="border-0 m-0"
+                  {' '}
+                  <Col xs="auto" className="text-center m-0 p-0 pt-1 px-1">
+                    <LightGallery
+                      // onInit={onInit}
+                      speed={500}
+                      plugins={[lgThumbnail, lgZoom]}
                     >
-                      <FaImages />
-                    </Button>
-                  </OverlayTrigger>
+                      {getItems()}
+                    </LightGallery>
+                  </Col>
                 </div>
               ) : null}
             </>
@@ -1014,13 +1056,6 @@ export default function Index() {
               renderRowSubComponent={renderRowSubSub1Component}
             />
           </>
-        ) : null}
-
-        {row.original.MaterialOutFiles.length ? (
-          <GalleryComponent
-            images={row.original.MaterialOutFiles}
-            hasDimensions={false}
-          />
         ) : null}
       </>
     ),
