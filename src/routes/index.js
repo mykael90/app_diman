@@ -4,7 +4,7 @@ import RequireAuth from './RequireAuth';
 
 import usersRoletypes from '../assets/JSON/data/usersRoletypes.json';
 
-import PhotoSwipe from '../components/PhotoSwipe';
+// import PhotoSwipe from '../components/PhotoSwipe';
 import Aluno from '../pages/Aluno';
 import Alunos from '../pages/Alunos';
 import Fotos from '../pages/Fotos';
@@ -38,7 +38,7 @@ export default function RoutesPages() {
   return (
     <Routes>
       {/* public routes */}
-      <Route path="/photoswipe" element={<PhotoSwipe />} />
+      {/* <Route path="/photoswipe" element={<PhotoSwipe />} /> */}
 
       <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
