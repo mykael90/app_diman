@@ -53,12 +53,22 @@ const schema = yup.object().shape({
     ),
 });
 
+// Get the current date
+const currentDate = new Date();
+
+// Get the first day of the current month
+const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+
+// Get the last day of the current month
+const lastDay = new Date(
+  currentDate.getFullYear(),
+  currentDate.getMonth() + 1,
+  0
+);
+
 const initialValues = {
-  startDate: new Date(new Date().getFullYear(), 0, 1)
-    .toISOString()
-    .split('T')[0],
-  endDate: new Date().toISOString().split('T')[0],
-  deficit: true,
+  startDate: firstDay.toISOString().split('T')[0],
+  endDate: lastDay.toISOString().split('T')[0],
 };
 
 const formatGroupLabel = (data) => (
@@ -226,28 +236,12 @@ const renderTooltipImage = (props, message, src) => (
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
-  const [workersFormated, setWorkersFormated] = useState([]);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [dataEdit, setDataEdit] = useState({});
-  const [workers, setWorkers] = useState([]);
+  const [manualFrequenciesItems, setManualFrequenciesItems] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [unidades, setUnidades] = useState([]);
   const inputRef = useRef();
-
-  async function getWorkers() {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(`/workers/actives`);
-      setWorkersFormated(response.data);
-      setIsLoading(false);
-    } catch (err) {
-      // eslint-disable-next-line no-unused-expressions
-      err.response?.data?.errors
-        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-      setIsLoading(false);
-    }
-  }
 
   // cancel modal -> don't update data
   const handleCancelModal = () => {
@@ -257,7 +251,6 @@ export default function Index() {
   // close modal -> update data
   const handleSaveModal = () => {
     setShowModalEdit(false);
-    getWorkers();
   };
 
   const handleShowModalEdit = (item) => {
@@ -266,53 +259,47 @@ export default function Index() {
   };
 
   useEffect(() => {
-    getWorkers();
-
     // Focus on inputRef
     if (inputRef.current) {
       inputRef.current.focus();
     }
 
     async function getData() {
-      const workersOp = [];
       try {
         setIsLoading(true);
-        const response = await axios.get('/workers/actives');
-
-        const workersJobs = response.data
-          .filter(
-            (value, index, arr) =>
-              arr.findIndex((item) => item.job === value.job) === index
-          )
-          .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
-
-        workersJobs.forEach((value) => {
-          workersOp.push([
-            value,
-            response.data.filter((item) => item.job === value),
-          ]);
-        });
+        const response = await axios.get('/workersmanualfrequencies/items');
 
         const differentsContracts = Array.from(
           new Set(
             response.data.map((w) =>
-              JSON.stringify(w.WorkerContracts[0]?.Contract)
-            )
-          )
-        ).map((json) => JSON.parse(json));
-        const differentsUnidades = Array.from(
-          new Set(
-            response.data.map((w) =>
-              JSON.stringify(
-                w.WorkerContracts[0]?.Unidade
-                  ? w.WorkerContracts[0]?.Unidade
-                  : ''
-              )
+              JSON.stringify(w.WorkerManualfrequency?.Contract)
             )
           )
         ).map((json) => JSON.parse(json));
 
-        setWorkers(workersOp);
+        const differentsUnidades = Array.from(
+          new Set(
+            response.data.map((w) =>
+              JSON.stringify(w.WorkerManualfrequency?.Unidade)
+            )
+          )
+        ).map((json) => JSON.parse(json));
+
+        const differentsWorkers = Array.from(
+          new Set(response.data.map((w) => JSON.stringify(w.Worker)))
+        ).map((json) => JSON.parse(json));
+
+        differentsWorkers.forEach((worker) => {
+          worker.horas = response.data
+            .filter((w) => 1 === 1)
+            .reduce((accumulator, item) => accumulator + item.hours, 0);
+        });
+
+        console.log(response.data);
+        console.log(differentsWorkers);
+
+        setManualFrequenciesItems(response.data);
+
         setContracts(differentsContracts.filter((item) => item));
         setUnidades(differentsUnidades.filter((item) => item));
 
@@ -353,275 +340,11 @@ export default function Index() {
       },
 
       {
-        Header: ({ value, row }) => <div className="text-start">Nome</div>,
-        accessor: 'name',
+        Header: `WorkerId`,
+        accessor: 'WorkerId',
         disableSortBy: true,
-        Cell: ({ value, row }) => (
-          <OverlayTrigger
-            placement="right"
-            delay={{ show: 250, hide: 400 }}
-            overlay={(props) =>
-              renderTooltipImage(
-                props,
-                value.split(' ')[0],
-                `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/${
-                  row.original.filenamePhoto ?? 'default.png'
-                }`
-              )
-            }
-          >
-            <Row
-              onClick={(e) => alert('Funcionalidade em implantação')}
-              style={{ cursor: 'pointer' }}
-            >
-              <Col className="text-start">{value} </Col>
-            </Row>
-          </OverlayTrigger>
-        ),
-        Filter: InputColumnFilter,
-        filter: 'text',
         isVisible: window.innerWidth > 768,
       },
-      {
-        Header: 'Idade',
-        id: 'age',
-        width: 70,
-        disableResizing: true,
-        accessor: (originalRow) =>
-          originalRow.birthdate
-            ? Math.floor(
-                (new Date() - new Date(originalRow.birthdate).getTime()) /
-                  3.15576e10
-              )
-            : null,
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'CPF',
-        accessor: 'cpf',
-        width: 130,
-        disableResizing: true,
-        disableSortBy: true,
-        Cell: ({ value }) => {
-          if (!value) return null;
-          const custom = value.replace(
-            /(\d{3})(\d{3})(\d{3})(\d{2})/gm,
-            '$1.$2.$3-$4'
-          ); // deixar só os dois primeiros nomes
-          return <span> {custom}</span>;
-        },
-        Filter: InputColumnFilter,
-        filter: 'text',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Contrato',
-        id: 'contract',
-        width: 100,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          if (index === 0) return 'INATIVO';
-          if (originalRow.WorkerContracts[index - 1]?.end) return 'DESLIGADO';
-          return originalRow.WorkerContracts[index - 1]?.Contract?.codigoSipac;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'includes',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Função',
-        id: 'job',
-        width: 200,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          if (index === 0) return 'INDEFINIDO';
-          return originalRow.WorkerContracts[index - 1]?.WorkerJobtype?.job;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'exactText',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Regime',
-        id: 'regime',
-        width: 140,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          if (index === 0) return '';
-          if (!originalRow.WorkerContracts[index - 1]?.WorkerContractRegime)
-            return '';
-          return originalRow.WorkerContracts[index - 1]?.WorkerContractRegime
-            .regime;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'exactText',
-        isVisible: window.innerWidth > 768,
-      },
-      // {
-      //   Header: 'Phone',
-      //   accessor: 'phone',
-      //   width: 140,
-      //   disableResizing: true,
-      //   disableSortBy: true,
-      //   Cell: ({ value }) => {
-      //     if (!value) return null;
-      //     const custom = value.replace(
-      //       /(\d{2})(\d{1})(\d{4})(\d{4})/gm,
-      //       '($1) $2.$3-$4'
-      //     ); // deixar só os dois primeiros nomes
-      //     return <span> {custom}</span>;
-      //   },
-      //   Filter: InputColumnFilter,
-      //   filter: 'text',
-      //   isVisible: window.innerWidth > 768,
-      // },
-      {
-        Header: 'Atuação',
-        id: 'acting',
-        width: 200,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          if (index === 0) return '';
-          if (!originalRow.WorkerContracts[index - 1]?.acting) return '';
-          return originalRow.WorkerContracts[index - 1]?.acting;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'exactText',
-        isVisible: window.innerWidth > 768,
-      },
-      // {
-      //   Header: 'E-mail',
-      //   accessor: 'email',
-      //   width: 160,
-      //   disableResizing: true,
-      //   disableSortBy: true,
-      //   Filter: InputColumnFilter,
-      //   filter: 'text',
-      //   isVisible: window.innerWidth > 768,
-      // },
-      {
-        Header: 'Unidade',
-        id: 'unit',
-        width: 120,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const index = originalRow.WorkerContracts.length;
-          return `${originalRow.WorkerContracts[index - 1]?.Unidade?.id}-${
-            originalRow.WorkerContracts[index - 1]?.Unidade?.sigla
-          }`;
-        },
-        Filter: SelectColumnFilter,
-        filter: 'includes',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: ({ value, row }) => (
-          <div className="text-center">Nome - Função - Contrato</div>
-        ),
-        id: 'mobile',
-        width: 100,
-        disableResizing: false,
-        disableSortBy: true,
-        defaultCanFilter: true,
-        isVisible: window.innerWidth < 768,
-        Cell: ({ value, row }) => {
-          const index = row.original.WorkerContracts.length;
-          return (
-            <>
-              <Row>
-                <Col className="d-flex justify-content-center">
-                  <Image
-                    crossOrigin=""
-                    src={row.original.urlPhoto}
-                    alt="Foto de perfil do colaborador"
-                    width="270"
-                    rounded="true"
-                  />
-                </Col>
-              </Row>
-              <Row className="d-flex justify-content-center py-2">
-                <Col xs="11" className="text-center bg-light mx-2">
-                  {row.original.name}
-                </Col>
-              </Row>
-
-              <Row className="d-flex justify-content-center">
-                <Col xs="auto" className="mt-0 pt-0 text-center">
-                  <Badge
-                    className="text-dark bg-light"
-                    style={{
-                      fontSize: '0.8em',
-                    }}
-                  >
-                    {index > 0
-                      ? row.original.WorkerContracts[index - 1]?.WorkerJobtype
-                          ?.job
-                      : 'INDEFINIDO'}
-                  </Badge>
-                </Col>
-                <Col xs="auto" className="mt-0 pt-0">
-                  <Badge
-                    className="text-dark bg-light"
-                    style={{
-                      fontSize: '0.8em',
-                    }}
-                  >
-                    {index === 0
-                      ? 'INATIVO'
-                      : row.original.WorkerContracts[index - 1]?.end
-                      ? 'DESLIGADO'
-                      : row.original.WorkerContracts[index - 1]?.Contract
-                          ?.codigoSipac}
-                  </Badge>
-                </Col>
-              </Row>
-              {/* <Row className="d-flex justify-content-end">
-                <Col xs="auto">
-                  <Button
-                    size="sm"
-                    variant="outline-secondary"
-                    className="border-0 m-0"
-                    onClick={(e) => handleShowModalEdit(row.original)}
-                  >
-                    <FaPencilAlt />
-                  </Button>
-                </Col>
-              </Row> */}
-            </>
-          );
-        },
-      },
-      // {
-      //   // Make an expander cell
-      //   Header: () => null, // No header
-      //   id: 'actions', // It needs an ID
-      //   width: 40,
-      //   disableResizing: true,
-      //   Cell: ({ row }) => (
-      //     // Use Cell to render an expander for each row.
-      //     // We can use the getToggleRowExpandedProps prop-getter
-      //     // to build the expander.
-      //     // <Link to={`/collaborator/record/update/${row.original.id}`}>
-      //     <Button
-      //       size="sm"
-      //       variant="outline-secondary"
-      //       className="border-0 m-0"
-      //       onClick={(e) => handleShowModalEdit(row.original)}
-      //     >
-      //       <FaPencilAlt />
-      //     </Button>
-      //     // </Link>
-      //   ),
-      // },
     ],
     []
   );
@@ -637,91 +360,6 @@ export default function Index() {
         disableSortBy: true,
         accessor: (originalRow) => originalRow.Contract?.codigoSipac,
         isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Função',
-        id: 'job',
-        accessor: (originalRow) => originalRow.WorkerJobtype?.job,
-        disableSortBy: true,
-        isVisible: window.innerWidth > 768,
-        // eslint-disable-next-line react/destructuring-assignment
-      },
-      {
-        Header: 'Início',
-        id: 'startBr',
-        accessor: (originalRow) => originalRow.startBr,
-        width: 100,
-        disableResizing: true,
-        disableSortBy: true,
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: 'Fim',
-        accessor: 'endBr',
-        width: 100,
-        disableResizing: true,
-        disableSortBy: true,
-        isVisible: window.innerWidth > 768,
-        // eslint-disable-next-line react/destructuring-assignment
-      },
-      {
-        Header: 'Lotado',
-        id: 'unidade',
-        width: 200,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) =>
-          `${originalRow.Unidade?.id}-${originalRow.Unidade?.sigla}`,
-        isVisible: window.innerWidth > 768,
-        // eslint-disable-next-line react/destructuring-assignment
-      },
-      {
-        Header: ({ value, row }) => (
-          <div className="text-start">Contrato - Função - Inicio - Fim</div>
-        ),
-        id: 'mobile',
-        width: 100,
-        disableResizing: false,
-        disableSortBy: true,
-        defaultCanFilter: true,
-        isVisible: window.innerWidth < 768,
-        Cell: ({ value, row }) => (
-          <Row>
-            <Col xs="auto" className="text-start mb-0 pb-0">
-              {row.original.Contract?.codigoSipac}
-            </Col>
-            <Col xs="auto" className="mt-0 pt-0">
-              <Badge
-                className="text-dark bg-light"
-                style={{
-                  fontSize: '0.8em',
-                }}
-              >
-                {row.original.WorkerJobtype?.job}
-              </Badge>
-            </Col>
-            <Col xs="auto" className="mt-0 pt-0">
-              <Badge
-                className="text-dark bg-success text-white"
-                style={{
-                  fontSize: '0.8em',
-                }}
-              >
-                {row.original.startBr}
-              </Badge>
-            </Col>
-            <Col xs="auto" className="mt-0 pt-0">
-              <Badge
-                className="text-dark bg-danger text-white"
-                style={{
-                  fontSize: '0.8em',
-                }}
-              >
-                {row.original.endBr}
-              </Badge>
-            </Col>
-          </Row>
-        ),
       },
     ];
     return (
@@ -769,7 +407,10 @@ export default function Index() {
     );
   }, []);
 
-  const data = React.useMemo(() => workersFormated, [workersFormated]);
+  const data = React.useMemo(
+    () => manualFrequenciesItems,
+    [manualFrequenciesItems]
+  );
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -992,6 +633,8 @@ export default function Index() {
                       }}
                       placeholder="Selecione o contrato"
                       onBlur={handleBlur}
+                      autoFocus
+                      ref={inputRef}
                     />
                     {touched.ContractId && !!errors.ContractId ? (
                       <Badge bg="danger">{errors.ContractId}</Badge>
@@ -1045,8 +688,6 @@ export default function Index() {
                     <Form.Control
                       type="date"
                       value={values.startDate}
-                      autoFocus
-                      ref={inputRef}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Início"
