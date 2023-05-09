@@ -377,7 +377,7 @@ export default function Index() {
       {
         Header: 'Data',
         id: 'data',
-        width: 250,
+        width: 350,
         disableResizing: true,
         disableSortBy: true,
         accessor: (originalRow) => {
@@ -387,17 +387,13 @@ export default function Index() {
             Number(myDate[1]) - 1,
             myDate[2]
           );
-          const weekdays = [
-            'Domingo',
-            'Segunda-feira',
-            'Terça-feira',
-            'Quarta-feira',
-            'Quinta-feira',
-            'Sexta-feira',
-            'Sábado',
-          ];
-          const weekday = weekdays[dateFormated.getDay()];
-          const dateString = `${weekday}, ${dateFormated.toLocaleDateString()}`;
+          const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          };
+          const dateString = dateFormated.toLocaleDateString('pt-BR', options);
           return dateString;
         },
         isVisible: window.innerWidth > 768,
