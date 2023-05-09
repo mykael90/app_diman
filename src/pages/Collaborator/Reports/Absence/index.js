@@ -45,12 +45,12 @@ const schema = yup.object().shape({
       new Date().toISOString().split('T')[0],
       'Escolha uma data passada para a data de início'
     ),
-  endDate: yup
-    .date()
-    .max(
-      new Date().toISOString().split('T')[0],
-      'Escolha uma data passada para a data final'
-    ),
+  // endDate: yup
+  //   .date()
+  //   .max(
+  //     new Date().toISOString().split('T')[0],
+  //     'Escolha uma data passada para a data final'
+  //   ),
 });
 
 // Get the current date
@@ -267,38 +267,15 @@ export default function Index() {
     async function getData() {
       try {
         setIsLoading(true);
-        const response = await axios.get('/workersmanualfrequencies/items');
+        const response = await axios.get('/workersmanualfrequencies');
 
         const differentsContracts = Array.from(
-          new Set(
-            response.data.map((w) =>
-              JSON.stringify(w.WorkerManualfrequency?.Contract)
-            )
-          )
+          new Set(response.data.map((w) => JSON.stringify(w.Contract)))
         ).map((json) => JSON.parse(json));
 
         const differentsUnidades = Array.from(
-          new Set(
-            response.data.map((w) =>
-              JSON.stringify(w.WorkerManualfrequency?.Unidade)
-            )
-          )
+          new Set(response.data.map((w) => JSON.stringify(w.Unidade)))
         ).map((json) => JSON.parse(json));
-
-        const differentsWorkers = Array.from(
-          new Set(response.data.map((w) => JSON.stringify(w.Worker)))
-        ).map((json) => JSON.parse(json));
-
-        differentsWorkers.forEach((worker) => {
-          worker.horas = response.data
-            .filter((w) => 1 === 1)
-            .reduce((accumulator, item) => accumulator + item.hours, 0);
-        });
-
-        console.log(response.data);
-        console.log(differentsWorkers);
-
-        setManualFrequenciesItems(response.data);
 
         setContracts(differentsContracts.filter((item) => item));
         setUnidades(differentsUnidades.filter((item) => item));
@@ -577,6 +554,46 @@ export default function Index() {
     []
   );
 
+  function objectToQueryString(obj) {
+    const queryString = Object.entries(obj)
+      .map(([key, value]) => {
+        if (Array.isArray(value)) {
+          return value
+            .map(
+              (val) => `${encodeURIComponent(key)}[]=${encodeURIComponent(val)}`
+            )
+            .join('&');
+        }
+        return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+      })
+      .join('&');
+    return queryString;
+  }
+
+  const getItems = async (values) => {
+    try {
+      setIsLoading(true);
+      console.log(values);
+      const queryString = objectToQueryString(values);
+
+      const response = await axios.get(
+        `/workersmanualfrequencies/items?${queryString}`
+      );
+
+      setManualFrequenciesItems(response.data);
+
+      console.log(queryString);
+
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <Loading isLoading={isLoading} />
@@ -593,7 +610,7 @@ export default function Index() {
             validationSchema={schema}
             onSubmit={(values) => {
               // getData(values);
-              console.log(values);
+              getItems(values);
             }}
           >
             {({
