@@ -317,8 +317,53 @@ export default function Index() {
       },
 
       {
-        Header: `WorkerId`,
-        accessor: 'WorkerId',
+        Header: `ID`,
+        accessor: 'id',
+        disableSortBy: true,
+        isVisible: false,
+      },
+      {
+        Header: () => <div className="text-start">Nome</div>,
+        accessor: 'name',
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
+      },
+      {
+        Header: `Função`,
+        accessor: (originalRow) =>
+          originalRow.WorkerContracts[0].WorkerJobtype.job,
+        width: 250,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: `Iniciou em`,
+        accessor: (originalRow) => originalRow.WorkerContracts[0].startBr,
+        width: 150,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: `Nº Faltas`,
+        accessor: (originalRow) =>
+          originalRow.WorkerManualfrequencyItems.length,
+        width: 150,
+        disableResizing: true,
+        disableSortBy: true,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: `Total Horas`,
+        accessor: (originalRow) =>
+          originalRow.WorkerManualfrequencyItems.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.hours,
+            0
+          ),
+        width: 150,
+        disableResizing: true,
         disableSortBy: true,
         isVisible: window.innerWidth > 768,
       },
@@ -330,12 +375,46 @@ export default function Index() {
   const renderRowSubComponent = React.useCallback(({ row }) => {
     const columns = [
       {
-        Header: 'Contrato',
-        id: 'contract',
+        Header: 'Data',
+        id: 'data',
+        width: 250,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => {
+          const myDate = originalRow.WorkerManualfrequency?.date.split('-');
+          const dateFormated = new Date(
+            myDate[0],
+            Number(myDate[1]) - 1,
+            myDate[2]
+          );
+          const weekdays = [
+            'Domingo',
+            'Segunda-feira',
+            'Terça-feira',
+            'Quarta-feira',
+            'Quinta-feira',
+            'Sexta-feira',
+            'Sábado',
+          ];
+          const weekday = weekdays[dateFormated.getDay()];
+          const dateString = `${weekday}, ${dateFormated.toLocaleDateString()}`;
+          return dateString;
+        },
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Horas',
+        accessor: 'hours',
         width: 125,
         disableResizing: true,
         disableSortBy: true,
-        accessor: (originalRow) => originalRow.Contract?.codigoSipac,
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: 'Observações',
+        id: 'obs',
+        disableSortBy: true,
+        accessor: (originalRow) => originalRow.WorkerManualfrequency?.obs,
         isVisible: window.innerWidth > 768,
       },
     ];
@@ -344,7 +423,7 @@ export default function Index() {
         <Row className="mb-2">
           <Col>
             {' '}
-            <Badge>CONTRATOS VINCULADOS AO COLABORADOR</Badge>
+            <Badge>AUSÊNCIAS VINCULADAS AO COLABORADOR</Badge>
           </Col>
         </Row>
         <Row>
@@ -352,7 +431,7 @@ export default function Index() {
             <TableNestedrow
               style={{ padding: 0, margin: 0 }}
               columns={columns}
-              data={row.original.WorkerContracts}
+              data={row.original.WorkerManualfrequencyItems}
               defaultColumn={{
                 // Let's set up our default Filter UI
                 // Filter: DefaultColumnFilter,
@@ -743,10 +822,10 @@ export default function Index() {
           </Formik>
         </Row>
         <Row className="text-center py-3">
-          <Card.Title>Colaboradores com contrato vigente</Card.Title>
+          <Card.Title>Colaboradores com registro de faltas</Card.Title>
           <Card.Text>
-            Listagem de todos os colabores que se encontram com contrato ativo e
-            válido.
+            Listagem de todos os colabores com registros de falta para o
+            contrato, unidade e período especificado.
           </Card.Text>
         </Row>
 

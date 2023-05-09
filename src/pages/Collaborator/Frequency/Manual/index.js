@@ -68,8 +68,8 @@ export default function Index() {
 
   const handlePushItem = (push, row, list) => {
     // não incluir repetido na lista
-    // console.log(row);
-    // console.log(list);
+    console.log(row);
+    console.log(list);
     if (list.length > 0) {
       let exists = false;
 
@@ -419,11 +419,7 @@ export default function Index() {
                               onChange={(selected, action) => {
                                 console.log(selected);
                                 console.log(values.WorkerManualfrequencyItems);
-                                handlePushItem(
-                                  push,
-                                  selected,
-                                  values.WorkerManualfrequencyItems
-                                );
+                                handlePushItem(push, selected, values);
                                 setFieldValue('searchWorker', '');
                               }}
                               placeholder="Selecione o profissional"
