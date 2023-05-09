@@ -92,7 +92,7 @@ export default function Index() {
       WorkerId: row.value.id,
       name: row.label,
       job: row.value.job,
-      WorkerManualfrequencytypeId: 2,
+      WorkerManualfrequencytypeId: 1,
       hours: 9,
       obs: '',
     });
@@ -516,9 +516,11 @@ export default function Index() {
                                         className="p-0 m-0 ps-2 pe-3 border-0"
                                         style={{ width: '130px' }}
                                       >
-                                        <option value="1">PRESENÇA</option>
-                                        <option value="2">FALTA</option>
-                                        <option value="3">ABONO</option>
+                                        <option value="1">FALTA</option>
+                                        <option value="2">FALTA ABONADA</option>
+                                        <option value="3">PRESENTE</option>
+                                        <option value="4">CAMPO</option>
+                                        <option value="5">SUBSTITUTO</option>
                                       </Form.Select>
                                     </Form.Group>
 

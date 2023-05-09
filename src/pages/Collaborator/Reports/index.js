@@ -21,19 +21,20 @@ export default function index() {
             <Nav.Item>
               <Link
                 className="text-decoration-none"
-                to="/collaborator/reports/effective"
+                to="/collaborator/reports/absence"
               >
-                <Nav.Link href="#2">Efetivo do dia</Nav.Link>
+                <Nav.Link href="#2">Registro de ausência</Nav.Link>
               </Link>
             </Nav.Item>
             <Nav.Item>
               <Link
                 className="text-decoration-none"
-                to="/collaborator/reports/absence"
+                to="/collaborator/reports/effective"
               >
-                <Nav.Link href="#3">Registro de ausência</Nav.Link>
+                <Nav.Link href="#3">Efetivo do dia</Nav.Link>
               </Link>
             </Nav.Item>
+
             <Nav.Item>
               <Link
                 className="text-decoration-none"
