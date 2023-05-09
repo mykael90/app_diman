@@ -21,14 +21,6 @@ export default function index() {
             <Nav.Item>
               <Link
                 className="text-decoration-none"
-                to="/collaborator/reports/absence"
-              >
-                <Nav.Link href="#1">Relatório de ausências</Nav.Link>
-              </Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Link
-                className="text-decoration-none"
                 to="/collaborator/frequency/facialrecognition"
               >
                 <Nav.Link href="#2">Reconhecimento Facial</Nav.Link>
