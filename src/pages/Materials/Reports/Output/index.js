@@ -39,6 +39,7 @@ import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
 import EditModal from './components/EditModal';
+import GalleryComponent from '../../../../components/GalleryComponent';
 
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedRowHiddenRows from '../../components/TableGfilterNestedRowHiddenRows';
