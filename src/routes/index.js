@@ -27,6 +27,7 @@ import Fleet from '../pages/Fleet';
 import Unauthorized from '../components/Unauthorized';
 
 import Test from '../pages/Materials/Reports/Output/components/EditModal';
+import BigCalendar from '../components/BigCalendar';
 
 // TRANSFORMANDO O ARRAY userRoletypes PARA UM OBJETO ONDE ROLE É A CHAVE E O CÓDIGO É O VALOR
 const roles = usersRoletypes.reduce(
@@ -45,6 +46,7 @@ export default function RoutesPages() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
+      <Route exact path="/bigcalendar/*" element={<BigCalendar />} />
       <Route exact path="/equip/*" element={<Equip />} />
       <Route exact path="/infra/eletrica/*" element={<Eletrica />} />
       <Route exact path="/infra/agua/*" element={<Agua />} />
