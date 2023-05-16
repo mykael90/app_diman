@@ -23,7 +23,7 @@ export default function index() {
                 className="text-decoration-none"
                 to="/collaborator/reports/absence"
               >
-                <Nav.Link href="#2">Registro de ausência</Nav.Link>
+                <Nav.Link href="#2">Ausências</Nav.Link>
               </Link>
             </Nav.Item>
             <Nav.Item>

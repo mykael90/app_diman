@@ -325,9 +325,30 @@ export default function Index() {
       {
         Header: () => <div className="text-start">Nome</div>,
         accessor: 'name',
-        disableSortBy: true,
+        // disableSortBy: true,
         isVisible: window.innerWidth > 768,
-        Cell: ({ value }) => <div className="text-start">{value}</div>,
+        Cell: ({ value, row }) => (
+          <OverlayTrigger
+            placement="right"
+            delay={{ show: 250, hide: 400 }}
+            overlay={(props) =>
+              renderTooltipImage(
+                props,
+                value.split(' ')[0],
+                `${process.env.REACT_APP_BASE_AXIOS_REST}/workers/images/${
+                  row.original.filenamePhoto ?? 'default.png'
+                }`
+              )
+            }
+          >
+            <Row
+              onClick={(e) => alert('Funcionalidade em implantação')}
+              style={{ cursor: 'pointer' }}
+            >
+              <Col className="text-start">{value} </Col>
+            </Row>
+          </OverlayTrigger>
+        ),
       },
       {
         Header: `Função`,
@@ -335,7 +356,9 @@ export default function Index() {
           originalRow.WorkerContracts[0].WorkerJobtype.job,
         width: 250,
         disableResizing: true,
-        disableSortBy: true,
+        // disableSortBy: true,
+        Filter: SelectColumnFilter,
+        filter: 'exactText',
         isVisible: window.innerWidth > 768,
       },
       {
@@ -343,7 +366,7 @@ export default function Index() {
         accessor: (originalRow) => originalRow.WorkerContracts[0].startBr,
         width: 150,
         disableResizing: true,
-        disableSortBy: true,
+        // disableSortBy: true,
         isVisible: window.innerWidth > 768,
       },
       {
@@ -352,7 +375,6 @@ export default function Index() {
           originalRow.WorkerManualfrequencyItems.length,
         width: 150,
         disableResizing: true,
-        disableSortBy: true,
         isVisible: window.innerWidth > 768,
       },
       {
@@ -364,7 +386,6 @@ export default function Index() {
           ),
         width: 150,
         disableResizing: true,
-        disableSortBy: true,
         isVisible: window.innerWidth > 768,
       },
     ],

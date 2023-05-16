@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Row, Col, Badge, Form, Image, Button } from 'react-bootstrap';
-import { FaPaperclip, FaSearch } from 'react-icons/fa';
+import { FaCamera, FaSearch } from 'react-icons/fa';
 import ImagesGallery from '../ImagesGallery';
 
 // eslint-disable-next-line react/prop-types
@@ -25,10 +25,21 @@ function PreviewMultipleImages({ files, setFiles }) {
   };
 
   return (
-    <Form.Group as={Col} xs="auto" controlId="photos">
-      <Form.Label className="border rounded-3 border-secondary text-muted p-2 mt-3">
+    <Form.Group as={Col} xs="12" controlId="photos">
+      <Form.Label
+        className="border-secondary border-1 text-muted p-2 mt-3"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          border: 'dashed',
+          cursor: 'pointer',
+        }}
+      >
         {' '}
-        <FaPaperclip size={28} cursor="pointer" />
+        <FaCamera size={38} cursor="pointer" className="m-auto" />
+        <p style={{ fontSize: '16px' }}>Adicionar fotos</p>
+        <p style={{ fontSize: '12px' }}>Apenas JPEG, JPG, PNG e GIF</p>
       </Form.Label>
       <Form.Control
         className="my-3 d-none"

@@ -35,6 +35,8 @@ import TableNestedrow from '../../../Materials/components/TableNestedRow';
 
 import ModalEdit from './components/ModalEdit';
 
+import hideCPF from '../../../../assets/script/hideCPF';
+
 // trigger to custom filter
 function DefaultColumnFilter() {
   return <> </>;
@@ -246,7 +248,7 @@ export default function Index() {
       {
         Header: ({ value, row }) => <div className="text-start">Nome</div>,
         accessor: 'name',
-        disableSortBy: true,
+        // disableSortBy: true,
         Cell: ({ value, row }) => (
           <OverlayTrigger
             placement="right"
@@ -299,7 +301,7 @@ export default function Index() {
             /(\d{3})(\d{3})(\d{3})(\d{2})/gm,
             '$1.$2.$3-$4'
           ); // deixar só os dois primeiros nomes
-          return <span> {custom}</span>;
+          return <span> {hideCPF(custom)}</span>;
         },
         Filter: InputColumnFilter,
         filter: 'text',
