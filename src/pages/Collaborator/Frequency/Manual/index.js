@@ -72,7 +72,11 @@ export default function Index({ id = null }) {
   const [unidades, setUnidades] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log(id);
+
   const isEditMode = useRef(!!id);
+
+  console.log(isEditMode);
 
   const handlePushItem = (push, row, list) => {
     // não incluir repetido na lista
@@ -304,7 +308,7 @@ export default function Index({ id = null }) {
                     className="pb-3"
                   >
                     <Form.Label>CONTRATO:</Form.Label>
-                    {isEditMode ? (
+                    {isEditMode.current ? (
                       <p>{`${initialData?.Contract?.codigoSipac} - ${initialData?.Contract?.objeto}`}</p>
                     ) : (
                       <Select
@@ -340,7 +344,7 @@ export default function Index({ id = null }) {
                     className="pb-3"
                   >
                     <Form.Label>UNIDADE:</Form.Label>
-                    {isEditMode ? (
+                    {isEditMode.current ? (
                       <p>{`${initialData?.Unidade?.id} - ${initialData?.Unidade?.sigla}`}</p>
                     ) : (
                       <Select
@@ -382,7 +386,7 @@ export default function Index({ id = null }) {
                     controlId="date"
                   >
                     <Form.Label>DATA:</Form.Label>
-                    {isEditMode ? (
+                    {isEditMode.current ? (
                       <p>{initialData.date}</p>
                     ) : (
                       <Form.Control
@@ -393,7 +397,7 @@ export default function Index({ id = null }) {
                         // isValid={touched.date && !errors.date}
                         onBlur={handleBlur}
                         placeholder="Selecione a data"
-                        disabled={isEditMode}
+                        disabled={isEditMode.current}
                       />
                     )}
 
