@@ -238,9 +238,7 @@ export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [dataEdit, setDataEdit] = useState({});
-  const [manualFrequenciesItems, setManualFrequenciesItems] = useState([]);
-  const [contracts, setContracts] = useState([]);
-  const [unidades, setUnidades] = useState([]);
+  const [manualFrequencies, setManualFrequencies] = useState([]);
   const inputRef = useRef();
 
   // cancel modal -> don't update data
@@ -253,45 +251,10 @@ export default function Index() {
     setShowModalEdit(false);
   };
 
-  const handleShowModalEdit = (item) => {
-    setDataEdit(item);
+  const handleShowModalEdit = (id) => {
+    setDataEdit(id);
     setShowModalEdit(true);
   };
-
-  useEffect(() => {
-    // Focus on inputRef
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-
-    async function getData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/workersmanualfrequencies');
-
-        const differentsContracts = Array.from(
-          new Set(response.data.map((w) => JSON.stringify(w.Contract)))
-        ).map((json) => JSON.parse(json));
-
-        const differentsUnidades = Array.from(
-          new Set(response.data.map((w) => JSON.stringify(w.Unidade)))
-        ).map((json) => JSON.parse(json));
-
-        setContracts(differentsContracts.filter((item) => item));
-        setUnidades(differentsUnidades.filter((item) => item));
-
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
-
-    getData();
-  }, []);
 
   const columns = React.useMemo(
     () => [
@@ -323,14 +286,116 @@ export default function Index() {
         isVisible: false,
       },
       {
+        Header: `Contrato`,
+        accessor: (originalRow) => originalRow.Contract.codigoSipac,
+        width: 150,
+        disableResizing: true,
+        disableSortBy: true,
+        Filter: SelectColumnFilter,
+        filter: 'exactText',
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: `Unidade`,
+        accessor: (originalRow) =>
+          `${originalRow.Unidade.id} - ${originalRow.Unidade.sigla}`,
+        width: 250,
+        disableResizing: true,
+        disableSortBy: true,
+        Filter: SelectColumnFilter,
+        filter: 'exactText',
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: `date`,
+        accessor: 'date',
+        disableSortBy: true,
+        isVisible: false,
+      },
+      {
+        Header: 'Data',
+        id: 'data',
+        width: 350,
+        disableResizing: true,
+        disableSortBy: true,
+        accessor: (originalRow) => {
+          const myDate = originalRow.date.split('-');
+          const dateFormated = new Date(
+            myDate[0],
+            Number(myDate[1]) - 1,
+            myDate[2]
+          );
+          const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          };
+          const dateString = dateFormated.toLocaleDateString('pt-BR', options);
+          return dateString;
+        },
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: `Obs`,
+        accessor: 'obs',
+        disableSortBy: true,
+      },
+      {
+        Header: `Usuário`,
+        accessor: (originalRow) => originalRow.User.username,
+        width: 200,
+        disableResizing: true,
+        disableSortBy: true,
+        Filter: SelectColumnFilter,
+        filter: 'exactText',
+        isVisible: window.innerWidth > 768,
+      },
+      {
+        Header: () => <div className="p-auto text-center">Editar</div>,
+        id: 'edit',
+        width: 70,
+        disableResizing: true,
+        // eslint-disable-next-line react/no-unstable-nested-components
+        Cell: ({ value, row }) => (
+          <Row className="d-flex flex-nowrap">
+            <Col xs="12" className="text-center m-0 p-0 px-2 ps-2">
+              <OverlayTrigger
+                placement="left"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, `Editar registro`)}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-primary"
+                  className="border-0 m-0"
+                  onClick={(e) => handleShowModalEdit(row.original.id)}
+                >
+                  <FaPencilAlt />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+          </Row>
+        ),
+      },
+    ],
+    []
+  );
+
+  // Create a function that will render our row sub components
+  const renderRowSubComponent = React.useCallback(({ row }) => {
+    const columns = [
+      {
         Header: () => <div className="text-start">Nome</div>,
-        accessor: 'name',
+        id: `name`,
+        accessor: (originalRow) => originalRow.Worker.name,
         // disableSortBy: true,
         isVisible: window.innerWidth > 768,
         Cell: ({ value, row }) => (
           <OverlayTrigger
             placement="right"
             delay={{ show: 250, hide: 400 }}
+            s
             overlay={(props) =>
               renderTooltipImage(
                 props,
@@ -351,72 +416,14 @@ export default function Index() {
         ),
       },
       {
-        Header: `Função`,
-        accessor: (originalRow) =>
-          originalRow.WorkerContracts[0].WorkerJobtype.job,
-        width: 250,
+        Header: `Registro`,
+        id: 'registro',
+        accessor: (originalRow) => originalRow.WorkerManualfrequencytype.type,
+        width: 150,
         disableResizing: true,
         // disableSortBy: true,
         Filter: SelectColumnFilter,
         filter: 'exactText',
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: `Iniciou em`,
-        accessor: (originalRow) => originalRow.WorkerContracts[0].startBr,
-        width: 150,
-        disableResizing: true,
-        // disableSortBy: true,
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: `Nº Faltas`,
-        accessor: (originalRow) =>
-          originalRow.WorkerManualfrequencyItems.length,
-        width: 150,
-        disableResizing: true,
-        isVisible: window.innerWidth > 768,
-      },
-      {
-        Header: `Total Horas`,
-        accessor: (originalRow) =>
-          originalRow.WorkerManualfrequencyItems.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.hours,
-            0
-          ),
-        width: 150,
-        disableResizing: true,
-        isVisible: window.innerWidth > 768,
-      },
-    ],
-    []
-  );
-
-  // Create a function that will render our row sub components
-  const renderRowSubComponent = React.useCallback(({ row }) => {
-    const columns = [
-      {
-        Header: 'Data',
-        id: 'data',
-        width: 350,
-        disableResizing: true,
-        disableSortBy: true,
-        accessor: (originalRow) => {
-          const myDate = originalRow.WorkerManualfrequency?.date.split('-');
-          const dateFormated = new Date(
-            myDate[0],
-            Number(myDate[1]) - 1,
-            myDate[2]
-          );
-          const options = {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          };
-          const dateString = dateFormated.toLocaleDateString('pt-BR', options);
-          return dateString;
-        },
         isVisible: window.innerWidth > 768,
       },
       {
@@ -439,7 +446,7 @@ export default function Index() {
         <Row className="mb-2">
           <Col>
             {' '}
-            <Badge>AUSÊNCIAS VINCULADAS AO COLABORADOR</Badge>
+            <Badge>AUSÊNCIAS VINCULADAS À DATA</Badge>
           </Col>
         </Row>
         <Row>
@@ -456,12 +463,12 @@ export default function Index() {
                 maxWidth: 800,
               }}
               initialState={{
-                // sortBy: [
-                //   {
-                //     id: 'name',
-                //     asc: true,
-                //   },
-                // ],
+                sortBy: [
+                  {
+                    id: 'name',
+                    asc: true,
+                  },
+                ],
                 hiddenColumns: [
                   ...columns
                     .filter((col) => col.isVisible === false)
@@ -479,10 +486,7 @@ export default function Index() {
     );
   }, []);
 
-  const data = React.useMemo(
-    () => manualFrequenciesItems,
-    [manualFrequenciesItems]
-  );
+  const data = React.useMemo(() => manualFrequencies, [manualFrequencies]);
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -498,8 +502,8 @@ export default function Index() {
   const initialState = {
     sortBy: [
       {
-        id: 'name',
-        asc: true,
+        id: 'date',
+        desc: true,
       },
     ],
     pageSize: 50,
@@ -672,12 +676,10 @@ export default function Index() {
       const queryString = objectToQueryString(values);
 
       const response = await axios.get(
-        `/workersmanualfrequencies/items?${queryString}`
+        `/workersmanualfrequencies?${queryString}`
       );
 
-      setManualFrequenciesItems(response.data);
-
-      console.log(queryString);
+      setManualFrequencies(response.data);
 
       setIsLoading(false);
     } catch (err) {
@@ -719,76 +721,6 @@ export default function Index() {
             }) => (
               <Form noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <Row className="align-items-top">
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    lg={3}
-                    // controlId="workerId"
-                    className="pb-3"
-                  >
-                    <Form.Label>CONTRATO:</Form.Label>
-                    <Select
-                      inputId="ContractId"
-                      options={contracts.map((contract) => ({
-                        value: contract.id,
-                        label: `${contract.codigoSipac} - ${contract.objeto} `,
-                      }))}
-                      value={
-                        values.ContractId
-                          ? unidades.find(
-                              (option) => option.value === values.ContractId
-                            )
-                          : null
-                      }
-                      onChange={(selected) => {
-                        setFieldValue('ContractId', selected.value);
-                      }}
-                      placeholder="Selecione o contrato"
-                      onBlur={handleBlur}
-                      autoFocus
-                      ref={inputRef}
-                    />
-                    {touched.ContractId && !!errors.ContractId ? (
-                      <Badge bg="danger">{errors.ContractId}</Badge>
-                    ) : null}
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    xs={12}
-                    lg={4}
-                    // controlId="workerId"
-                    className="pb-3"
-                  >
-                    <Form.Label>UNIDADE:</Form.Label>
-                    <Select
-                      inputId="UnidadeId"
-                      options={unidades.map((unidade) => ({
-                        value: unidade.id,
-                        label: `${unidade.id} - ${unidade.nomeUnidade} `,
-                      }))}
-                      value={
-                        values.UnidadeId
-                          ? unidades.find(
-                              (option) => option.value === values.UnidadeId
-                            )
-                          : null
-                      }
-                      onChange={(selected) => {
-                        setFieldValue('UnidadeId', selected.value);
-                        setFieldValue(
-                          'date',
-                          new Date().toISOString().split('T')[0]
-                        );
-                      }}
-                      placeholder="Selecione a unidade"
-                      onBlur={(e) => {
-                        handleBlur(e);
-                      }}
-                    />
-                    {touched.UnidadeId && !!errors.UnidadeId ? (
-                      <Badge bg="danger">{errors.UnidadeId}</Badge>
-                    ) : null}
-                  </Form.Group>
                   <Form.Group
                     as={Col}
                     xs={12}
@@ -838,10 +770,10 @@ export default function Index() {
           </Formik>
         </Row>
         <Row className="text-center py-3">
-          <Card.Title>Colaboradores com registro de faltas</Card.Title>
+          <Card.Title>Registros de faltas por data</Card.Title>
           <Card.Text>
-            Listagem de todos os colabores com registros de falta para o
-            contrato, unidade e período especificado.
+            Listagem de todos os registros de falta organizados por contrato,
+            unidade e data.
           </Card.Text>
         </Row>
 

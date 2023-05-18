@@ -23,7 +23,15 @@ export default function index() {
                 className="text-decoration-none"
                 to="/collaborator/reports/absence"
               >
-                <Nav.Link href="#2">Ausências</Nav.Link>
+                <Nav.Link href="#2">Ausências Colaboradores</Nav.Link>
+              </Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Link
+                className="text-decoration-none"
+                to="/collaborator/reports/absence_date"
+              >
+                <Nav.Link href="#3">Ausências Datas</Nav.Link>
               </Link>
             </Nav.Item>
             <Nav.Item>
@@ -31,7 +39,7 @@ export default function index() {
                 className="text-decoration-none"
                 to="/collaborator/reports/effective"
               >
-                <Nav.Link href="#3">Efetivo do dia</Nav.Link>
+                <Nav.Link href="#4">Efetivo do dia</Nav.Link>
               </Link>
             </Nav.Item>
 
@@ -40,7 +48,7 @@ export default function index() {
                 className="text-decoration-none"
                 to="/collaborator/reports/frequency"
               >
-                <Nav.Link href="#4">Registro de freqência</Nav.Link>
+                <Nav.Link href="#5">Registro de freqência</Nav.Link>
               </Link>
             </Nav.Item>
             <Nav.Item>
@@ -48,7 +56,7 @@ export default function index() {
                 className="text-decoration-none"
                 to="/collaborator/reports/hourbank"
               >
-                <Nav.Link href="#5">Banco de horas</Nav.Link>
+                <Nav.Link href="#6">Banco de horas</Nav.Link>
               </Link>
             </Nav.Item>
           </Nav>

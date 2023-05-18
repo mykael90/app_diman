@@ -18,6 +18,7 @@ import Effective from './Reports/Effective';
 import HourBank from './Reports/HourBank';
 import RegisterFrequency from './Reports/Frequency';
 import Absence from './Reports/Absence';
+import AbsenceDate from './Reports/AbsenceDate';
 
 import Record from './Record';
 import List from './Record/List';
@@ -45,6 +46,7 @@ export default function MaterialsRoutes() {
       <Route path="reports" element={<Reports />}>
         <Route path="active" element={<Active />} />{' '}
         <Route path="absence" element={<Absence />} />{' '}
+        <Route path="absence_date" element={<AbsenceDate />} />{' '}
         <Route path="effective" element={<Effective />} />{' '}
         <Route path="hourbank" element={<HourBank />} />{' '}
         <Route path="frequency" element={<RegisterFrequency />} />{' '}

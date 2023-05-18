@@ -56,20 +56,29 @@ const formatGroupLabel = (data) => (
   </Col>
 );
 
-export default function Index() {
+const emptyValues = {
+  ContractId: '',
+  UnidadeId: '',
+  date: '',
+  obs: '',
+  WorkerManualfrequencyItems: [],
+};
+
+export default function Index({ id = null }) {
   const userId = useSelector((state) => state.auth.user.id);
-  const [data, setData] = useState([]);
+  const [initialData, setInitialData] = useState(emptyValues);
   const [workers, setWorkers] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [unidades, setUnidades] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [files, setFiles] = useState([]);
+  const isEditMode = useRef(!!id);
 
   const handlePushItem = (push, row, list) => {
     // não incluir repetido na lista
-    console.log(row);
-    console.log(list);
+    // console.log(row);
+    // console.log(list);
+    const isFriday = new Date(list.date).getDay() === 4;
     if (list.length > 0) {
       let exists = false;
 
@@ -93,7 +102,7 @@ export default function Index() {
       name: row.label,
       job: row.value.job,
       WorkerManualfrequencytypeId: 1,
-      hours: 9,
+      hours: isFriday ? 8 : 9,
       obs: '',
     });
   };
@@ -173,7 +182,52 @@ export default function Index() {
       }
     }
 
-    getData();
+    async function getEditData() {
+      const workersOp = [];
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/workers/actives');
+        const response1 = await axios.get(`/workersmanualfrequencies/${id}`);
+
+        // ajustes
+        response1.data?.WorkerManualfrequencyItems?.forEach((item) => {
+          item.name = item.Worker.name;
+          item.job = item.Worker.WorkerContracts[0].WorkerJobtype.job;
+        });
+
+        setInitialData(response1.data);
+
+        const workersJobs = response.data
+          .filter(
+            (value, index, arr) =>
+              arr.findIndex((item) => item.job === value.job) === index
+          )
+          .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
+
+        workersJobs.forEach((value) => {
+          workersOp.push([
+            value,
+            response.data.filter((item) => item.job === value),
+          ]);
+        });
+
+        setWorkers(workersOp);
+
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
+    if (isEditMode.current) {
+      getEditData();
+    } else {
+      getData();
+    }
   }, []);
 
   const handleStore = async (values, resetForm) => {
@@ -205,13 +259,6 @@ export default function Index() {
     }
   };
 
-  const initialValues = {
-    ContractId: '',
-    UnidadeId: '',
-    date: '',
-    obs: '',
-    WorkerManualfrequencyItems: [],
-  };
   return (
     <>
       <Loading isLoading={isLoading} />
@@ -229,11 +276,12 @@ export default function Index() {
         </Row>
         <Row className="px-0 pt-2">
           <Formik // FORAM DEFINIFOS 2 FORMULÁRIOS POIS O SEGUNDO SÓ VAI APARECER AOÓS A INSERÇÃO DO PRIMEIRO
-            initialValues={initialValues}
+            initialValues={initialData}
             validationSchema={schema}
             onSubmit={(values, { resetForm }) => {
               handleStore(values, resetForm);
             }}
+            enableReinitialize
           >
             {({
               submitForm,
@@ -256,26 +304,30 @@ export default function Index() {
                     className="pb-3"
                   >
                     <Form.Label>CONTRATO:</Form.Label>
-                    <Select
-                      inputId="ContractId"
-                      options={contracts.map((contract) => ({
-                        value: contract.id,
-                        label: `${contract.codigoSipac} - ${contract.objeto} `,
-                      }))}
-                      value={
-                        values.ContractId
-                          ? unidades.find(
-                              (option) => option.value === values.ContractId
-                            )
-                          : null
-                      }
-                      onChange={(selected) => {
-                        setFieldValue('ContractId', selected.value);
-                      }}
-                      placeholder="Selecione o contrato"
-                      onBlur={handleBlur}
-                      isDisabled={values.WorkerManualfrequencyItems.length}
-                    />
+                    {isEditMode ? (
+                      <p>{`${initialData?.Contract?.codigoSipac} - ${initialData?.Contract?.objeto}`}</p>
+                    ) : (
+                      <Select
+                        inputId="ContractId"
+                        options={contracts.map((contract) => ({
+                          value: contract.id,
+                          label: `${contract.codigoSipac} - ${contract.objeto} `,
+                        }))}
+                        value={
+                          values.ContractId
+                            ? unidades.find(
+                                (option) => option.value === values.ContractId
+                              )
+                            : null
+                        }
+                        onChange={(selected) => {
+                          setFieldValue('ContractId', selected.value);
+                        }}
+                        placeholder="Selecione o contrato"
+                        onBlur={handleBlur}
+                        isDisabled={values.WorkerManualfrequencyItems.length}
+                      />
+                    )}
                     {touched.ContractId && !!errors.ContractId ? (
                       <Badge bg="danger">{errors.ContractId}</Badge>
                     ) : null}
@@ -288,32 +340,36 @@ export default function Index() {
                     className="pb-3"
                   >
                     <Form.Label>UNIDADE:</Form.Label>
-                    <Select
-                      inputId="UnidadeId"
-                      options={unidades.map((unidade) => ({
-                        value: unidade.id,
-                        label: `${unidade.id} - ${unidade.nomeUnidade} `,
-                      }))}
-                      value={
-                        values.UnidadeId
-                          ? unidades.find(
-                              (option) => option.value === values.UnidadeId
-                            )
-                          : null
-                      }
-                      onChange={(selected) => {
-                        setFieldValue('UnidadeId', selected.value);
-                        setFieldValue(
-                          'date',
-                          new Date().toISOString().split('T')[0]
-                        );
-                      }}
-                      placeholder="Selecione a unidade"
-                      onBlur={(e) => {
-                        handleBlur(e);
-                      }}
-                      isDisabled={values.WorkerManualfrequencyItems.length}
-                    />
+                    {isEditMode ? (
+                      <p>{`${initialData?.Unidade?.id} - ${initialData?.Unidade?.sigla}`}</p>
+                    ) : (
+                      <Select
+                        inputId="UnidadeId"
+                        options={unidades.map((unidade) => ({
+                          value: unidade.id,
+                          label: `${unidade.id} - ${unidade.nomeUnidade} `,
+                        }))}
+                        value={
+                          values.UnidadeId
+                            ? unidades.find(
+                                (option) => option.value === values.UnidadeId
+                              )
+                            : null
+                        }
+                        onChange={(selected) => {
+                          setFieldValue('UnidadeId', selected.value);
+                          setFieldValue(
+                            'date',
+                            new Date().toISOString().split('T')[0]
+                          );
+                        }}
+                        placeholder="Selecione a unidade"
+                        onBlur={(e) => {
+                          handleBlur(e);
+                        }}
+                        isDisabled={values.WorkerManualfrequencyItems.length}
+                      />
+                    )}
                     {touched.UnidadeId && !!errors.UnidadeId ? (
                       <Badge bg="danger">{errors.UnidadeId}</Badge>
                     ) : null}
@@ -326,15 +382,21 @@ export default function Index() {
                     controlId="date"
                   >
                     <Form.Label>DATA:</Form.Label>
-                    <Form.Control
-                      type="date"
-                      value={values.date}
-                      onChange={handleChange}
-                      isInvalid={touched.date && !!errors.date}
-                      // isValid={touched.date && !errors.date}
-                      onBlur={handleBlur}
-                      placeholder="Selecione a data"
-                    />
+                    {isEditMode ? (
+                      <p>{initialData.date}</p>
+                    ) : (
+                      <Form.Control
+                        type="date"
+                        value={values.date}
+                        onChange={handleChange}
+                        isInvalid={touched.date && !!errors.date}
+                        // isValid={touched.date && !errors.date}
+                        onBlur={handleBlur}
+                        placeholder="Selecione a data"
+                        disabled={isEditMode}
+                      />
+                    )}
+
                     <Form.Control.Feedback
                       tooltip
                       type="invalid"
@@ -417,8 +479,6 @@ export default function Index() {
                               formatGroupLabel={formatGroupLabel}
                               value={null}
                               onChange={(selected, action) => {
-                                console.log(selected);
-                                console.log(values.WorkerManualfrequencyItems);
                                 handlePushItem(push, selected, values);
                                 setFieldValue('searchWorker', '');
                               }}
