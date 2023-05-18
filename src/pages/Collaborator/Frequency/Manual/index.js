@@ -239,14 +239,42 @@ export default function Index({ id = null }) {
       ...convertEmptyToNull(values),
     };
 
+    const updateList = [];
+    let addList;
+    let deleteList;
+
     formattedValues.UserId = userId;
+
+    if (isEditMode) {
+      addList = [
+        ...formattedValues.WorkerManualfrequencyItems.filter(
+          (item) =>
+            !initialData.WorkerManualfrequencyItems.some(
+              (initialItem) => initialItem.WorkerId === item.WorkerId
+            )
+        ),
+      ];
+      deleteList = [
+        ...initialData.WorkerManualfrequencyItems.filter(
+          (initialItem) =>
+            !formattedValues.WorkerManualfrequencyItems.some(
+              (item) => initialItem.WorkerId === item.WorkerId
+            )
+        ),
+      ];
+    }
 
     console.log(formattedValues);
 
     try {
       setIsLoading(true);
 
-      await axios.post(`/workersmanualfrequencies`, formattedValues);
+      if (isEditMode) {
+        console.log('addList', addList);
+        console.log('deleteList', deleteList);
+      } else {
+        await axios.post(`/workersmanualfrequencies`, formattedValues);
+      }
 
       setIsLoading(false);
       resetForm();
