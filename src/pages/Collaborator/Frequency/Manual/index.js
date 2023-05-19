@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
@@ -10,6 +11,7 @@ import { toast } from 'react-toastify';
 import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
 import Select from 'react-select';
+import { update } from 'lodash';
 import axios from '../../../../services/axios';
 import {
   primaryDarkColor,
@@ -239,9 +241,9 @@ export default function Index({ id = null }) {
       ...convertEmptyToNull(values),
     };
 
-    const updateList = [];
     let addList;
     let deleteList;
+    let updateList;
 
     formattedValues.UserId = userId;
 
@@ -254,6 +256,11 @@ export default function Index({ id = null }) {
             )
         ),
       ];
+
+      addList.forEach(
+        (item) => (item.WorkerManualfrequencyId = initialData.id)
+      );
+
       deleteList = [
         ...initialData.WorkerManualfrequencyItems.filter(
           (initialItem) =>
@@ -262,24 +269,50 @@ export default function Index({ id = null }) {
             )
         ),
       ];
-    }
 
-    console.log(formattedValues);
+      deleteList.forEach(
+        (item) => (item.WorkerManualfrequencyId = initialData.id)
+      );
+
+      updateList = [
+        ...initialData.WorkerManualfrequencyItems.filter((initialItem) =>
+          formattedValues.WorkerManualfrequencyItems.some(
+            (item) => initialItem.WorkerId === item.WorkerId
+          )
+        ),
+      ];
+
+      updateList.forEach(
+        (item) => (item.WorkerManualfrequencyId = initialData.id)
+      );
+    }
 
     try {
       setIsLoading(true);
 
       if (isEditMode) {
-        console.log('addList', addList);
-        console.log('deleteList', deleteList);
+        // DELETE DATA
+        console.log(deleteList);
+        if (deleteList.length > 0)
+          await axios.delete(`/workersmanualfrequencies/items`, {
+            data: deleteList,
+          });
+
+        // ADD AND UPDATE DATA
+        const AddANDUpdateList = [...addList, ...updateList];
+        console.log(AddANDUpdateList);
+        if (AddANDUpdateList.length > 0)
+          await axios.post(`/workersmanualfrequencies/items`, AddANDUpdateList);
+
+        toast.success(`Registros alterados com sucesso!`);
       } else {
         await axios.post(`/workersmanualfrequencies`, formattedValues);
+        resetForm();
+
+        toast.success(`Registro realizado com sucesso!`);
       }
 
       setIsLoading(false);
-      resetForm();
-
-      toast.success(`Registro realizado com sucesso!`);
     } catch (err) {
       // eslint-disable-next-line no-unused-expressions
       console.log(err);
@@ -732,20 +765,23 @@ export default function Index({ id = null }) {
                 <hr />
 
                 <Row className="justify-content-center">
-                  <Col xs="auto" className="text-center pt-2 pb-4">
-                    <Button
-                      type="reset"
-                      variant="warning"
-                      onClick={() => {
-                        resetForm();
-                      }}
-                    >
-                      Limpar
-                    </Button>
-                  </Col>
+                  {isEditMode ? null : (
+                    <Col xs="auto" className="text-center pt-2 pb-4">
+                      <Button
+                        type="reset"
+                        variant="warning"
+                        onClick={() => {
+                          resetForm();
+                        }}
+                      >
+                        Limpar
+                      </Button>
+                    </Col>
+                  )}
+
                   <Col xs="auto" className="text-center pt-2 pb-4">
                     <Button variant="success" onClick={submitForm}>
-                      Registrar
+                      {isEditMode ? 'Alterar' : 'Registrar'}
                     </Button>
                   </Col>
                 </Row>
