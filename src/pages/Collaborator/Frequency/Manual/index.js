@@ -74,33 +74,15 @@ export default function Index({ id = null }) {
   const [unidades, setUnidades] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log(id);
-
   const isEditMode = useRef(!!id);
-
-  console.log(isEditMode);
 
   const handlePushItem = (push, row, list) => {
     // não incluir repetido na lista
     // console.log(row);
     // console.log(list);
-    const isFriday = new Date(list.date).getDay() === 4;
-    if (list.length > 0) {
-      let exists = false;
-
-      list.every((item) => {
-        if (item.WorkerId === row.value.id) {
-          exists = true;
-          return false;
-        }
-        return true;
-      });
-
-      if (exists) {
-        toast.error('Item já incluído na lista de saída');
-        return;
-      }
-    }
+    const dateBR = String(list.date.split('-').reverse().join('/'));
+    console.log(dateBR);
+    const isFriday = new Date(`${list.date}T00:00`).getDay() === 5;
 
     // adicionar na lista de saída
     push({
@@ -133,6 +115,61 @@ export default function Index({ id = null }) {
       .required()
       .min(1, 'A lista de colaboradores não pode ser vazia'),
   });
+
+  async function getEditData(idEdit) {
+    const workersOp = [];
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/workers/actives');
+      const response1 = await axios.get(`/workersmanualfrequencies/${idEdit}`);
+
+      // ajustes
+      response1.data?.WorkerManualfrequencyItems?.forEach((item) => {
+        item.name = item.Worker.name;
+        item.job = item.Worker.WorkerContracts[0].WorkerJobtype.job;
+      });
+
+      const myDate = response1.data?.date.split('-');
+      const dateFormated = new Date(
+        myDate[0],
+        Number(myDate[1]) - 1,
+        myDate[2]
+      );
+      const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      };
+      response1.data.dateBR = dateFormated.toLocaleDateString('pt-BR', options);
+
+      setInitialData(response1.data);
+
+      const workersJobs = response.data
+        .filter(
+          (value, index, arr) =>
+            arr.findIndex((item) => item.job === value.job) === index
+        )
+        .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
+
+      workersJobs.forEach((value) => {
+        workersOp.push([
+          value,
+          response.data.filter((item) => item.job === value),
+        ]);
+      });
+
+      setWorkers(workersOp);
+
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function getData() {
@@ -188,49 +225,8 @@ export default function Index({ id = null }) {
       }
     }
 
-    async function getEditData() {
-      const workersOp = [];
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/workers/actives');
-        const response1 = await axios.get(`/workersmanualfrequencies/${id}`);
-
-        // ajustes
-        response1.data?.WorkerManualfrequencyItems?.forEach((item) => {
-          item.name = item.Worker.name;
-          item.job = item.Worker.WorkerContracts[0].WorkerJobtype.job;
-        });
-
-        setInitialData(response1.data);
-
-        const workersJobs = response.data
-          .filter(
-            (value, index, arr) =>
-              arr.findIndex((item) => item.job === value.job) === index
-          )
-          .map((value) => value.job); // RETORNA OS DIFERENTES TRABALHOS
-
-        workersJobs.forEach((value) => {
-          workersOp.push([
-            value,
-            response.data.filter((item) => item.job === value),
-          ]);
-        });
-
-        setWorkers(workersOp);
-
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
-
     if (isEditMode.current) {
-      getEditData();
+      getEditData(id);
     } else {
       getData();
     }
@@ -247,7 +243,7 @@ export default function Index({ id = null }) {
 
     formattedValues.UserId = userId;
 
-    if (isEditMode) {
+    if (isEditMode.current) {
       addList = [
         ...formattedValues.WorkerManualfrequencyItems.filter(
           (item) =>
@@ -290,7 +286,7 @@ export default function Index({ id = null }) {
     try {
       setIsLoading(true);
 
-      if (isEditMode) {
+      if (isEditMode.current) {
         // DELETE DATA
         console.log(deleteList);
         if (deleteList.length > 0)
@@ -304,9 +300,19 @@ export default function Index({ id = null }) {
         if (AddANDUpdateList.length > 0)
           await axios.post(`/workersmanualfrequencies/items`, AddANDUpdateList);
 
+        // NOW, UPDATE INITIAL DATA FOR UPDATED DATA (IF NECESSARY NEW CHANGES)
+        getEditData(id);
         toast.success(`Registros alterados com sucesso!`);
       } else {
-        await axios.post(`/workersmanualfrequencies`, formattedValues);
+        const { data } = await axios.post(
+          `/workersmanualfrequencies`,
+          formattedValues
+        );
+
+        // getEditData(data.id);
+
+        // isEditMode.current = true;
+
         resetForm();
 
         toast.success(`Registro realizado com sucesso!`);
@@ -370,7 +376,7 @@ export default function Index({ id = null }) {
                   >
                     <Form.Label>CONTRATO:</Form.Label>
                     {isEditMode.current ? (
-                      <p>{`${initialData?.Contract?.codigoSipac} - ${initialData?.Contract?.objeto}`}</p>
+                      <p className="fw-bold">{`${initialData?.Contract?.codigoSipac}`}</p>
                     ) : (
                       <Select
                         inputId="ContractId"
@@ -390,7 +396,7 @@ export default function Index({ id = null }) {
                         }}
                         placeholder="Selecione o contrato"
                         onBlur={handleBlur}
-                        isDisabled={values.WorkerManualfrequencyItems.length}
+                        isDisabled={values.WorkerManualfrequencyItems?.length}
                       />
                     )}
                     {touched.ContractId && !!errors.ContractId ? (
@@ -406,7 +412,7 @@ export default function Index({ id = null }) {
                   >
                     <Form.Label>UNIDADE:</Form.Label>
                     {isEditMode.current ? (
-                      <p>{`${initialData?.Unidade?.id} - ${initialData?.Unidade?.sigla}`}</p>
+                      <p className="fw-bold">{`${initialData?.Unidade?.id} - ${initialData?.Unidade?.sigla}`}</p>
                     ) : (
                       <Select
                         inputId="UnidadeId"
@@ -432,7 +438,7 @@ export default function Index({ id = null }) {
                         onBlur={(e) => {
                           handleBlur(e);
                         }}
-                        isDisabled={values.WorkerManualfrequencyItems.length}
+                        isDisabled={values.WorkerManualfrequencyItems?.length}
                       />
                     )}
                     {touched.UnidadeId && !!errors.UnidadeId ? (
@@ -448,7 +454,7 @@ export default function Index({ id = null }) {
                   >
                     <Form.Label>DATA:</Form.Label>
                     {isEditMode.current ? (
-                      <p>{initialData.date}</p>
+                      <p className="fw-bold">{initialData?.dateBR}</p>
                     ) : (
                       <Form.Control
                         type="date"
@@ -487,6 +493,7 @@ export default function Index({ id = null }) {
                         setFieldValue('obs', e.target.value.toUpperCase()); // UPPERCASE
                         handleBlur(e);
                       }}
+                      readOnly={isEditMode.current}
                     />
                     <Form.Control.Feedback
                       tooltip
@@ -555,8 +562,8 @@ export default function Index({ id = null }) {
                           </Col>
                         </Row>
                         <Row style={{ background: body2Color }}>
-                          {values.WorkerManualfrequencyItems.length > 0 &&
-                            values.WorkerManualfrequencyItems.map(
+                          {values.WorkerManualfrequencyItems?.length > 0 &&
+                            values.WorkerManualfrequencyItems?.map(
                               (item, index) => (
                                 <>
                                   <Row className="d-block d-lg-none">
@@ -765,7 +772,7 @@ export default function Index({ id = null }) {
                 <hr />
 
                 <Row className="justify-content-center">
-                  {isEditMode ? null : (
+                  {isEditMode.current ? null : (
                     <Col xs="auto" className="text-center pt-2 pb-4">
                       <Button
                         type="reset"
@@ -781,7 +788,7 @@ export default function Index({ id = null }) {
 
                   <Col xs="auto" className="text-center pt-2 pb-4">
                     <Button variant="success" onClick={submitForm}>
-                      {isEditMode ? 'Alterar' : 'Registrar'}
+                      {isEditMode.current ? 'Alterar' : 'Registrar'}
                     </Button>
                   </Col>
                 </Row>
