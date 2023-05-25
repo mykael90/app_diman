@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 /* eslint-disable no-param-reassign */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unstable-nested-components */
@@ -44,6 +45,23 @@ import GalleryComponent from '../../../../components/GalleryComponent';
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedRowHiddenRows from '../../components/TableGfilterNestedRowHiddenRows';
 import TableNestedrow from '../../components/TableNestedRow';
+import FilterDate from './components/FilterDate';
+
+function objectToQueryString(obj) {
+  const queryString = Object.entries(obj)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value
+          .map(
+            (val) => `${encodeURIComponent(key)}[]=${encodeURIComponent(val)}`
+          )
+          .join('&');
+      }
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+    })
+    .join('&');
+  return queryString;
+}
 
 // trigger to custom filter
 function DefaultColumnFilter() {
@@ -396,10 +414,12 @@ export default function Index() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [dataModal, setDataModal] = useState('');
 
-  async function getData() {
+  async function getData(values) {
     try {
       setIsLoading(true);
-      const response = await axios.get('/materials/out/');
+      const queryString = objectToQueryString(values);
+
+      const response = await axios.get(`/materials/out?${queryString}`);
       setReqs(response.data);
       setIsLoading(false);
     } catch (err) {
@@ -414,16 +434,16 @@ export default function Index() {
   const handleCloseEditModal = () => setShowEditModal(false);
   const handleSaveEditModal = () => {
     setShowEditModal(false);
-    getData();
+    // getData();
   };
   const handleShowEditModal = (data) => {
     setDataModal(data);
     setShowEditModal(true);
   };
 
-  useEffect(() => {
-    getData();
-  }, []);
+  // useEffect(() => {
+  //   getData();
+  // }, []);
 
   const handleAskUpdateUserReplacement = (e, values) => {
     e.preventDefault();
@@ -1221,6 +1241,7 @@ export default function Index() {
     <>
       <Loading isLoading={isLoading} />
       <Container>
+        <FilterDate getData={getData} />
         <EditModal // modal p/ pesquisa de materiais
           handleClose={handleCloseEditModal}
           show={showEditModal}
@@ -1234,7 +1255,6 @@ export default function Index() {
             Extravio, Empréstimo, etc.
           </Card.Text>
         </Row>
-
         <TableGfilterNestedRowHiddenRows
           columns={columns}
           data={data}
