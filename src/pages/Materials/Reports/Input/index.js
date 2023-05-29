@@ -31,12 +31,29 @@ import {
   Form,
 } from 'react-bootstrap';
 
-import axios from '../../../services/axios';
-import Loading from '../../../components/Loading';
+import axios from '../../../../services/axios';
+import Loading from '../../../../components/Loading';
 
 // import generic table from material's components with global filter and nested row
-import TableGfilterNestedRowHiddenRows from '../components/TableGfilterNestedRowHiddenRows';
-import TableNestedrow from '../components/TableNestedRow';
+import TableGfilterNestedRowHiddenRows from '../../components/TableGfilterNestedRowHiddenRows';
+import TableNestedrow from '../../components/TableNestedRow';
+import FilterDate from './components/FilterDate';
+
+function objectToQueryString(obj) {
+  const queryString = Object.entries(obj)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value
+          .map(
+            (val) => `${encodeURIComponent(key)}[]=${encodeURIComponent(val)}`
+          )
+          .join('&');
+      }
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+    })
+    .join('&');
+  return queryString;
+}
 
 // trigger to custom filter
 function DefaultColumnFilter() {
@@ -360,24 +377,26 @@ export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [reqs, setReqs] = useState([]);
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('/materials/in/');
-        setReqs(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        // eslint-disable-next-line no-unused-expressions
-        err.response?.data?.errors
-          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
-          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
-        setIsLoading(false);
-      }
-    }
+  async function getData(values) {
+    try {
+      setIsLoading(true);
+      const queryString = objectToQueryString(values);
 
-    getData();
-  }, []);
+      const response = await axios.get(`/materials/in?${queryString}`);
+      setReqs(response.data);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
+
+  // useEffect(() => {
+  //   getData();
+  // }, []);
 
   const columns = React.useMemo(
     () => [
@@ -865,6 +884,7 @@ export default function Index() {
   return (
     <>
       <Loading isLoading={isLoading} />
+      <FilterDate getData={getData} />
       <Container>
         <Row className="text-center py-3">
           <Card.Title>Relatório de Entrada: Materiais</Card.Title>
