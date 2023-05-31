@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
@@ -41,6 +42,7 @@ function Recursive({
   setFieldValue,
   nameArray = 'sections',
   level = 0,
+  sectionstypes,
 }) {
   return (
     <FieldArray name={nameArray}>
@@ -90,19 +92,21 @@ function Recursive({
                           <Select
                             {...field}
                             inputId={`${nameArray}.${index}.name`}
-                            options={[
-                              { label: 'PAVIMENTO', value: 1 },
-                              { label: 'SALA', value: 2 },
-                            ]}
+                            options={sectionstypes.map((item) => ({
+                              label: item.type,
+                              value: item.id,
+                            }))}
                             size="sm"
                             value={
                               section.name
-                                ? [
-                                    { label: 'PAVIMENTO', value: 1 },
-                                    { label: 'SALA', value: 2 },
-                                  ].find(
-                                    (option) => option.value === section.name
-                                  )
+                                ? sectionstypes
+                                    .map((item) => ({
+                                      label: item.type,
+                                      value: item.id,
+                                    }))
+                                    .find(
+                                      (option) => option.id === section.name
+                                    )
                                 : null
                             }
                             onChange={(selectedOption) =>
@@ -168,6 +172,7 @@ function Recursive({
                       setFieldValue={setFieldValue}
                       level={level + 1}
                       nameArray={`${nameArray}.${index}.sections`}
+                      sectionstypes={sectionstypes}
                     />
                   ) : null}
                 </div>
@@ -182,8 +187,28 @@ function Recursive({
 
 function MyForm({ initialValues = null }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [sectionstypes, setSectionstypes] = useState(false);
 
   const isEditMode = !!initialValues;
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('/properties/buildings/sectionstypes');
+        setSectionstypes(response.data);
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
+    getData();
+  }, []);
 
   return (
     <>
@@ -215,7 +240,11 @@ function MyForm({ initialValues = null }) {
             }) => (
               <Form as BootstrapForm onReset={handleReset}>
                 <h3>PRÉDIO TAL</h3>
-                <Recursive values={values} setFieldValue={setFieldValue} />
+                <Recursive
+                  values={values}
+                  setFieldValue={setFieldValue}
+                  sectionstypes={sectionstypes}
+                />
                 <Row className="justify-content-center pt-2 pb-4">
                   <Col xs="auto" className="text-center">
                     <Button variant="danger" type="reset">
