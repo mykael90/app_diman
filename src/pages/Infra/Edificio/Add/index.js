@@ -43,8 +43,13 @@ function Recursive({
   nameArray = 'sections',
   level = 0,
   sectionstypes,
-  superIndex = 0,
+  superIndex,
 }) {
+  // não ta utilizando
+  const changeSuperIndex = (index) => {
+    superIndex = `${superIndex}.${index + 1}`;
+  };
+
   return (
     <FieldArray name={nameArray}>
       {({ push, remove, swap }) => {
@@ -75,13 +80,19 @@ function Recursive({
                   key={index}
                   style={{ background: 'rgba(69, 98, 150, 0.25)' }}
                 >
-                  <h3>{superIndex}</h3>
-                  <h3>{index + 1}</h3>
-                  <h5>{level + 1}</h5>
                   <Row
                     className={`${level === 0 ? 'pt-3' : 'pt-1'}`}
                     style={{ paddingLeft: `${level * 20}px` }}
                   >
+                    <Col xs="auto">
+                      {superIndex ? (
+                        <h5>
+                          {superIndex}.{index + 1}
+                        </h5>
+                      ) : (
+                        <h3>{index + 1}</h3>
+                      )}
+                    </Col>
                     <BootstrapForm.Group
                       as={Col}
                       xs={4}
@@ -91,6 +102,7 @@ function Recursive({
                       <BootstrapForm.Label className="d-none">
                         Name
                       </BootstrapForm.Label>
+
                       <Field name={`${nameArray}.${index}.name`}>
                         {({ field }) => (
                           <Select
@@ -129,7 +141,7 @@ function Recursive({
                         placeholder="Nome"
                       />
                     </BootstrapForm.Group>
-                    <Col xs={4}>
+                    <Col xs={3}>
                       <Button
                         type="button"
                         size="sm"
@@ -166,7 +178,11 @@ function Recursive({
                       level={level + 1}
                       nameArray={`${nameArray}.${index}.sections`}
                       sectionstypes={sectionstypes}
-                      superIndex={`${index + 1}`}
+                      superIndex={
+                        superIndex
+                          ? `${superIndex}.${index + 1}`
+                          : `${index + 1}`
+                      }
                     />
                   ) : null}
                 </div>
