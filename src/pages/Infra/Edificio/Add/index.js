@@ -74,6 +74,8 @@ function Recursive({
                   key={index}
                   style={{ background: 'rgba(69, 98, 150, 0.25)' }}
                 >
+                  <h3>{index + 1}</h3>
+                  <h5>{level + 1}</h5>
                   <Row
                     className={`${level === 0 ? 'pt-3' : 'pt-1'}`}
                     style={{ paddingLeft: `${level * 20}px` }}
@@ -97,22 +99,11 @@ function Recursive({
                               value: item.id,
                             }))}
                             size="sm"
-                            value={
-                              section.name
-                                ? sectionstypes
-                                    .map((item) => ({
-                                      label: item.type,
-                                      value: item.id,
-                                    }))
-                                    .find(
-                                      (option) => option.id === section.name
-                                    )
-                                : null
-                            }
+                            value={section.name}
                             onChange={(selectedOption) =>
                               setFieldValue(
                                 `${nameArray}.${index}.name`,
-                                selectedOption.value
+                                selectedOption
                               )
                             }
                             placeholder="Tipo"
