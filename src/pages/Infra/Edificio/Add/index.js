@@ -43,6 +43,7 @@ function Recursive({
   nameArray = 'sections',
   level = 0,
   sectionstypes,
+  superIndex = 0,
 }) {
   return (
     <FieldArray name={nameArray}>
@@ -74,8 +75,9 @@ function Recursive({
                   key={index}
                   style={{ background: 'rgba(69, 98, 150, 0.25)' }}
                 >
-                  {/* <h3>{index + 1}</h3>
-                  <h5>{level + 1}</h5> */}
+                  <h3>{superIndex}</h3>
+                  <h3>{index + 1}</h3>
+                  <h5>{level + 1}</h5>
                   <Row
                     className={`${level === 0 ? 'pt-3' : 'pt-1'}`}
                     style={{ paddingLeft: `${level * 20}px` }}
@@ -164,6 +166,7 @@ function Recursive({
                       level={level + 1}
                       nameArray={`${nameArray}.${index}.sections`}
                       sectionstypes={sectionstypes}
+                      superIndex={`${index + 1}`}
                     />
                   ) : null}
                 </div>
