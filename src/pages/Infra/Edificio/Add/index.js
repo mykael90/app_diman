@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import {
@@ -305,7 +306,7 @@ function MyForm({ initialValues = null }) {
 
     const retornaValores = (array, superId = null) => {
       array.forEach((item) => {
-        item.uuid = '1234-4564-456';
+        item.uuid = uuidv4();
         item.sub_rip = 'tal tal';
         item.superId = superId;
         arrayValues.push(item);
