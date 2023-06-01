@@ -26,6 +26,25 @@ import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 import { primaryDarkColor } from '../../../../config/colors';
 
+const convertEmptyToNull = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map((value) => convertEmptyToNull(value));
+  }
+
+  if (typeof obj === 'object' && obj !== null) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => {
+        if (Array.isArray(value) && value.length === 0) {
+          return [key, value];
+        }
+        return [key, convertEmptyToNull(value) ?? null];
+      })
+    );
+  }
+
+  return obj ?? null;
+};
+
 const renderTooltip = (props, message) => (
   <Tooltip id="button-tooltip" {...props}>
     {message}
@@ -54,7 +73,13 @@ function Recursive({
     <FieldArray name={nameArray}>
       {({ push, remove, swap }) => {
         const addChild = (section, index) => {
-          section.sections.push({ name: '', email: '', sections: [] });
+          section.sections.push({
+            BuildingSectiontypeId: '',
+            name: '',
+            cod: '',
+            obs: '',
+            sections: [],
+          });
           // o método swap é só pra atualizar o estado pq nao utilizei funcao nativa do formik para adicionar o form filho
           swap(index, index);
         };
@@ -66,7 +91,15 @@ function Recursive({
                   <Button
                     variant="outline-primary"
                     size="sm"
-                    onClick={() => push({ name: '', email: '', sections: [] })}
+                    onClick={() =>
+                      push({
+                        BuildingSectiontypeId: '',
+                        name: '',
+                        cod: '',
+                        obs: '',
+                        sections: [],
+                      })
+                    }
                     // style={{ marginLeft: `${level * 20}px` }}
                   >
                     <FaPlus /> Divisão
@@ -76,47 +109,56 @@ function Recursive({
             ) : null}
             <Row>
               {values.sections.map((section, index) => (
-                <div
-                  key={index}
-                  style={{ background: 'rgba(69, 98, 150, 0.25)' }}
-                >
+                <div key={index}>
                   <Row
-                    className={`${level === 0 ? 'pt-3' : 'pt-1'}`}
-                    style={{ paddingLeft: `${level * 20}px` }}
+                    className={`${level === 0 ? 'mt-3' : 'mt-1'} py-1`}
+                    style={{ background: 'rgba(69, 98, 150, 0.25)' }}
+                    // style={{ paddingLeft: `${level * 20}px` }}
                   >
-                    <Col xs="auto">
-                      {superIndex ? (
-                        <h5>
-                          {superIndex}.{index + 1}
-                        </h5>
-                      ) : (
-                        <h3>{index + 1}</h3>
-                      )}
+                    <Col
+                      xs="auto"
+                      style={{ paddingLeft: `${2 + level * 20}px` }}
+                    >
+                      <div
+                        className="border px-2  border-dark"
+                        style={{ height: '36px' }}
+                      >
+                        {superIndex ? (
+                          <h5>
+                            {superIndex}.{index + 1}
+                          </h5>
+                        ) : (
+                          <h5>{index + 1}</h5>
+                        )}
+                      </div>
                     </Col>
                     <BootstrapForm.Group
                       as={Col}
-                      xs={4}
-                      controlId={`${nameArray}.${index}.name`}
+                      xs={2}
+                      controlId={`${nameArray}.${index}.BuildingSectiontypeId`}
                       // className="border-0 m-0 p-0 d-none"
                     >
                       <BootstrapForm.Label className="d-none">
-                        Name
+                        BuildingSectiontypeId
                       </BootstrapForm.Label>
 
-                      <Field name={`${nameArray}.${index}.name`}>
+                      <Field
+                        name={`${nameArray}.${index}.BuildingSectiontypeId`}
+                      >
                         {({ field }) => (
                           <Select
                             {...field}
-                            inputId={`${nameArray}.${index}.name`}
+                            as={BootstrapForm.Control}
+                            inputId={`${nameArray}.${index}.BuildingSectiontypeId`}
                             options={sectionstypes.map((item) => ({
                               label: item.type,
                               value: item.id,
                             }))}
                             size="sm"
-                            value={section.name}
+                            value={section.BuildingSectiontypeId}
                             onChange={(selectedOption) =>
                               setFieldValue(
-                                `${nameArray}.${index}.name`,
+                                `${nameArray}.${index}.BuildingSectiontypeId`,
                                 selectedOption
                               )
                             }
@@ -127,18 +169,52 @@ function Recursive({
                     </BootstrapForm.Group>
                     <BootstrapForm.Group
                       as={Col}
-                      xs={4}
-                      controlId={`${nameArray}.${index}.email`}
+                      controlId={`${nameArray}.${index}.name`}
                     >
                       <BootstrapForm.Label className="d-none">
-                        Email
+                        Descrição
                       </BootstrapForm.Label>
                       <Field
-                        name={`${nameArray}.${index}.email`}
-                        type="email"
+                        name={`${nameArray}.${index}.name`}
+                        type="text"
                         as={BootstrapForm.Control}
                         // size="sm"
-                        placeholder="Nome"
+                        placeholder="Descrição"
+                        // className="border-0"
+                      />
+                    </BootstrapForm.Group>
+                    <BootstrapForm.Group
+                      as={Col}
+                      xs={1}
+                      controlId={`${nameArray}.${index}.cod`}
+                    >
+                      <BootstrapForm.Label className="d-none">
+                        Codigo
+                      </BootstrapForm.Label>
+                      <Field
+                        name={`${nameArray}.${index}.cod`}
+                        type="text"
+                        as={BootstrapForm.Control}
+                        // size="sm"
+                        placeholder="Cód"
+                        // className="border-0"
+                      />
+                    </BootstrapForm.Group>
+                    <BootstrapForm.Group
+                      as={Col}
+                      xs={3}
+                      controlId={`${nameArray}.${index}.obs`}
+                    >
+                      <BootstrapForm.Label className="d-none">
+                        Obs
+                      </BootstrapForm.Label>
+                      <Field
+                        name={`${nameArray}.${index}.obs`}
+                        type="text"
+                        as={BootstrapForm.Control}
+                        // size="sm"
+                        placeholder="Observações"
+                        // className="border-0"
                       />
                     </BootstrapForm.Group>
                     <Col xs={3}>
@@ -220,6 +296,58 @@ function MyForm({ initialValues = null }) {
     getData();
   }, []);
 
+  const handleStore = async (values, resetForm) => {
+    const formattedValues = {
+      ...convertEmptyToNull(values),
+    };
+
+    const arrayValues = [];
+
+    const retornaValores = (array, superId = null) => {
+      array.forEach((item) => {
+        item.uuid = '1234-4564-456';
+        item.sub_rip = 'tal tal';
+        item.superId = superId;
+        arrayValues.push(item);
+        if (item.sections.length > 0)
+          return retornaValores(item.sections, item.uuid);
+      });
+      return arrayValues;
+    };
+
+    retornaValores(formattedValues.sections);
+    console.log(arrayValues);
+
+    // formattedValues.sections.forEach((item) => console.log(item));
+
+    try {
+      setIsLoading(true);
+
+      // const { data } = await axios.post(
+      //   `/workersmanualfrequencies`,
+      //   formattedValues
+      // );
+
+      // getEditData(data.id);
+
+      // isEditMode.current = true;
+
+      // resetForm();
+
+      toast.success(`Registro realizado com sucesso!`);
+
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      console.log(err);
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <Loading isLoading={isLoading} />
@@ -237,7 +365,12 @@ function MyForm({ initialValues = null }) {
           </Col>
         </Row>
         <Row className="pt-2">
-          <Formik initialValues={emptyValues}>
+          <Formik
+            initialValues={emptyValues}
+            onSubmit={(values, { resetForm }) => {
+              handleStore(values, resetForm);
+            }}
+          >
             {({
               values,
               errors,
