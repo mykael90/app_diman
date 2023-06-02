@@ -272,7 +272,7 @@ function Recursive({
   );
 }
 
-function MyForm({ initialValues = null }) {
+function MyForm({ buildingData, initialValues = null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [sectionstypes, setSectionstypes] = useState(false);
   const [initialData, setInitialData] = useState(emptyValues);
@@ -328,30 +328,36 @@ function MyForm({ initialValues = null }) {
 
     const arrayValues = [];
 
-    const retornaValores = (array, superId = null) => {
+    const flatArray = (array, superId = null) => {
       array.forEach((item) => {
-        item.uuid = uuidv4();
-        item.sub_rip = 'tal tal';
+        item.id = uuidv4();
+        item.BuildingSipacSubRip = buildingData.subRip;
         item.superId = superId;
         arrayValues.push(item);
-        if (item.sections.length > 0)
-          return retornaValores(item.sections, item.uuid);
+        if (item.sections.length > 0) return flatArray(item.sections, item.id);
       });
       return arrayValues;
     };
 
-    retornaValores(formattedValues.sections);
+    flatArray(formattedValues.sections);
+    arrayValues.forEach((obj, index) => {
+      obj.order = index;
+      delete obj.sections;
+    });
     console.log(arrayValues);
+    console.log(formattedValues.sections.flat());
 
     // formattedValues.sections.forEach((item) => console.log(item));
 
     try {
       setIsLoading(true);
 
-      // const { data } = await axios.post(
-      //   `/workersmanualfrequencies`,
-      //   formattedValues
-      // );
+      const { data } = await axios.post(
+        `/properties/buildings/sections/bulk'`,
+        arrayValues
+      );
+
+      console.log(data);
 
       // getEditData(data.id);
 
@@ -407,7 +413,7 @@ function MyForm({ initialValues = null }) {
               setFieldTouched,
             }) => (
               <Form as BootstrapForm onReset={handleReset}>
-                <h3>PRÉDIO TAL</h3>
+                <h3>{buildingData?.name}</h3>
                 <Recursive
                   values={values}
                   setFieldValue={setFieldValue}

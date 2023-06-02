@@ -3,7 +3,7 @@
 import React, { useEffect, useContext } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
-// import EditCollaborator from '../../Add/index';
+import EditDivisions from '../../Add/index';
 
 export default function ModalEdit(props) {
   const { show, handleSaveModal, handleCancelModal, data } = props;
@@ -41,11 +41,11 @@ export default function ModalEdit(props) {
         <Modal.Title>Edição</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* <EditCollaborator
-          data={data}
+        <EditDivisions
+          buildingData={data}
           handleCancelModal={handleCancelModal}
           handleSaveModal={handleSaveModal}
-        /> */}
+        />
       </Modal.Body>
       {/* <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
