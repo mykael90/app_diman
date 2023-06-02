@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
@@ -275,10 +275,30 @@ function Recursive({
 function MyForm({ initialValues = null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [sectionstypes, setSectionstypes] = useState(false);
+  const [initialData, setInitialData] = useState(emptyValues);
 
-  const isEditMode = !!initialValues;
+  const isEditMode = useRef(!!initialValues);
 
   useEffect(() => {
+    async function getEditData(idEdit) {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          `/properties/buildings/sections/${idEdit}`
+        );
+
+        setInitialData(response.data);
+
+        setIsLoading(false);
+      } catch (err) {
+        // eslint-disable-next-line no-unused-expressions
+        err.response?.data?.errors
+          ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+          : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+        setIsLoading(false);
+      }
+    }
+
     async function getData() {
       try {
         setIsLoading(true);
@@ -294,7 +314,11 @@ function MyForm({ initialValues = null }) {
       }
     }
 
-    getData();
+    if (isEditMode.current) {
+      getEditData(initialValues.id);
+    } else {
+      getData();
+    }
   }, []);
 
   const handleStore = async (values, resetForm) => {

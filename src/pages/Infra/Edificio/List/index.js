@@ -10,6 +10,7 @@ import {
   FaSearch,
   FaSearchPlus,
   FaSearchMinus,
+  FaEllipsisH,
 } from 'react-icons/fa';
 
 import {
@@ -29,11 +30,11 @@ import {
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
+import ModalEdit from './components/ModalEdit';
+
 // import generic table from material's components with global filter and nested row
 import TableGfilterNestedRowHiddenRows from '../../../Materials/components/TableGfilterNestedRowHiddenRows';
 import TableNestedrow from '../../../Materials/components/TableNestedRow';
-
-import ModalEdit from './components/ModalEdit';
 
 // trigger to custom filter
 function DefaultColumnFilter() {
@@ -294,6 +295,62 @@ export default function Index() {
         filter: 'text',
         isVisible: window.innerWidth > 768,
         Cell: ({ value }) => <div className="text-start">{value}</div>,
+      },
+      {
+        Header: 'Zona',
+        accessor: 'zone',
+        disableSortBy: true,
+        width: 80,
+        disableResizing: true,
+        Filter: InputColumnFilter,
+        filter: 'text',
+        isVisible: window.innerWidth > 768,
+        Cell: ({ value }) => <div className="text-start">{value}</div>,
+      },
+      {
+        // Make an action cell
+        Header: 'Ações', // No header
+        id: 'actions', // It needs an ID
+        width: 80,
+        disableResizing: true,
+        Cell: ({ row }) => (
+          <Row className="d-flex flex-nowrap">
+            <Col xs="auto" className="text-center ms-2 m-0 p-0 px-1">
+              <OverlayTrigger
+                placement="left"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) =>
+                  renderTooltip(props, 'Editar instalação física')
+                }
+              >
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  className="border-0 m-0"
+                  onClick={(e) => handleShowModalEdit(row.original)}
+                >
+                  <FaPencilAlt />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+            <Col xs="auto" className="text-center  m-0 p-0 px-1">
+              <OverlayTrigger
+                placement="right"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Compartimentação')}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-primary"
+                  className="border-0 m-0"
+                  onClick={(e) => handleShowModalEdit(row.original)}
+                >
+                  <FaEllipsisH />
+                </Button>
+              </OverlayTrigger>
+            </Col>
+          </Row>
+        ),
       },
       // {
       //   Header: 'Idade',
