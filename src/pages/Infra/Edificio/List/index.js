@@ -187,6 +187,7 @@ export default function Index() {
   const [buildings, setBuildings] = useState([]);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [dataEdit, setDataEdit] = useState({});
+  const [modalName, setModalName] = useState();
 
   async function getWorkers() {
     try {
@@ -214,9 +215,10 @@ export default function Index() {
     getWorkers();
   };
 
-  const handleShowModalEdit = (item) => {
+  const handleShowModalEdit = (item, modalName) => {
     setDataEdit(item);
     setShowModalEdit(true);
+    setModalName(modalName);
   };
 
   useEffect(() => {
@@ -336,11 +338,18 @@ export default function Index() {
                   <Dropdown.Item eventKey="1">Editar instalação</Dropdown.Item>
                   <Dropdown.Item
                     eventKey="2"
-                    onClick={(e) => handleShowModalEdit(row.original)}
+                    onClick={(e) =>
+                      handleShowModalEdit(row.original, 'Subdivision')
+                    }
                   >
                     Subdivisões
                   </Dropdown.Item>
-                  <Dropdown.Item eventKey="3">
+                  <Dropdown.Item
+                    eventKey="3"
+                    onClick={(e) =>
+                      handleShowModalEdit(row.original, 'Geolocation')
+                    }
+                  >
                     Definir localização
                   </Dropdown.Item>
                   <Dropdown.Divider />
@@ -891,6 +900,7 @@ export default function Index() {
           handleSaveModal={handleSaveModal}
           show={showModalEdit}
           data={dataEdit}
+          modalName={modalName}
         />
         <Row className="text-center py-3">
           <Card.Title>Instalações Físicas da UFRN</Card.Title>

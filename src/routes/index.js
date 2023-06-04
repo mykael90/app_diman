@@ -26,7 +26,7 @@ import Adm from '../pages/Adm';
 import Fleet from '../pages/Fleet';
 import Unauthorized from '../components/Unauthorized';
 
-import Test from '../pages/Materials/Reports/Output/components/EditModal';
+import Test from '../pages/Infra/Edificio/Geolocation';
 import BigCalendar from '../components/BigCalendar';
 
 // TRANSFORMANDO O ARRAY userRoletypes PARA UM OBJETO ONDE ROLE É A CHAVE E O CÓDIGO É O VALOR

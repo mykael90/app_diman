@@ -2,11 +2,14 @@
 /* eslint-disable react/react-in-jsx-scope */
 import React, { useEffect, useContext } from 'react';
 import { Button, Modal } from 'react-bootstrap';
+import { primaryDarkColor } from '../../../../../config/colors';
 
-import EditDivisions from '../../Add/index';
+import Subdivision from '../../Subdivision/index';
+
+import Geolocation from '../../Geolocation/index';
 
 export default function ModalEdit(props) {
-  const { show, handleSaveModal, handleCancelModal, data } = props;
+  const { show, handleSaveModal, handleCancelModal, data, modalName } = props;
 
   // Manipulando o botão de voltar do navegador para não sair da página de reserva
   useEffect(() => {
@@ -29,6 +32,29 @@ export default function ModalEdit(props) {
     };
   }, []);
 
+  const renderSwitch = (param) => {
+    switch (param) {
+      case 'Subdivision':
+        return (
+          <Subdivision
+            buildingData={data}
+            handleCancelModal={handleCancelModal}
+            handleSaveModal={handleSaveModal}
+          />
+        );
+      case 'Geolocation':
+        return (
+          <Geolocation
+            buildingData={data}
+            handleCancelModal={handleCancelModal}
+            handleSaveModal={handleSaveModal}
+          />
+        );
+      default:
+        return 'foo';
+    }
+  };
+
   return (
     <Modal
       show={show}
@@ -37,15 +63,19 @@ export default function ModalEdit(props) {
       keyboard={false}
       size="xl"
     >
-      <Modal.Header closeButton>
-        <Modal.Title>Edição</Modal.Title>
+      <Modal.Header
+        style={{ background: primaryDarkColor, color: 'white' }}
+        closeButton
+      >
+        <Modal.Title>SUBDIVISÕES EM INSTALAÇÕES FÍSICAS</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <EditDivisions
+        {/* <Subdivision
           buildingData={data}
           handleCancelModal={handleCancelModal}
           handleSaveModal={handleSaveModal}
-        />
+        /> */}
+        {renderSwitch(modalName)}
       </Modal.Body>
       {/* <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
