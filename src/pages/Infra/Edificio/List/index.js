@@ -19,6 +19,7 @@ import {
   Card,
   Col,
   Button,
+  ButtonGroup,
   OverlayTrigger,
   Tooltip,
   Badge,
@@ -310,44 +311,41 @@ export default function Index() {
       },
       {
         // Make an action cell
-        Header: 'Ações', // No header
+        Header: '', // No header
         id: 'actions', // It needs an ID
-        width: 80,
+        width: 36,
         disableResizing: true,
         Cell: ({ row }) => (
           <Row className="d-flex flex-nowrap">
-            <Col xs="auto" className="text-center ms-2 m-0 p-0 px-1">
-              <OverlayTrigger
-                placement="left"
-                delay={{ show: 250, hide: 400 }}
-                overlay={(props) =>
-                  renderTooltip(props, 'Editar instalação física')
-                }
-              >
-                <Button
-                  size="sm"
-                  variant="outline-danger"
-                  className="border-0 m-0"
-                  onClick={(e) => handleShowModalEdit(row.original)}
-                >
-                  <FaPencilAlt />
-                </Button>
-              </OverlayTrigger>
-            </Col>
-            <Col xs="auto" className="text-center  m-0 p-0 px-1">
+            <Col xs="auto" className="text-center">
               <OverlayTrigger
                 placement="right"
                 delay={{ show: 250, hide: 400 }}
-                overlay={(props) => renderTooltip(props, 'Compartimentação')}
+                overlay={(props) => renderTooltip(props, 'Opções')}
               >
-                <Button
-                  size="sm"
+                <DropdownButton
+                  as={ButtonGroup}
+                  // key={direction}
+                  id="dropdown-button-drop-end"
+                  drop="down"
                   variant="outline-primary"
-                  className="border-0 m-0"
-                  onClick={(e) => handleShowModalEdit(row.original)}
+                  title=""
+                  size="sm"
+                  style={{ border: 0 }}
                 >
-                  <FaEllipsisH />
-                </Button>
+                  <Dropdown.Item eventKey="1">Editar instalação</Dropdown.Item>
+                  <Dropdown.Item
+                    eventKey="2"
+                    onClick={(e) => handleShowModalEdit(row.original)}
+                  >
+                    Subdivisões
+                  </Dropdown.Item>
+                  <Dropdown.Item eventKey="3">
+                    Something else here
+                  </Dropdown.Item>
+                  <Dropdown.Divider />
+                  <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
+                </DropdownButton>
               </OverlayTrigger>
             </Col>
           </Row>

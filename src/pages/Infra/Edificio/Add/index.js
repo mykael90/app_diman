@@ -20,6 +20,7 @@ import {
   FaAngleDoubleDown,
   FaRegClone,
   FaTrashAlt,
+  FaTimes,
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
@@ -164,6 +165,7 @@ function Recursive({
                               )
                             }
                             placeholder="Tipo"
+                            isDisabled={values.sections[index].inactive}
                           />
                         )}
                       </Field>
@@ -188,6 +190,7 @@ function Recursive({
                             e.target.value.toUpperCase()
                           ); // UPPERCASE
                         }}
+                        disabled={values.sections[index].inactive}
                       />
                     </BootstrapForm.Group>
                     <BootstrapForm.Group
@@ -211,6 +214,7 @@ function Recursive({
                             e.target.value.toUpperCase()
                           ); // UPPERCASE
                         }}
+                        disabled={values.sections[index].inactive}
                       />
                     </BootstrapForm.Group>
                     <BootstrapForm.Group
@@ -234,37 +238,94 @@ function Recursive({
                             e.target.value.toUpperCase()
                           ); // UPPERCASE
                         }}
+                        disabled={values.sections[index].inactive}
                       />
                     </BootstrapForm.Group>
-                    <Col xs="auto">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline-secondary"
-                        className="border-0 m-0"
-                        onClick={() => push(section)}
-                      >
-                        <FaRegClone />
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline-secondary"
-                        className="border-0 m-0"
-                        onClick={() => addChild(section, index)}
-                      >
-                        <FaAngleDoubleDown />
-                      </Button>
+                    <Col xs="2">
+                      {values.sections[index].id ? null : (
+                        <OverlayTrigger
+                          placement="top"
+                          delay={{ show: 250, hide: 400 }}
+                          overlay={(props) =>
+                            renderTooltip(props, 'Clonar divisão')
+                          }
+                        >
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline-primary"
+                            className="border-0 m-0"
+                            onClick={() => push(section)}
+                          >
+                            <FaRegClone />
+                          </Button>
+                        </OverlayTrigger>
+                      )}
 
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline-danger"
-                        className="border-0 m-0"
-                        onClick={() => remove(index)}
-                      >
-                        <FaTrashAlt />
-                      </Button>
+                      {values.sections[index].inactive ? null : (
+                        <>
+                          <OverlayTrigger
+                            placement="top"
+                            delay={{ show: 250, hide: 400 }}
+                            overlay={(props) =>
+                              renderTooltip(props, 'Inserir subdivisão')
+                            }
+                          >
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline-info"
+                              className="border-0 m-0"
+                              onClick={() => addChild(section, index)}
+                            >
+                              <FaAngleDoubleDown />
+                            </Button>
+                          </OverlayTrigger>
+
+                          {values.sections[index].id ? (
+                            <OverlayTrigger
+                              placement="top"
+                              delay={{ show: 250, hide: 400 }}
+                              overlay={(props) =>
+                                renderTooltip(props, 'Desativar divisão')
+                              }
+                            >
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline-danger"
+                                className="border-0 m-0"
+                                onClick={() => {
+                                  setFieldValue(
+                                    `${nameArray}.${index}.inactive`,
+                                    1
+                                  ); // UPPERCASE
+                                }}
+                              >
+                                <FaTimes />
+                              </Button>
+                            </OverlayTrigger>
+                          ) : (
+                            <OverlayTrigger
+                              placement="top"
+                              delay={{ show: 250, hide: 400 }}
+                              overlay={(props) =>
+                                renderTooltip(props, 'Remover divisão')
+                              }
+                            >
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline-danger"
+                                className="border-0 m-0"
+                                onClick={() => remove(index)}
+                              >
+                                <FaTrashAlt />
+                              </Button>
+                            </OverlayTrigger>
+                          )}
+                        </>
+                      )}
                     </Col>
                   </Row>{' '}
                   {section.sections.length > 0 ? (
@@ -302,11 +363,11 @@ function MyForm({ buildingData }) {
     async function getEditData(idEdit) {
       try {
         setIsLoading(true);
-        const response = await axios.get(
+        const response1 = await axios.get(
           `/properties/buildings/sections/recursive/${idEdit}`
         );
 
-        setInitialData({ sections: response.data });
+        setInitialData({ sections: response1.data });
 
         setIsLoading(false);
       } catch (err) {
@@ -318,11 +379,21 @@ function MyForm({ buildingData }) {
       }
     }
 
-    async function getData() {
+    async function getData(idEdit) {
       try {
         setIsLoading(true);
+
         const response = await axios.get('/properties/buildings/sectionstypes');
         setSectionstypes(response.data);
+
+        const response1 = await axios.get(
+          `/properties/buildings/sections/recursive/${idEdit}`
+        );
+
+        setInitialData({ sections: response1.data });
+
+        if (response1.data.length) isEditMode.current = true;
+
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-unused-expressions
@@ -332,9 +403,9 @@ function MyForm({ buildingData }) {
         setIsLoading(false);
       }
     }
-    getData();
+    getData(buildingData.subRip);
 
-    getEditData(buildingData.subRip);
+    // getEditData(buildingData.subRip);
   }, []);
 
   const handleStore = async (values, resetForm) => {
@@ -446,7 +517,7 @@ function MyForm({ buildingData }) {
                   </Col>
                   <Col xs="auto" className="text-center">
                     <Button variant="success" type="submit">
-                      {isEditMode ? 'Alterar' : 'Cadastrar'}
+                      {isEditMode.current ? 'Alterar' : 'Cadastrar'}
                     </Button>
                   </Col>
                 </Row>
