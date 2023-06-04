@@ -341,7 +341,7 @@ export default function Index() {
                     Subdivisões
                   </Dropdown.Item>
                   <Dropdown.Item eventKey="3">
-                    Something else here
+                    Definir localização
                   </Dropdown.Item>
                   <Dropdown.Divider />
                   <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
