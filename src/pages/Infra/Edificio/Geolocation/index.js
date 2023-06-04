@@ -63,6 +63,7 @@ function MyComponent() {
           mapContainerClassName="map-container"
           options={options}
           onLoad={onLoad}
+          onDblClick={(e) => console.log(e)}
         >
           {/* Child components, such as markers, info windows, etc. */}
           <Marker

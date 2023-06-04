@@ -55,6 +55,17 @@ export default function ModalEdit(props) {
     }
   };
 
+  const renderSwitchTitle = (param) => {
+    switch (param) {
+      case 'Subdivision':
+        return 'Subdivisões de Instalações';
+      case 'Geolocation':
+        return 'Localização';
+      default:
+        return 'foo';
+    }
+  };
+
   return (
     <Modal
       show={show}
@@ -67,7 +78,7 @@ export default function ModalEdit(props) {
         style={{ background: primaryDarkColor, color: 'white' }}
         closeButton
       >
-        <Modal.Title>SUBDIVISÕES EM INSTALAÇÕES FÍSICAS</Modal.Title>
+        <Modal.Title>{renderSwitchTitle(modalName)}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {/* <Subdivision
