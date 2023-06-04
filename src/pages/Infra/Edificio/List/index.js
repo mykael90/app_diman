@@ -23,8 +23,9 @@ import {
   Tooltip,
   Badge,
   Image,
-  Dropdown,
   Form,
+  Dropdown,
+  DropdownButton,
 } from 'react-bootstrap';
 
 import axios from '../../../../services/axios';

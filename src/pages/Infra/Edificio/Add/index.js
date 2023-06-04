@@ -151,7 +151,7 @@ function Recursive({
                             {...field}
                             as={BootstrapForm.Control}
                             inputId={`${nameArray}.${index}.BuildingSectiontypeId`}
-                            options={sectionstypes.map((item) => ({
+                            options={sectionstypes?.map((item) => ({
                               label: item.type,
                               value: item.id,
                             }))}
@@ -182,6 +182,12 @@ function Recursive({
                         // size="sm"
                         placeholder="Descrição"
                         // className="border-0"
+                        onBlur={(e) => {
+                          setFieldValue(
+                            `${nameArray}.${index}.name`,
+                            e.target.value.toUpperCase()
+                          ); // UPPERCASE
+                        }}
                       />
                     </BootstrapForm.Group>
                     <BootstrapForm.Group
@@ -199,6 +205,12 @@ function Recursive({
                         // size="sm"
                         placeholder="Cód"
                         // className="border-0"
+                        onBlur={(e) => {
+                          setFieldValue(
+                            `${nameArray}.${index}.cod`,
+                            e.target.value.toUpperCase()
+                          ); // UPPERCASE
+                        }}
                       />
                     </BootstrapForm.Group>
                     <BootstrapForm.Group
@@ -216,17 +228,23 @@ function Recursive({
                         // size="sm"
                         placeholder="Observações"
                         // className="border-0"
+                        onBlur={(e) => {
+                          setFieldValue(
+                            `${nameArray}.${index}.obs`,
+                            e.target.value.toUpperCase()
+                          ); // UPPERCASE
+                        }}
                       />
                     </BootstrapForm.Group>
-                    <Col xs={3}>
+                    <Col xs="auto">
                       <Button
                         type="button"
                         size="sm"
-                        variant="outline-danger"
+                        variant="outline-secondary"
                         className="border-0 m-0"
-                        onClick={() => remove(index)}
+                        onClick={() => push(section)}
                       >
-                        <FaTrashAlt />
+                        <FaRegClone />
                       </Button>
                       <Button
                         type="button"
@@ -237,14 +255,15 @@ function Recursive({
                       >
                         <FaAngleDoubleDown />
                       </Button>
+
                       <Button
                         type="button"
                         size="sm"
-                        variant="outline-secondary"
+                        variant="outline-danger"
                         className="border-0 m-0"
-                        onClick={() => push(section)}
+                        onClick={() => remove(index)}
                       >
-                        <FaRegClone />
+                        <FaTrashAlt />
                       </Button>
                     </Col>
                   </Row>{' '}
@@ -272,22 +291,22 @@ function Recursive({
   );
 }
 
-function MyForm({ buildingData, initialValues = null }) {
+function MyForm({ buildingData }) {
   const [isLoading, setIsLoading] = useState(false);
   const [sectionstypes, setSectionstypes] = useState(false);
   const [initialData, setInitialData] = useState(emptyValues);
 
-  const isEditMode = useRef(!!initialValues);
+  const isEditMode = useRef(!!initialData.sections.length);
 
   useEffect(() => {
     async function getEditData(idEdit) {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `/properties/buildings/sections/${idEdit}`
+          `/properties/buildings/sections/recursive/${idEdit}`
         );
 
-        setInitialData(response.data);
+        setInitialData({ sections: response.data });
 
         setIsLoading(false);
       } catch (err) {
@@ -313,12 +332,9 @@ function MyForm({ buildingData, initialValues = null }) {
         setIsLoading(false);
       }
     }
+    getData();
 
-    if (isEditMode.current) {
-      getEditData(initialValues.id);
-    } else {
-      getData();
-    }
+    getEditData(buildingData.subRip);
   }, []);
 
   const handleStore = async (values, resetForm) => {
@@ -330,7 +346,7 @@ function MyForm({ buildingData, initialValues = null }) {
 
     const flatArray = (array, superId = null) => {
       array.forEach((item) => {
-        item.id = uuidv4();
+        if (!item.id) item.id = uuidv4();
         item.BuildingSipacSubRip = buildingData.subRip;
         item.superId = superId;
         arrayValues.push(item);
@@ -340,12 +356,14 @@ function MyForm({ buildingData, initialValues = null }) {
     };
 
     flatArray(formattedValues.sections);
+
     arrayValues.forEach((obj, index) => {
-      obj.order = index;
+      console.log(index);
+      obj.BuildingSectiontypeId = obj.BuildingSectiontypeId.value;
+      obj.position = index;
       delete obj.sections;
     });
-    console.log(arrayValues);
-    console.log(formattedValues.sections.flat());
+    // console.log(arrayValues);
 
     // formattedValues.sections.forEach((item) => console.log(item));
 
@@ -353,11 +371,11 @@ function MyForm({ buildingData, initialValues = null }) {
       setIsLoading(true);
 
       const { data } = await axios.post(
-        `/properties/buildings/sections/bulk'`,
+        `/properties/buildings/sections/bulk`,
         arrayValues
       );
 
-      console.log(data);
+      // console.log(data);
 
       // getEditData(data.id);
 
@@ -397,10 +415,11 @@ function MyForm({ buildingData, initialValues = null }) {
         </Row>
         <Row className="pt-2">
           <Formik
-            initialValues={emptyValues}
+            initialValues={initialData}
             onSubmit={(values, { resetForm }) => {
               handleStore(values, resetForm);
             }}
+            enableReinitialize
           >
             {({
               values,
