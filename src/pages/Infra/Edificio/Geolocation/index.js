@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useCallback } from 'react';
+import React, { useMemo, useRef, useCallback, useState } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import {
   Container,
@@ -17,16 +17,15 @@ const containerStyle = {
   height: '600px',
 };
 
-const position = {
-  lat: -5.839692696223772,
-  lng: -35.20156446349059,
-};
-
 const onLoadMarker = (marker) => {
   console.log('marker: ', marker);
 };
 
 function MyComponent({ buildingData }) {
+  const [position, setPosition] = useState({
+    lat: -5.839692696223772,
+    lng: -35.20156446349059,
+  });
   const mapRef = useRef();
 
   const center = useMemo(
@@ -45,6 +44,14 @@ function MyComponent({ buildingData }) {
     }),
     []
   );
+
+  const setNewPosition = (lat, lng) => {
+    setPosition({
+      lat,
+      lng,
+    });
+    console.log(lat, lng);
+  };
 
   // eslint-disable-next-line no-return-assign
   const onLoad = useCallback((map) => (mapRef.current = map), []);
@@ -105,7 +112,9 @@ function MyComponent({ buildingData }) {
               mapContainerClassName="map-container"
               options={options}
               onLoad={onLoad}
-              onDblClick={(e) => console.log(e)}
+              onDblClick={(e) => {
+                setNewPosition(e.latLng.lat(), e.latLng.lng());
+              }}
             >
               {/* Child components, such as markers, info windows, etc. */}
               <Marker
