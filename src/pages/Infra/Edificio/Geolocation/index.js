@@ -130,6 +130,13 @@ function MyComponent({ buildingData }) {
             </GoogleMap>
           </LoadScript>
         </Row>
+        <Row className="justify-content-center pt-2 pb-4">
+          <Col xs="auto" className="text-center">
+            <Button variant="success" type="submit">
+              Confirmar
+            </Button>
+          </Col>
+        </Row>
       </Container>
     </>
   );
