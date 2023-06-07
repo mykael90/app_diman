@@ -11,6 +11,7 @@ import {
   FaSearchPlus,
   FaSearchMinus,
   FaEllipsisH,
+  FaMapMarkedAlt,
 } from 'react-icons/fa';
 
 import {
@@ -189,7 +190,45 @@ export default function Index() {
   const [dataEdit, setDataEdit] = useState({});
   const [modalName, setModalName] = useState();
 
-  async function getWorkers() {
+  // The forwardRef is important!!
+  // Dropdown needs access to the DOM node in order to position the Menu
+  const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+    <Button
+      href=""
+      size="sm"
+      variant="outline-primary"
+      className="border-0 m-0"
+      ref={ref}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(e);
+      }}
+    >
+      {children}
+      {/* &#x25bc; */}
+    </Button>
+  ));
+
+  // forwardRef again here!
+  // Dropdown needs access to the DOM of the Menu to measure it
+  const CustomMenu = React.forwardRef(
+    ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
+      const [value, setValue] = useState('');
+
+      return (
+        <div
+          ref={ref}
+          style={style}
+          className={className}
+          aria-labelledby={labeledBy}
+        >
+          <ul className="list-unstyled">{React.Children.toArray(children)}</ul>
+        </div>
+      );
+    }
+  );
+
+  async function getBuildings() {
     try {
       setIsLoading(true);
       const response = await axios.get(`/properties/buildings`);
@@ -212,7 +251,7 @@ export default function Index() {
   // close modal -> update data
   const handleSaveModal = () => {
     setShowModalEdit(false);
-    getWorkers();
+    getBuildings();
   };
 
   const handleShowModalEdit = (item, modalName) => {
@@ -222,7 +261,7 @@ export default function Index() {
   };
 
   useEffect(() => {
-    getWorkers();
+    getBuildings();
   }, []);
 
   const columns = React.useMemo(
@@ -313,48 +352,65 @@ export default function Index() {
       },
       {
         // Make an action cell
-        Header: '', // No header
+        Header: 'Ações', // No header
         id: 'actions', // It needs an ID
-        width: 36,
+        width: 80,
         disableResizing: true,
         Cell: ({ row }) => (
           <Row className="d-flex flex-nowrap">
-            <Col xs="auto" className="text-center">
+            <Col xs="auto" className="text-center d-flex">
               <OverlayTrigger
-                placement="right"
+                placement="top"
                 delay={{ show: 250, hide: 400 }}
                 overlay={(props) => renderTooltip(props, 'Opções')}
               >
-                <DropdownButton
-                  as={ButtonGroup}
-                  // key={direction}
-                  id="dropdown-button-drop-end"
-                  drop="down"
-                  variant="outline-primary"
-                  title=""
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as={CustomToggle}
+                    id="dropdown-custom-components"
+                  >
+                    <FaEllipsisH />
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu as={CustomMenu}>
+                    <Dropdown.Item eventKey="1">
+                      Editar instalação
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      eventKey="2"
+                      onClick={(e) =>
+                        handleShowModalEdit(row.original, 'Subdivision')
+                      }
+                    >
+                      Subdivisões
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      eventKey="3"
+                      onClick={(e) =>
+                        handleShowModalEdit(row.original, 'Geolocation')
+                      }
+                    >
+                      Definir localização
+                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </OverlayTrigger>
+              <OverlayTrigger
+                placement="top"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => renderTooltip(props, 'Definir localização')}
+              >
+                <Button
                   size="sm"
-                  style={{ border: 0 }}
+                  variant="outline-danger"
+                  className="border-0 m-0 ms-1"
+                  onClick={(e) =>
+                    handleShowModalEdit(row.original, 'Geolocation')
+                  }
                 >
-                  <Dropdown.Item eventKey="1">Editar instalação</Dropdown.Item>
-                  <Dropdown.Item
-                    eventKey="2"
-                    onClick={(e) =>
-                      handleShowModalEdit(row.original, 'Subdivision')
-                    }
-                  >
-                    Subdivisões
-                  </Dropdown.Item>
-                  <Dropdown.Item
-                    eventKey="3"
-                    onClick={(e) =>
-                      handleShowModalEdit(row.original, 'Geolocation')
-                    }
-                  >
-                    Definir localização
-                  </Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
-                </DropdownButton>
+                  <FaMapMarkedAlt />
+                </Button>
               </OverlayTrigger>
             </Col>
           </Row>
