@@ -141,7 +141,7 @@ function MyComponent({ buildingData }) {
         </Row>
       </Container>
       <Container>
-        <Row style={{ height: '70vh' }}>
+        <Row style={{ height: '65vh' }}>
           <LoadScript
             googleMapsApiKey={process.env.REACT_APP_BASE_GOOGLE_API_KEY}
             region="us"
