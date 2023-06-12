@@ -361,7 +361,7 @@ function FilterDate({ getData }) {
               </Col>
             </Row>
 
-            <Row className="justify-content-center">
+            {/* <Row className="justify-content-center">
               <Col xs="auto" className="text-center pt-2 pb-4">
                 <Button
                   type="reset"
@@ -379,7 +379,7 @@ function FilterDate({ getData }) {
                   Pesquisar
                 </Button>
               </Col>
-            </Row>
+            </Row> */}
           </Form>
         )}
       </Formik>

@@ -399,25 +399,27 @@ export default function Index() {
             (item) => item.MaterialOut.workerId === worker.WorkerId
           );
 
+          // getting total out
+          worker.materialsOutItemsTotal = worker.materialsOutItems.reduce(
+            (acc, current) => acc + current.quantity,
+            0
+          );
+
           worker.materialsInItems = material.MaterialInItems.filter(
             (item) =>
               item.MaterialIn.MaterialReturned.workerId === worker.WorkerId
           );
-        });
 
-        // getting total out
-        material.totalMaterialsOutItems = material.MaterialOutItems.reduce(
-          (acc, current) => acc + current.quantity,
-          0
-        );
-        // getting total in
-        material.totalMaterialsInItems = material.MaterialInItems.reduce(
-          (acc, current) => acc + current.quantity,
-          0
-        );
-        // getting total effective
-        material.totalMaterialsEffectiveOut =
-          material.totalMaterialsOutItems - material.totalMaterialsInItems;
+          // getting total in
+          worker.materialsInItemsTotal = worker.materialsInItems.reduce(
+            (acc, current) => acc + current.quantity,
+            0
+          );
+
+          // getting total effective
+          worker.materialsEffectiveItemsTotal =
+            worker.materialsOutItemsTotal - worker.materialsInItemsTotal;
+        });
       });
 
       setData(response.data);
@@ -483,21 +485,33 @@ export default function Index() {
       },
       {
         Header: 'Saída',
-        accessor: 'totalMaterialsOutItems',
+        accessor: (originalRow) =>
+          originalRow.Workers.reduce(
+            (acc, current) => acc + current.materialsOutItemsTotal,
+            0
+          ),
         width: 120,
         disableResizing: true,
         disableSortBy: true,
       },
       {
         Header: 'Retorno',
-        accessor: 'totalMaterialsInItems',
+        accessor: (originalRow) =>
+          originalRow.Workers.reduce(
+            (acc, current) => acc + current.materialsInItemsTotal,
+            0
+          ),
         width: 120,
         disableResizing: true,
         disableSortBy: true,
       },
       {
         Header: 'Uso efetivo',
-        accessor: 'totalMaterialsEffectiveOut',
+        accessor: (originalRow) =>
+          originalRow.Workers.reduce(
+            (acc, current) => acc + current.materialsEffectiveItemsTotal,
+            0
+          ),
         width: 120,
         disableResizing: true,
         disableSortBy: true,
@@ -764,7 +778,9 @@ export default function Index() {
     ({ row }) => (
       <Row>
         <Col xs={6}>
-          {' '}
+          <div>
+            <Badge className="text-white">USO</Badge>
+          </div>{' '}
           <TableNestedrow
             style={{ padding: 0, margin: 0 }}
             columns={[
@@ -784,11 +800,23 @@ export default function Index() {
               //   ),
               // },
               {
+                Header: 'Data',
+                accessor: (originalRow) => {
+                  const dateString = originalRow.MaterialOut.created_at;
+                  const date = new Date(dateString);
+                  const formattedDate = date.toLocaleDateString('pt-BR');
+                  return formattedDate; // Output: 05/04/2023
+                },
+                width: 110,
+                disableResizing: true,
+              },
+              {
                 Header: 'Manutenção',
                 accessor: (originalRow) =>
                   originalRow.MaterialOut.reqMaintenance,
-                width: 100,
+                width: 120,
                 disableResizing: true,
+                disableSortBy: true,
               },
               {
                 Header: 'Qtd',
@@ -807,10 +835,18 @@ export default function Index() {
               {
                 Header: 'Total',
                 accessor: (originalRow) =>
-                  Number(originalRow.quantity) * Number(originalRow.value),
+                  (
+                    Number(originalRow.quantity) * Number(originalRow.value)
+                  ).toFixed(2),
                 width: 80,
                 disableResizing: true,
                 isVisible: window.innerWidth > 768,
+              },
+              {
+                Header: 'Local',
+                accessor: (originalRow) => originalRow.MaterialOut.place,
+
+                disableSortBy: true,
               },
               // {
               //   Header: 'Nome',
@@ -839,6 +875,127 @@ export default function Index() {
               // },
             ]}
             data={row.original.materialsOutItems}
+            defaultColumn={{
+              // Let's set up our default Filter UI
+              // Filter: DefaultColumnFilter,
+              minWidth: 30,
+              width: 50,
+              maxWidth: 800,
+            }}
+            initialState={{
+              // sortBy: [
+              //   {
+              //     id: 'MaterialId',
+              //     asc: true,
+              //   },
+              // ],
+              hiddenColumns: columns
+                .filter((col) => col.isVisible === false)
+                .map((col) => col.accessor),
+            }}
+            filterTypes={filterTypes}
+            // renderRowSubComponent={renderRowSubSubComponent}
+          />
+        </Col>
+        <Col xs={6}>
+          <div>
+            <Badge className="text-white">RETORNO</Badge>
+          </div>{' '}
+          <TableNestedrow
+            style={{ padding: 0, margin: 0 }}
+            columns={[
+              // {
+              //   // Make an expander cell
+              //   Header: () => null, // No header
+              //   id: 'expander', // It needs an ID
+              //   width: 30,
+              //   disableResizing: true,
+              //   Cell: ({ row }) => (
+              //     // Use Cell to render an expander for each row.
+              //     // We can use the getToggleRowExpandedProps prop-getter
+              //     // to build the expander.
+              //     <span {...row.getToggleRowExpandedProps()}>
+              //       {row.isExpanded ? '▽' : '▷'}
+              //     </span>
+              //   ),
+              // },
+              {
+                Header: 'Data',
+                accessor: (originalRow) => {
+                  const dateString = originalRow.MaterialIn.created_at;
+                  const date = new Date(dateString);
+                  const formattedDate = date.toLocaleDateString('pt-BR');
+                  return formattedDate; // Output: 05/04/2023
+                },
+                width: 110,
+                disableResizing: true,
+              },
+              {
+                Header: 'Manutenção',
+                accessor: (originalRow) =>
+                  originalRow.MaterialIn.reqMaintenance,
+                disableSortBy: true,
+                width: 110,
+                disableResizing: true,
+              },
+              {
+                Header: 'Qtd',
+                accessor: 'quantity',
+                width: 70,
+                disableResizing: true,
+                isVisible: window.innerWidth > 768,
+              },
+              {
+                Header: 'Unit.',
+                accessor: 'value',
+                width: 70,
+                disableResizing: true,
+                isVisible: window.innerWidth > 768,
+              },
+              {
+                Header: 'Total',
+                accessor: (originalRow) =>
+                  (
+                    Number(originalRow.quantity) * Number(originalRow.value)
+                  ).toFixed(2),
+                width: 80,
+                disableResizing: true,
+                isVisible: window.innerWidth > 768,
+              },
+              {
+                Header: 'Local',
+                accessor: (originalRow) =>
+                  originalRow.MaterialIn.MaterialReturned.place,
+
+                disableSortBy: true,
+              },
+              // {
+              //   Header: 'Nome',
+              //   accessor: 'name',
+              //   isVisible: window.innerWidth > 768,
+              // },
+              // { Header: 'Denominação', accessor: 'name' },
+              // {
+              //   Header: 'Unidade',
+              //   accessor: 'unit',
+              //   width: 100,
+              //   disableResizing: true,
+              // },
+              // {
+              //   Header: 'Qtd',
+              //   accessor: 'quantity',
+              //   width: 100,
+              //   disableResizing: true,
+              // },
+              // {
+              //   Header: 'Valor',
+              //   accessor: 'value',
+              //   width: 100,
+              //   disableResizing: true,
+              //   // eslint-disable-next-line react/destructuring-assignment
+              // },
+            ]}
+            data={row.original.materialsInItems}
             defaultColumn={{
               // Let's set up our default Filter UI
               // Filter: DefaultColumnFilter,
@@ -892,31 +1049,37 @@ export default function Index() {
               </span>
             ),
           },
-          {
-            Header: 'WorkerId',
-            accessor: 'WorkerId',
-            width: 125,
-            disableResizing: true,
-            isVisible: window.innerWidth > 768,
-          },
+          // {
+          //   Header: 'WorkerId',
+          //   accessor: 'WorkerId',
+          //   width: 125,
+          //   disableResizing: true,
+          //   isVisible: window.innerWidth > 768,
+          // },
           {
             Header: 'Nome',
             accessor: 'name',
             isVisible: window.innerWidth > 768,
           },
           {
+            Header: 'Saída (Uso)',
+            width: 125,
+            disableResizing: true,
+            accessor: 'materialsOutItemsTotal',
+            isVisible: window.innerWidth > 768,
+          },
+          {
+            Header: 'Retorno',
+            width: 125,
+            disableResizing: true,
+            accessor: 'materialsInItemsTotal',
+            isVisible: window.innerWidth > 768,
+          },
+          {
             Header: 'Uso Efetivo',
             width: 125,
             disableResizing: true,
-            accessor: (originalRow) =>
-              originalRow.materialsOutItems.reduce(
-                (acc, item) => acc + item.quantity,
-                0
-              ) -
-              originalRow.materialsInItems.reduce(
-                (acc, item) => acc + item.quantity,
-                0
-              ),
+            accessor: 'materialsEffectiveItemsTotal',
             isVisible: window.innerWidth > 768,
           },
           // {
