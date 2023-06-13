@@ -484,7 +484,7 @@ export default function Index() {
         filter: 'includes',
       },
       {
-        Header: 'Saída',
+        Header: 'Saída (Uso)',
         accessor: (originalRow) =>
           originalRow.Workers.reduce(
             (acc, current) => acc + current.materialsOutItemsTotal,
@@ -1080,6 +1080,17 @@ export default function Index() {
             width: 125,
             disableResizing: true,
             accessor: 'materialsEffectiveItemsTotal',
+            isVisible: window.innerWidth > 768,
+          },
+          {
+            Header: '% Retorno',
+            width: 125,
+            disableResizing: true,
+            accessor: (originalRow) =>
+              `${(
+                (originalRow.materialsInItemsTotal * 100) /
+                originalRow.materialsOutItemsTotal
+              ).toFixed(2)} %`,
             isVisible: window.innerWidth > 768,
           },
           // {
