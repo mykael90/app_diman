@@ -252,9 +252,11 @@ export default function Index() {
   };
 
   // close modal -> update data
-  const handleSaveModal = () => {
+  const handleSaveModal = (rowIndex, columId, value) => {
     setShowModalEdit(false);
-    getBuildings();
+    // getBuildings();
+    // eslint-disable-next-line no-use-before-define
+    updateMyData(rowIndex, columId, value);
   };
 
   const handleShowModalEdit = (item, modalName) => {
