@@ -12,6 +12,7 @@ import {
   FaSearchMinus,
   FaEllipsisH,
   FaMapMarkedAlt,
+  FaMapMarkerAlt,
 } from 'react-icons/fa';
 
 import {
@@ -30,6 +31,7 @@ import {
   DropdownButton,
 } from 'react-bootstrap';
 
+import { original } from '@reduxjs/toolkit';
 import axios from '../../../../services/axios';
 import Loading from '../../../../components/Loading';
 
@@ -376,10 +378,23 @@ export default function Index() {
         Cell: ({ value }) => <div className="text-start">{value}</div>,
       },
       {
+        Header: 'Mapa',
+        accessor: 'geo',
+        disableSortBy: true,
+        width: 70,
+        disableResizing: true,
+        Filter: InputColumnFilter,
+        filter: 'text',
+        isVisible: window.innerWidth > 768,
+        Cell: ({ value }) => (
+          <div className="text-center">{value ? <FaMapMarkerAlt /> : null}</div>
+        ),
+      },
+      {
         Header: 'Pvtos',
         accessor: 'floors',
         disableSortBy: true,
-        width: 80,
+        width: 70,
         disableResizing: true,
         Filter: InputColumnFilter,
         filter: 'text',
@@ -390,7 +405,7 @@ export default function Index() {
         Header: 'Área',
         accessor: 'area',
         disableSortBy: true,
-        width: 90,
+        width: 80,
         disableResizing: true,
         Filter: InputColumnFilter,
         filter: 'text',
@@ -401,7 +416,7 @@ export default function Index() {
         Header: 'Zona',
         accessor: 'zone',
         disableSortBy: true,
-        width: 80,
+        width: 70,
         disableResizing: true,
         Filter: InputColumnFilter,
         filter: 'text',
