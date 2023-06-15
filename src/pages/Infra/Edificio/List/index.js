@@ -189,6 +189,7 @@ export default function Index() {
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [dataEdit, setDataEdit] = useState({});
   const [modalName, setModalName] = useState();
+  const [skipPageReset, setSkipPageReset] = React.useState(false);
 
   // The forwardRef is important!!
   // Dropdown needs access to the DOM node in order to position the Menu
@@ -263,6 +264,63 @@ export default function Index() {
   useEffect(() => {
     getBuildings();
   }, []);
+
+  const handleUpdateDatabase = async (e, values, actualBalance) => {
+    e.preventDefault();
+    const { materialId } = values;
+    const updateInitialQuantity = {
+      // userIdInitialQuantity: userId,
+      dateInitialQuantity: new Date().toISOString(),
+      initialQuantity: Number(actualBalance) - Number(values.balance),
+    };
+
+    try {
+      setIsLoading(true);
+
+      // FAZ A ATUALIZAÇÃO DA SEPARAÇÃO
+      await axios.put(
+        `/materials/inventory/${materialId}`,
+        updateInitialQuantity
+      );
+
+      setIsLoading(false);
+      // getData();
+
+      toast.success(`Saldo inicial atualizado com sucesso`);
+    } catch (err) {
+      // eslint-disable-next-line no-unused-expressions
+      err.response?.data?.errors
+        ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
+        : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+
+      setIsLoading(false);
+    }
+  };
+
+  // When our cell renderer calls updateMyData, we'll use
+  // the rowIndex, columnId and new value to update the
+  // original data
+  const updateMyData = (rowIndex, columnId, value) => {
+    // We also turn on the flag to not reset the page
+    setSkipPageReset(true);
+    setBuildings((old) =>
+      old.map((row, index) => {
+        if (index === rowIndex) {
+          // const date = new Date()
+          //   .toISOString()
+          //   .split('T')[0]
+          //   .replace(/^(\d{4})-(\d{1,2})-(\d{1,2})$/, '$3/$2/$1');
+          // const time = new Date().toISOString().split('T')[1].substring(0, 5);
+          return {
+            ...old[rowIndex],
+            // initialQuantity: Number(value) - Number(old[rowIndex].balance),
+            // dateInitialQuantity: `${date} ${time}`,
+          };
+        }
+        return row;
+      })
+    );
+  };
 
   const columns = React.useMemo(
     () => [
@@ -973,6 +1031,9 @@ export default function Index() {
           initialState={initialState}
           filterTypes={filterTypes}
           // renderRowSubComponent={renderRowSubComponent}
+          updateMyData={updateMyData}
+          updateMyDataDatabase={handleUpdateDatabase}
+          skipPageReset={skipPageReset}
         />
       </Container>
     </>
