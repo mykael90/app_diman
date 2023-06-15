@@ -1032,7 +1032,6 @@ export default function Index() {
           filterTypes={filterTypes}
           // renderRowSubComponent={renderRowSubComponent}
           updateMyData={updateMyData}
-          updateMyDataDatabase={handleUpdateDatabase}
           skipPageReset={skipPageReset}
         />
       </Container>
