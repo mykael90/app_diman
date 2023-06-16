@@ -452,9 +452,10 @@ export default function Index() {
                     </Dropdown.Item>
                     <Dropdown.Item
                       eventKey="2"
-                      onClick={(e) =>
-                        handleShowModalEdit(row.original, 'Subdivision')
-                      }
+                      onClick={(e) => {
+                        handleShowModalEdit(row.original, 'Subdivision');
+                        console.log(row);
+                      }}
                     >
                       Subdivisões
                     </Dropdown.Item>
