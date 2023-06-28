@@ -37,7 +37,7 @@ export default function ModalEdit(props) {
       case 'Subdivision':
         return (
           <Subdivision
-            buildingData={data}
+            buildingData={data.original}
             handleCancelModal={handleCancelModal}
             handleSaveModal={handleSaveModal}
           />
@@ -45,7 +45,7 @@ export default function ModalEdit(props) {
       case 'Geolocation':
         return (
           <Geolocation
-            buildingData={data}
+            buildingData={data.original}
             handleCancelModal={handleCancelModal}
             handleSaveModal={handleSaveModal}
           />
