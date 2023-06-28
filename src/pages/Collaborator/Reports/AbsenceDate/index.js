@@ -247,13 +247,6 @@ export default function Index() {
     (role) => role.role === 'adm' || role.role === 'adm_workers'
   ).length;
 
-  console.log(
-    user.roles.filter(
-      (role) => role.role === 'adm' || role.role === 'adm_workers'
-    ),
-    allowEdit
-  );
-
   // cancel modal -> don't update data
   const handleCancelModal = () => {
     setShowModalEdit(false);
