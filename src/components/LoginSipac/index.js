@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { toast } from 'react-toastify';
 import { Formik, Field } from 'formik';
@@ -10,7 +11,7 @@ const LoginSchema = Yup.object().shape({
   passwordSipac: Yup.string().required('Required'),
 });
 
-function LoginForm() {
+function LoginForm({ handleCancelModal, handleSaveModal, getCredentials }) {
   const initialValues = {
     loginSipac: '',
     passwordSipac: '',
@@ -18,8 +19,10 @@ function LoginForm() {
 
   const handleStore = (values, { setSubmitting }) => {
     // Handle form submission logic here
-    console.log(values);
+    // console.log(values);
+    getCredentials(values);
     setSubmitting(false);
+    handleSaveModal();
   };
 
   return (
@@ -38,11 +41,11 @@ function LoginForm() {
           handleSubmit,
         }) => (
           <Form onSubmit={handleSubmit}>
-            <Row>
+            {/* <Row>
               <p className="h4 text-center pb-2">Login SIPAC</p>
-            </Row>
+            </Row> */}
             <Row className="justify-content-center">
-              <Form.Group as={Col} xs="12" md="4" lg="3" controlId="loginSipac">
+              <Form.Group as={Col} xs="12" controlId="loginSipac">
                 {/* <Form.Label>Login</Form.Label> */}
                 <InputGroup className="mb-3">
                   <InputGroup.Text id="basic-addon1">
@@ -60,13 +63,7 @@ function LoginForm() {
               </Form.Group>
             </Row>
             <Row className="justify-content-center">
-              <Form.Group
-                as={Col}
-                xs="12"
-                md="4"
-                lg="3"
-                controlId="passwordSipac"
-              >
+              <Form.Group as={Col} xs="12" controlId="passwordSipac">
                 {/* <Form.Label>Senha</Form.Label> */}
                 <InputGroup className="mb-3">
                   <InputGroup.Text id="basic-addon3">

@@ -2,8 +2,16 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react/prop-types */
 import React, { useState, useRef, useEffect } from 'react';
+import { get } from 'lodash';
 import { useSelector } from 'react-redux';
-import { FaTrashAlt, FaPlus, FaSearch } from 'react-icons/fa';
+import {
+  FaTrashAlt,
+  FaPlus,
+  FaSearch,
+  FaSignInAlt,
+  FaLock,
+  FaArrowAltCircleDown,
+} from 'react-icons/fa';
 import {
   Button,
   Row,
@@ -13,13 +21,15 @@ import {
   Dropdown,
   ButtonGroup,
   Collapse,
+  InputGroup,
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
 import * as yup from 'yup'; // RulesValidation
 import { Formik, FieldArray } from 'formik'; // FormValidation
 import Select from 'react-select';
-import axios from '../../../../services/axios';
+import axios from 'axios';
+import axiosRest from '../../../../services/axios';
 import {
   primaryDarkColor,
   body1Color,
@@ -29,6 +39,7 @@ import Loading from '../../../../components/Loading';
 
 import SearchModalInventory from '../../out/components/SearchModalInventory';
 import ReleaseItemsModal from './components/ReleaseItemsModal';
+import ModalLoginSipac from './components/ModalLoginSipac';
 
 const formatGroupLabel = (data) => (
   <Col className="d-flex justify-content-between">
@@ -60,6 +71,10 @@ export default function Index() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [showModalSearch, setShowModalSearch] = useState(false);
+  const [showModalLoginSipac, setShowModalLoginSipac] = useState(false);
+  const [RMModal, setRMModal] = useState('');
+  const [userSipac, setUserSipac] = useState({});
+  // Rel = release
   const [showModalRel, setShowModalRel] = useState(false);
   const [reqInModal, setReqInModal] = useState('');
   const [openCollapse, setOpenCollapse] = useState(false);
@@ -68,6 +83,7 @@ export default function Index() {
   const handleCancelModal = () => {
     setShowModalRel(false);
     setShowModalSearch(false);
+    setShowModalLoginSipac(false);
   };
 
   const handleCloseModalRel = () => {
@@ -76,9 +92,23 @@ export default function Index() {
 
   const handleCloseModalSearch = () => setShowModalSearch(false);
 
+  const handleCloseModalLoginSipac = () => setShowModalLoginSipac(false);
+
   const handleShowModalRel = (reqIn) => {
     setReqInModal(reqIn);
     setShowModalRel(true);
+  };
+
+  const handleShowModalLoginSipac = (RM) => {
+    setRMModal(RM);
+    setShowModalLoginSipac(true);
+  };
+
+  const handleSaveModalLoginSipac = () => {
+    console.log('rmModal', RMModal);
+    // eslint-disable-next-line no-use-before-define
+    importRMSipac(RMModal);
+    setShowModalLoginSipac(false);
   };
 
   const handleShowModalSearch = () => setShowModalSearch(true);
@@ -148,7 +178,7 @@ export default function Index() {
   async function getMaterialsData() {
     try {
       setIsLoading(true);
-      const response = await axios.get('/materials/inventory/');
+      const response = await axiosRest.get('/materials/inventory/');
       setinventoryData(response.data);
       setIsLoading(false);
     } catch (err) {
@@ -156,6 +186,53 @@ export default function Index() {
       err.response?.data?.errors
         ? err.response.data.errors.map((error) => toast.error(error)) // errors -> resposta de erro enviada do backend (precisa se conectar com o back)
         : toast.error(err.message); // e.message -> erro formulado no front (é criado pelo front, não precisa de conexão)
+      setIsLoading(false);
+    }
+  }
+
+  const showErrorsSipac = (errorsArray) => {
+    errorsArray.forEach((error) =>
+      toast.error(error, {
+        autoClose: false,
+        draggable: true,
+        closeOnClick: true,
+      })
+    );
+  };
+
+  function getCredentials(values) {
+    console.log(values);
+    setUserSipac(values);
+  }
+
+  async function importRMSipac(requisicoes) {
+    try {
+      setIsLoading(true);
+
+      const arrRequisicoes = { requisicoes: [requisicoes] };
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial`,
+        arrRequisicoes
+      );
+
+      const RM = response.data;
+
+      console.log(RM);
+
+      setIsLoading(false);
+      if (response.data.errors) showErrorsSipac(response.data.errors);
+    } catch (err) {
+      const status = get(err, 'response.status', 0);
+
+      if (status === 401) {
+        toast.error('Você precisa fazer login');
+      } else {
+        toast.error(
+          'Ocorreu um erro ao importar a requisição, verifique a conexão'
+        );
+      }
+
       setIsLoading(false);
     }
   }
@@ -169,7 +246,7 @@ export default function Index() {
     async function getUsersData() {
       try {
         setIsLoading(true);
-        const response = await axios.get('/users/');
+        const response = await axiosRest.get('/users/');
         setUsers(response.data);
         setIsLoading(false);
       } catch (err) {
@@ -185,7 +262,7 @@ export default function Index() {
       const workersOp = [];
       try {
         setIsLoading(true);
-        const response = await axios.get('/workers/');
+        const response = await axiosRest.get('/workers/');
         const workersJobs = response.data
           .filter(
             (value, index, arr) =>
@@ -251,7 +328,7 @@ export default function Index() {
 
       console.log(formattedValues);
       // RESERVA, ATUALIZA O INVENTARIO E JA BLOQUEIA
-      await axios.post(`/materials/reserve/`, formattedValues);
+      await axiosRest.post(`/materials/reserve/`, formattedValues);
 
       setIsLoading(false);
       setOpenCollapse(false);
@@ -272,7 +349,9 @@ export default function Index() {
   async function getReqMaterialsData(reqMaintenance) {
     try {
       setIsLoading(true);
-      const response = await axios.get(`/materials/in/rl/${reqMaintenance}`);
+      const response = await axiosRest.get(
+        `/materials/in/rl/${reqMaintenance}`
+      );
       setReqRMs(response.data);
       setIsLoading(false);
     } catch (err) {
@@ -647,6 +726,20 @@ export default function Index() {
                                 inventoryData={inventoryData}
                               />
 
+                              <ModalLoginSipac // modal p/ importar RM do sipac através de login
+                                handleClose={handleCloseModalLoginSipac}
+                                show={showModalLoginSipac}
+                                handleCancelModal={handleCancelModal}
+                                handleSaveModal={handleSaveModalLoginSipac}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                getCredentials={getCredentials}
+                                // push={push}
+                                // hiddenItems={values.MaterialReserveItems.map(
+                                //   (item) => item.materialId
+                                // )}
+                                // inventoryData={inventoryData}
+                              />
+
                               {values.MaterialReserveItems.length > 0 &&
                                 values.MaterialReserveItems.map(
                                   (item, index) => (
@@ -852,7 +945,7 @@ export default function Index() {
                         ) : null}
                       </Col>
                     </Row>
-                    <Row>
+                    <Row className="justify-content-between">
                       <Col xs="auto" className="text-center py-2">
                         <Button
                           variant="outline-secondary"
@@ -863,6 +956,42 @@ export default function Index() {
                         >
                           <FaSearch /> Pesquisar no saldo comum
                         </Button>
+                      </Col>
+                      <Col xs="auto" className="text-center py-2">
+                        <InputGroup>
+                          <InputGroup.Text
+                            id="basic-addon3"
+                            className="bg-light text-secondary"
+                          >
+                            Importar RM do SIPAC
+                          </InputGroup.Text>
+                          <Form.Control
+                            type="tel"
+                            name="RMSipac"
+                            style={{ width: '120px' }}
+                          />
+                          <Button
+                            id="button-addon1"
+                            variant="secondary"
+                            size="sm"
+                            // type="submit"
+                            onClick={(e) => {
+                              handleShowModalLoginSipac(
+                                formatReq(
+                                  e.currentTarget.previousElementSibling.value
+                                )
+                              );
+                              // console.log(
+                              //   formatReq(
+                              //     e.currentTarget.previousElementSibling.value
+                              //   )
+                              // );
+                              e.currentTarget.previousElementSibling.value = '';
+                            }}
+                          >
+                            <FaArrowAltCircleDown size={16} />
+                          </Button>
+                        </InputGroup>
                       </Col>
                     </Row>
                     <hr />
