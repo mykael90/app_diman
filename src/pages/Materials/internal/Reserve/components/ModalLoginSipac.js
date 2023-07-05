@@ -7,7 +7,13 @@ import { primaryDarkColor } from '../../../../../config/colors';
 import LoginSipac from '../../../../../components/LoginSipac';
 
 export default function ModalEdit(props) {
-  const { show, handleSaveModal, handleCancelModal, getCredentials } = props;
+  const {
+    show,
+    handleSaveModal,
+    handleCancelModal,
+    getCredentials,
+    setFieldValue,
+  } = props;
 
   // Manipulando o botão de voltar do navegador para não sair da página de reserva
   useEffect(() => {
@@ -49,6 +55,7 @@ export default function ModalEdit(props) {
           handleCancelModal={handleCancelModal}
           handleSaveModal={handleSaveModal}
           getCredentials={getCredentials}
+          setFieldValue={setFieldValue}
         />
       </Modal.Body>
       {/* <Modal.Footer>

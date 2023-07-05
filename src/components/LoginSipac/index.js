@@ -7,22 +7,27 @@ import * as Yup from 'yup';
 import { FaUser, FaSignInAlt, FaLock } from 'react-icons/fa';
 
 const LoginSchema = Yup.object().shape({
-  loginSipac: Yup.string().required('Required'),
+  usernameSipac: Yup.string().required('Required'),
   passwordSipac: Yup.string().required('Required'),
 });
 
-function LoginForm({ handleCancelModal, handleSaveModal, getCredentials }) {
+function LoginForm({
+  handleCancelModal,
+  handleSaveModal,
+  getCredentials,
+  setFieldValue,
+}) {
   const initialValues = {
-    loginSipac: '',
+    usernameSipac: '',
     passwordSipac: '',
   };
 
   const handleStore = (values, { setSubmitting }) => {
     // Handle form submission logic here
     // console.log(values);
-    getCredentials(values);
+    // getCredentials(values);
+    handleSaveModal(setFieldValue, values);
     setSubmitting(false);
-    handleSaveModal();
   };
 
   return (
@@ -45,20 +50,20 @@ function LoginForm({ handleCancelModal, handleSaveModal, getCredentials }) {
               <p className="h4 text-center pb-2">Login SIPAC</p>
             </Row> */}
             <Row className="justify-content-center">
-              <Form.Group as={Col} xs="12" controlId="loginSipac">
+              <Form.Group as={Col} xs="12" controlId="usernameSipac">
                 {/* <Form.Label>Login</Form.Label> */}
                 <InputGroup className="mb-3">
                   <InputGroup.Text id="basic-addon1">
                     <FaUser />
                   </InputGroup.Text>
-                  <Field type="text" name="loginSipac" as={Form.Control} />
+                  <Field type="text" name="usernameSipac" as={Form.Control} />
                 </InputGroup>
                 <Form.Control.Feedback
                   tooltip
                   type="invalid"
                   style={{ position: 'static' }}
                 >
-                  {errors.loginSipac}
+                  {errors.usernameSipac}
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>

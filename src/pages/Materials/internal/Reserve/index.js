@@ -18,10 +18,10 @@ import {
   Col,
   Form,
   Badge,
-  Dropdown,
-  ButtonGroup,
   Collapse,
   InputGroup,
+  ToggleButton,
+  ToggleButtonGroup,
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
@@ -73,6 +73,7 @@ export default function Index() {
   const [showModalSearch, setShowModalSearch] = useState(false);
   const [showModalLoginSipac, setShowModalLoginSipac] = useState(false);
   const [RMModal, setRMModal] = useState('');
+  const [importSipac, setImportSipac] = useState(false);
   const [userSipac, setUserSipac] = useState({});
   // Rel = release
   const [showModalRel, setShowModalRel] = useState(false);
@@ -104,10 +105,9 @@ export default function Index() {
     setShowModalLoginSipac(true);
   };
 
-  const handleSaveModalLoginSipac = () => {
-    console.log('rmModal', RMModal);
+  const handleSaveModalLoginSipac = (setFieldValue, credentials) => {
     // eslint-disable-next-line no-use-before-define
-    importRMSipac(RMModal);
+    importRMSipac(RMModal, setFieldValue, credentials);
     setShowModalLoginSipac(false);
   };
 
@@ -153,6 +153,9 @@ export default function Index() {
       .string()
       .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida')
       .required('Requerido'),
+    RMSipac: yup
+      .string()
+      .matches(/^[0-9]{1,5}$|^[0-9]+[/]{1}[0-9]{4}$/, 'Entrada inválida'),
     intendedUse: yup
       .date()
       .min(
@@ -201,27 +204,63 @@ export default function Index() {
   };
 
   function getCredentials(values) {
-    console.log(values);
     setUserSipac(values);
   }
 
-  async function importRMSipac(requisicoes) {
+  async function importRMSipac(requisicoes, setFieldValue, credentials) {
     try {
       setIsLoading(true);
 
-      const arrRequisicoes = { requisicoes: [requisicoes] };
+      const payload = { requisicoes: [requisicoes], user: credentials };
+
+      console.log('payload', payload);
 
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial`,
-        arrRequisicoes
+        `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial/reserve/`,
+        payload
       );
 
-      const RM = response.data;
+      if (response.data.errors.length > 0) {
+        showErrorsSipac(response.data.errors);
+        setIsLoading(false);
+        return;
+      }
 
-      console.log(RM);
+      const reqSipac = response.data.info[0];
 
+      console.log(reqSipac);
+
+      setFieldValue(
+        'reqMaintenance',
+        reqSipac.dadosJSON['Número da Requisição Relacionada'].match(
+          /^\d+\/\d{4}/
+        )[0]
+      );
+
+      const materials = reqSipac.itensJSON.map((item) => ({
+        materialId: item['Código'],
+        name: item['Denominação'],
+        unit: item['Unid. Med.'],
+        balancedQuantity: item['Qt.'],
+        value: item.Valor.replace(/\./g, '')
+          .replace(/,/g, '.')
+          .replace(/[^0-9\.]+/g, ''),
+        quantity: item['Qt.'],
+      }));
+
+      // verificar se os materiais existem na lista de inventário, retornar só os que existem
+      const foundObjects = materials.filter((obj) =>
+        inventoryData.some(
+          (objToFind) =>
+            obj.materialId.toString() === objToFind.materialId.toString()
+        )
+      );
+
+      setFieldValue('MaterialReserveItems', foundObjects);
+
+      // eslint-disable-next-line consistent-return
       setIsLoading(false);
-      if (response.data.errors) showErrorsSipac(response.data.errors);
+      setOpenCollapse(!openCollapse);
     } catch (err) {
       const status = get(err, 'response.status', 0);
 
@@ -394,6 +433,7 @@ export default function Index() {
     obs: '',
     MaterialReserveItems: [],
     searchMaterial: '',
+    RMSipac: '',
   };
   return (
     <>
@@ -438,6 +478,57 @@ export default function Index() {
                   setFieldValue={setFieldValue}
                   data={reqInModal}
                 />
+
+                <ModalLoginSipac // modal p/ importar RM do sipac através de login
+                  handleClose={handleCloseModalLoginSipac}
+                  show={showModalLoginSipac}
+                  handleCancelModal={handleCancelModal}
+                  handleSaveModal={handleSaveModalLoginSipac}
+                  setFieldValue={setFieldValue}
+                  // eslint-disable-next-line react/jsx-no-bind
+                  getCredentials={getCredentials}
+                  // push={push}
+                  // hiddenItems={values.MaterialReserveItems.map(
+                  //   (item) => item.materialId
+                  // )}
+                  // inventoryData={inventoryData}
+                />
+
+                {!openCollapse ? (
+                  <Row className="mb-3">
+                    <Col xs={12} md={4}>
+                      <ToggleButtonGroup
+                        type="radio"
+                        name="options"
+                        defaultValue={1}
+                      >
+                        <ToggleButton
+                          id="tbg-radio-1"
+                          value={1}
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => {
+                            setImportSipac(false);
+                          }}
+                        >
+                          Reserva OS
+                        </ToggleButton>
+                        <ToggleButton
+                          id="tbg-radio-2"
+                          value={2}
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => {
+                            setImportSipac(true);
+                          }}
+                        >
+                          Importar RM Sipac
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    </Col>
+                  </Row>
+                ) : null}
+
                 <Row>
                   <Form.Group
                     as={Col}
@@ -446,7 +537,9 @@ export default function Index() {
                     md={3}
                     lg={2}
                     controlId="reqMaintenance"
-                    className="pb-3"
+                    className={`pb-3 ${
+                      importSipac && !openCollapse ? 'd-none' : ''
+                    }`}
                   >
                     <Form.Label>MANUTENÇÃO</Form.Label>
                     <Form.Control
@@ -455,7 +548,7 @@ export default function Index() {
                       onChange={handleChange}
                       autoFocus
                       ref={inputRef}
-                      placeholder="Nº Requisição"
+                      placeholder="Nº OS"
                       onBlur={handleBlur}
                       readOnly={!!openCollapse}
                     />
@@ -465,9 +558,12 @@ export default function Index() {
                   </Form.Group>
 
                   {!openCollapse ? (
-                    <Col xs="auto" className="ps-1 pt-4">
+                    <Col
+                      xs="auto"
+                      className={`ps-1 pt-4 ${importSipac ? 'd-none' : ''}`}
+                    >
                       <Button
-                        type="submit"
+                        // type="submit"
                         variant="success"
                         onClick={() => {
                           if (
@@ -489,6 +585,61 @@ export default function Index() {
                         className="mt-2"
                       >
                         <FaPlus />
+                      </Button>
+                    </Col>
+                  ) : null}
+
+                  <Form.Group
+                    as={Col}
+                    xs={9}
+                    sm={5}
+                    md={3}
+                    lg={2}
+                    controlId="RMSipac"
+                    className={`pb-3 ${!importSipac ? 'd-none' : ''}`}
+                  >
+                    <Form.Label>IMPORTAR RM</Form.Label>
+                    <Form.Control
+                      type="tel"
+                      value={values.RMSipac}
+                      onChange={handleChange}
+                      placeholder="Nº RM"
+                      onBlur={handleBlur}
+                      readOnly={!!openCollapse}
+                    />
+                    {touched.RMSipac && !!errors.RMSipac ? (
+                      <Badge bg="danger">{errors.RMSipac}</Badge>
+                    ) : null}
+                  </Form.Group>
+
+                  {!openCollapse ? (
+                    <Col
+                      xs="auto"
+                      className={`ps-1 pt-4 ${!importSipac ? 'd-none' : ''}`}
+                    >
+                      <Button
+                        // type="submit"
+                        variant="success"
+                        onClick={() => {
+                          if (!!values.RMSipac && !errors.RMSipac) {
+                            setFieldValue(
+                              'RMSipac',
+                              formatReq(values.RMSipac) // formatar o numero da requisicao
+                            );
+                            handleShowModalLoginSipac(
+                              formatReq(values.RMSipac)
+                            );
+                            // setOpenCollapse(!openCollapse);
+                            // getReqMaterialsData(
+                            //   formatReq(values.reqMaintenance)
+                            // );
+                          }
+                        }}
+                        aria-controls="collapse-form"
+                        aria-expanded={openCollapse}
+                        className="mt-2"
+                      >
+                        <FaArrowAltCircleDown />
                       </Button>
                     </Col>
                   ) : null}
@@ -520,7 +671,10 @@ export default function Index() {
                           }}
                           onBlur={handleBlur}
                           placeholder="Selecione a RM"
-                          isDisabled={values.MaterialReserveItems.length > 0}
+                          isDisabled={
+                            values.MaterialReserveItems.length > 0 ||
+                            importSipac
+                          }
                         />
                       </Form.Group>
 
@@ -549,9 +703,9 @@ export default function Index() {
 
                       <Form.Group
                         as={Col}
-                        xs={12}
-                        md={6}
-                        lg={6}
+                        // xs={12}
+                        // md={6}
+                        // lg={6}
                         className="pb-3"
                       >
                         <Form.Label>AUTORIZADO POR:</Form.Label>
@@ -724,20 +878,6 @@ export default function Index() {
                                   (item) => item.materialId
                                 )}
                                 inventoryData={inventoryData}
-                              />
-
-                              <ModalLoginSipac // modal p/ importar RM do sipac através de login
-                                handleClose={handleCloseModalLoginSipac}
-                                show={showModalLoginSipac}
-                                handleCancelModal={handleCancelModal}
-                                handleSaveModal={handleSaveModalLoginSipac}
-                                // eslint-disable-next-line react/jsx-no-bind
-                                getCredentials={getCredentials}
-                                // push={push}
-                                // hiddenItems={values.MaterialReserveItems.map(
-                                //   (item) => item.materialId
-                                // )}
-                                // inventoryData={inventoryData}
                               />
 
                               {values.MaterialReserveItems.length > 0 &&
@@ -957,7 +1097,7 @@ export default function Index() {
                           <FaSearch /> Pesquisar no saldo comum
                         </Button>
                       </Col>
-                      <Col xs="auto" className="text-center py-2">
+                      {/* <Col xs="auto" className="text-center py-2">
                         <InputGroup>
                           <InputGroup.Text
                             id="basic-addon3"
@@ -971,7 +1111,7 @@ export default function Index() {
                             style={{ width: '120px' }}
                           />
                           <Button
-                            id="button-addon1"
+                            id="button-addon2"
                             variant="secondary"
                             size="sm"
                             // type="submit"
@@ -992,7 +1132,7 @@ export default function Index() {
                             <FaArrowAltCircleDown size={16} />
                           </Button>
                         </InputGroup>
-                      </Col>
+                      </Col> */}
                     </Row>
                     <hr />
 
