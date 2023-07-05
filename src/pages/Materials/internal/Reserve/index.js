@@ -211,9 +211,15 @@ export default function Index() {
     try {
       setIsLoading(true);
 
-      const payload = { requisicoes: [requisicoes], user: credentials };
+      const exists = await axiosRest.post('/materials/in/reqMaterial', {
+        req: requisicoes,
+      });
 
-      console.log('payload', payload);
+      console.log('requisicoes', requisicoes);
+
+      console.log('exists', exists.response);
+
+      const payload = { requisicoes: [requisicoes], user: credentials };
 
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial/reserve/`,
