@@ -566,9 +566,10 @@ export default function Index() {
                       className={`ps-1 pt-4 ${importSipac ? 'd-none' : ''}`}
                     >
                       <Button
-                        // type="submit"
+                        type="submit"
                         variant="success"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
                           if (
                             !!values.reqMaintenance &&
                             !errors.reqMaintenance
@@ -621,9 +622,10 @@ export default function Index() {
                       className={`ps-1 pt-4 ${!importSipac ? 'd-none' : ''}`}
                     >
                       <Button
-                        // type="submit"
+                        type="submit"
                         variant="success"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
                           if (!!values.RMSipac && !errors.RMSipac) {
                             setFieldValue(
                               'RMSipac',

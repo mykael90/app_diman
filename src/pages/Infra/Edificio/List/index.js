@@ -438,7 +438,7 @@ export default function Index() {
         width: 260,
         disableResizing: true,
         Filter: SelectColumnFilter,
-        filter: 'text',
+        filter: 'exactText',
         isVisible: window.innerWidth > 768,
         Cell: ({ value }) => <div className="text-start">{value}</div>,
       },
