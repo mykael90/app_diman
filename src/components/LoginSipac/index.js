@@ -2,13 +2,21 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { Formik, Field } from 'formik';
-import { Container, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Form,
+  InputGroup,
+  Badge,
+} from 'react-bootstrap';
 import * as Yup from 'yup';
 import { FaUser, FaSignInAlt, FaLock } from 'react-icons/fa';
 
 const LoginSchema = Yup.object().shape({
-  usernameSipac: Yup.string().required('Required'),
-  passwordSipac: Yup.string().required('Required'),
+  usernameSipac: Yup.string().required('Campo obrigatório'),
+  passwordSipac: Yup.string().required('Campo obrigatório'),
 });
 
 function LoginForm({
@@ -58,13 +66,14 @@ function LoginForm({
                   </InputGroup.Text>
                   <Field type="text" name="usernameSipac" as={Form.Control} />
                 </InputGroup>
-                <Form.Control.Feedback
-                  tooltip
-                  type="invalid"
+                <Badge
+                  pill
+                  bg="danger"
                   style={{ position: 'static' }}
+                  className="mt-0 mb-4"
                 >
                   {errors.usernameSipac}
-                </Form.Control.Feedback>
+                </Badge>
               </Form.Group>
             </Row>
             <Row className="justify-content-center">
@@ -79,6 +88,7 @@ function LoginForm({
                     name="passwordSipac"
                     as={Form.Control}
                   />
+
                   <Button
                     id="button-addon1"
                     variant="primary"
@@ -89,13 +99,14 @@ function LoginForm({
                     <FaSignInAlt />
                   </Button>
                 </InputGroup>
-                <Form.Control.Feedback
-                  tooltip
-                  type="invalid"
+                <Badge
+                  pill
+                  bg="danger"
                   style={{ position: 'static' }}
+                  className="mt-0 mb-4"
                 >
                   {errors.passwordSipac}
-                </Form.Control.Feedback>
+                </Badge>
               </Form.Group>
 
               {/* <Button
