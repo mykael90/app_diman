@@ -215,9 +215,10 @@ export default function Index() {
         req: requisicoes,
       });
 
-      console.log('requisicoes', requisicoes);
-
-      console.log('exists', exists.response);
+      if (exists.data)
+        throw new Error(
+          'Requisição já recebida pelo depósito provisório, realize a saída pela OS e vincule à RM desejada'
+        );
 
       const payload = { requisicoes: [requisicoes], user: credentials };
 
@@ -233,8 +234,6 @@ export default function Index() {
       }
 
       const reqSipac = response.data.info[0];
-
-      console.log(reqSipac);
 
       setFieldValue(
         'reqMaintenance',
@@ -273,9 +272,7 @@ export default function Index() {
       if (status === 401) {
         toast.error('Você precisa fazer login');
       } else {
-        toast.error(
-          'Ocorreu um erro ao importar a requisição, verifique a conexão'
-        );
+        toast.error(err.message);
       }
 
       setIsLoading(false);
