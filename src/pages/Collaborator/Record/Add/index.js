@@ -889,8 +889,10 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                                             .find(
                                               (contract) =>
                                                 String(contract.id) ===
-                                                values.WorkerContracts[index]
-                                                  .ContractId
+                                                String(
+                                                  values.WorkerContracts[index]
+                                                    .ContractId
+                                                )
                                             )
                                             ?.ContractUnidades?.map((i) => (
                                               <option
