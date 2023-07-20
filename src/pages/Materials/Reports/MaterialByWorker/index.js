@@ -375,7 +375,9 @@ export default function Index() {
     try {
       setIsLoading(true);
 
-      const response = await axios.get(`/materials/itemsworkers${queryString}`);
+      const response = await axios.get(
+        `/materials/itemsbyworkers${queryString}`
+      );
 
       response.data.forEach((material, index) => {
         // show differents workers for each material
