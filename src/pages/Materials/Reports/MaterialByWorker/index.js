@@ -375,9 +375,7 @@ export default function Index() {
     try {
       setIsLoading(true);
 
-      const response = await axios.get(
-        `/materials/workersbyitems${queryString}`
-      );
+      const response = await axios.get(`/materials/itemsworkers${queryString}`);
 
       response.data.forEach((material, index) => {
         // show differents workers for each material
@@ -1155,11 +1153,11 @@ export default function Index() {
       <Container>
         <Row className="text-center py-3">
           <Card.Title>
-            Relatório de Consumo: Colaborador por Material
+            Relatório de Consumo: Material por Colaborador
           </Card.Title>
           <Card.Text>
-            Usos e retornos referentes a todos os colaboradores por determinados
-            materiais
+            Usos e retornos referentes a todos os materiais por determinados
+            colaboradores
           </Card.Text>
         </Row>
 
