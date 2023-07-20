@@ -1153,9 +1153,12 @@ export default function Index() {
       <Container>
         <Row className="text-center py-3">
           <Card.Title>
-            Relatório de Consumo: Materiais por Colaborador
+            Relatório de Consumo: Colaborador por Material
           </Card.Title>
-          <Card.Text>Usos e retornos de materiais por colaborador</Card.Text>
+          <Card.Text>
+            Usos e retornos referentes a todos os colaboradores por determinados
+            materiais
+          </Card.Text>
         </Row>
 
         <TableGfilterNestedRowHiddenRows

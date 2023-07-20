@@ -63,7 +63,7 @@ export default function index() {
                 className="text-decoration-none"
                 to="/materials/reports/materialworker"
               >
-                <Nav.Link href="#7">Material x Colaborador</Nav.Link>
+                <Nav.Link href="#7">Colaborador p/ Material</Nav.Link>
               </Link>
             </Nav.Item>
           </Nav>
