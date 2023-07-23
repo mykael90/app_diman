@@ -425,17 +425,115 @@ export default function Index() {
       //   filter: 'text',
       // },
       {
-        Header: 'Nome',
-        accessor: 'name',
+        Header: () => <div className="text-start">Nome</div>,
+        id: 'name',
+        accessor: (originalRow) => (
+          <div className="text-start">{originalRow.name}</div>
+        ),
         isVisible: window.innerWidth > 768,
       },
-      // {
-      //   Header: 'Descrição',
-      //   accessor: 'name',
-      //   disableSortBy: true,
-      //   Filter: InputColumnFilter,
-      //   filter: 'text',
-      // },
+      {
+        Header: 'Nº Saídas',
+        accessor: (originalRow) => originalRow.MaterialOuts.length,
+        width: 80,
+        disableResizing: true,
+        // disableSortBy: true,
+        // Filter: InputColumnFilter,
+        // filter: 'text',
+      },
+      {
+        Header: 'Valor Total Saídas',
+        accessor: (originalRow) =>
+          originalRow.MaterialOuts.reduce((sum, m) => sum + m.value, 0),
+        width: 120,
+        disableResizing: true,
+        // disableSortBy: true,
+        // Filter: InputColumnFilter,
+        // filter: 'text',
+        Cell: ({ value }) =>
+          value.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          }),
+      },
+      {
+        Header: 'Nº Retornos',
+        accessor: (originalRow) =>
+          originalRow.MaterialOuts.filter((m) => m.MaterialReturned.length)
+            .length,
+        width: 80,
+        disableResizing: true,
+        // disableSortBy: true,
+        // Filter: InputColumnFilter,
+        // filter: 'text',
+      },
+      {
+        Header: 'Valor Total Retornos',
+        accessor: (originalRow) =>
+          originalRow.MaterialOuts.filter(
+            (m) => m.MaterialReturned.length
+          ).reduce((sum, m) => sum + m.value, 0),
+        width: 120,
+        disableResizing: true,
+        // disableSortBy: true,
+        // Filter: InputColumnFilter,
+        // filter: 'text',
+        Cell: ({ value }) =>
+          value.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          }),
+      },
+      {
+        Header: 'Nº Req. Manut.',
+        // differents requests for maintenance
+        accessor: (originalRow) =>
+          new Set(originalRow.MaterialOuts.map((m) => m.reqMaintenance)).size,
+        width: 80,
+        disableResizing: true,
+        // disableSortBy: true,
+        // Filter: InputColumnFilter,
+        // filter: 'text',
+      },
+      {
+        Header: 'N % Retorno',
+        // differents requests for maintenance
+        accessor: (originalRow) =>
+          (
+            originalRow.MaterialOuts.filter((m) => m.MaterialReturned.length)
+              .length / originalRow.MaterialOuts.length
+          ).toLocaleString('pt-BR', {
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+        width: 80,
+        disableResizing: true,
+        // disableSortBy: true,
+        // Filter: InputColumnFilter,
+        // filter: 'text',
+      },
+      {
+        Header: 'Valor % Retorno',
+        // differents requests for maintenance
+        accessor: (originalRow) =>
+          (
+            originalRow.MaterialOuts.filter(
+              (m) => m.MaterialReturned.length
+            ).reduce((sum, m) => sum + m.value, 0) /
+            originalRow.MaterialOuts.reduce((sum, m) => sum + m.value, 0)
+          ).toLocaleString('pt-BR', {
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+        width: 80,
+        disableResizing: true,
+        // disableSortBy: true,
+        // Filter: InputColumnFilter,
+        // filter: 'text',
+      },
+
       // {
       //   Header: 'Unidade',
       //   accessor: 'unit',
@@ -500,7 +598,7 @@ export default function Index() {
     //     desc: true,
     //   },
     // ],
-    pageSize: 50,
+    pageSize: 100,
     hiddenColumns: columns
       .filter((col) => col.isVisible === false)
       .map((col) => col.accessor),
@@ -954,41 +1052,48 @@ export default function Index() {
           //   isVisible: window.innerWidth > 768,
           // },
           {
-            Header: 'Nome',
+            Header: 'Material',
             accessor: 'name',
             isVisible: window.innerWidth > 768,
           },
           {
-            Header: 'Saída (Uso)',
-            width: 125,
+            Header: 'Qtd Saídas',
+            width: 80,
             disableResizing: true,
-            accessor: 'materialsOutItemsTotal',
+            accessor: (originalRow) => originalRow.qtdOut.toFixed(2),
             isVisible: window.innerWidth > 768,
           },
           {
-            Header: 'Retorno',
-            width: 125,
+            Header: 'Valor Total Saídas',
+            width: 120,
             disableResizing: true,
-            accessor: 'materialsInItemsTotal',
+            accessor: (originalRow) => originalRow.totalOut,
             isVisible: window.innerWidth > 768,
+            Cell: ({ value }) =>
+              value.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }),
           },
           {
-            Header: 'Uso Efetivo',
-            width: 125,
-            disableResizing: true,
-            accessor: 'materialsEffectiveItemsTotal',
-            isVisible: window.innerWidth > 768,
-          },
-          {
-            Header: '% Retorno',
-            width: 125,
+            Header: 'Qtd Retornos',
+            width: 80,
             disableResizing: true,
             accessor: (originalRow) =>
-              `${(
-                (originalRow.materialsInItemsTotal * 100) /
-                originalRow.materialsOutItemsTotal
-              ).toFixed(2)} %`,
+              originalRow.qtdReturned?.toFixed(2) ?? (0.0).toFixed(2),
             isVisible: window.innerWidth > 768,
+          },
+          {
+            Header: 'Valor Total Retornos',
+            width: 120,
+            disableResizing: true,
+            accessor: (originalRow) => originalRow.totalReturned ?? 0.0,
+            isVisible: window.innerWidth > 768,
+            Cell: ({ value }) =>
+              value.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }),
           },
           // {
           //   Header: 'Total',
@@ -1018,7 +1123,7 @@ export default function Index() {
           //   // eslint-disable-next-line react/destructuring-assignment
           // },
         ]}
-        data={row.original.Workers}
+        data={row.original.Materials}
         defaultColumn={{
           // Let's set up our default Filter UI
           // Filter: DefaultColumnFilter,

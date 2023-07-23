@@ -199,14 +199,14 @@ function FilterDate({ getData }) {
                 </Button>
               </Col>
             </Row>
-            <Row
+            {/* <Row
               className="text-center"
               style={{ background: primaryDarkColor, color: 'white' }}
             >
               <span className="fs-6">
                 LISTA DE COLABORADORES A SEREM PESQUISADOS
               </span>
-            </Row>
+            </Row> */}
             <FieldArray name="idWorker">
               {(fieldArrayProps) => {
                 const { remove, push } = fieldArrayProps;
@@ -216,7 +216,7 @@ function FilterDate({ getData }) {
                       {/* <Col sm="12" md="auto">
                             PESQUISA RÁPIDA:
                           </Col> */}
-                      <Col>
+                      {/* <Col>
                         {' '}
                         <Select
                           inputId="searchWorker"
@@ -234,7 +234,7 @@ function FilterDate({ getData }) {
                           escapeClearsValue
                           filterOption={filterOptions}
                         />
-                      </Col>
+                      </Col> */}
                     </Row>
                     <Row style={{ background: body2Color }}>
                       {values.idWorker?.length > 0 &&
