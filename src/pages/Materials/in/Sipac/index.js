@@ -12,11 +12,82 @@ import Loading from '../../../../components/Loading';
 import ImportSipac from './components/ImportSipac';
 import ResponseSipac from './components/ResponseSipac';
 
+import ModalLoginSipac from './components/ModalLoginSipac';
+
 export default function inputMaterial() {
   const userId = useSelector((state) => state.auth.user.id);
   const [reqs, setReqs] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sipac, setSipac] = useState({});
+
+  const [showModalLoginSipac, setShowModalLoginSipac] = useState(false);
+  const [RMModal, setRMModal] = useState([]);
+  const [userSipac, setUserSipac] = useState({});
+
+  const handleCancelModal = () => {
+    setShowModalLoginSipac(false);
+  };
+
+  const handleCloseModalLoginSipac = () => setShowModalLoginSipac(false);
+
+  const handleShowModalLoginSipac = (RM) => {
+    setRMModal(RM);
+    setShowModalLoginSipac(true);
+  };
+
+  const handleSaveModalLoginSipac = (setFieldValue, credentials) => {
+    // eslint-disable-next-line no-use-before-define
+    importRMSipac(RMModal, setFieldValue, credentials);
+    setShowModalLoginSipac(false);
+  };
+
+  function getCredentials(values) {
+    setUserSipac(values);
+  }
+
+  const showErrorsSipac = (errorsArray) => {
+    errorsArray.forEach((error) =>
+      toast.error(error, {
+        autoClose: false,
+        draggable: true,
+        closeOnClick: true,
+      })
+    );
+  };
+
+  async function importRMSipac(requisicoes, setFieldValue, credentials) {
+    try {
+      setIsLoading(true);
+
+      const payload = {
+        requisicoes,
+        user: credentials,
+      };
+
+      console.log('payload', payload);
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial`,
+        payload
+      );
+
+      setSipac({ ...sipac, ...response.data });
+
+      setReqs('');
+      setIsLoading(false);
+      if (response.data.errors) showErrorsSipac(response.data.errors);
+    } catch (err) {
+      const status = get(err, 'response.status', 0);
+
+      if (status === 401) {
+        toast.error('Você precisa fazer login');
+      } else {
+        toast.error(err.message);
+      }
+
+      setIsLoading(false);
+    }
+  }
 
   const addReq = (req) => {
     const currentYear = new Date().getFullYear();
@@ -71,47 +142,13 @@ export default function inputMaterial() {
     resetForm();
   };
 
-  const showErrorsSipac = (errorsArray) => {
-    errorsArray.forEach((error) =>
-      toast.error(error, {
-        autoClose: false,
-        draggable: true,
-        closeOnClick: true,
-      })
-    );
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      setIsLoading(true);
-      const requisicoes = {
-        requisicoes: Object.values(reqs).map((item) => item.req),
-      };
-      console.log(requisicoes);
-      const response = await axios.post(
-        `${process.env.REACT_APP_BASE_AXIOS_SIPAC}/reqmaterial`,
-        requisicoes
-      );
-      setSipac({ ...sipac, ...response.data });
+    const requisicoes = Object.values(reqs).map((item) => item.req);
 
-      setReqs('');
-      setIsLoading(false);
-      if (response.data.errors) showErrorsSipac(response.data.errors);
-    } catch (err) {
-      const status = get(err, 'response.status', 0);
-
-      if (status === 401) {
-        toast.error('Você precisa fazer login');
-      } else {
-        toast.error(
-          'Ocorreu um erro ao importar a requisição, verifique a conexão'
-        );
-      }
-
-      setIsLoading(false);
-    }
+    handleShowModalLoginSipac(requisicoes);
+    console.log(requisicoes);
   };
 
   const handleDelete = async (e, index) => {
@@ -208,6 +245,19 @@ export default function inputMaterial() {
     <>
       <Loading isLoading={isLoading} />
       <Container>
+        <ModalLoginSipac // modal p/ importar RM do sipac através de login
+          handleClose={handleCloseModalLoginSipac}
+          show={showModalLoginSipac}
+          handleCancelModal={handleCancelModal}
+          handleSaveModal={handleSaveModalLoginSipac}
+          // eslint-disable-next-line react/jsx-no-bind
+          getCredentials={getCredentials}
+          // push={push}
+          // hiddenItems={values.MaterialReserveItems.map(
+          //   (item) => item.materialId
+          // )}
+          // inventoryData={inventoryData}
+        />
         {!sipac.info?.length ? (
           <ImportSipac
             handleSubmit={handleSubmit}
