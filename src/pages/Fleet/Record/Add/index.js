@@ -672,7 +672,7 @@ export default function Car({ data = null }) {
                       controlId="payload"
                       className="pb-3"
                     >
-                      <BootstrapForm.Label>CARGA ÚTIL</BootstrapForm.Label>
+                      <BootstrapForm.Label>CARGA ÚTIL (KG)</BootstrapForm.Label>
 
                       <Field
                         type="text"
@@ -709,7 +709,7 @@ export default function Car({ data = null }) {
                       className="pb-3"
                     >
                       <BootstrapForm.Label>
-                        PESO BRUTO TOTAL
+                        PESO BRUTO TOTAL (KG)
                       </BootstrapForm.Label>
 
                       <Field
@@ -743,7 +743,7 @@ export default function Car({ data = null }) {
                       className="pb-3"
                     >
                       <BootstrapForm.Label>
-                        VOLUME DO TANQUE
+                        VOLUME DO TANQUE (L)
                       </BootstrapForm.Label>
 
                       <Field
