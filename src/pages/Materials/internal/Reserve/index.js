@@ -288,29 +288,29 @@ export default function Index() {
         req: requisicoes,
       });
 
-      console.log(exists);
-
-      if (!exists.data)
+      if (!exists.data.length)
         throw new Error(
           'Requisição não recebida pelo depósito provisório, verifique novamente ou contate o setor do almoxarifado'
         );
 
-          setFieldValue(
-          'reqMaintenance',
-          exists.data[0].reqMaintenance
+      if (!exists.data[0].MaterialReleases.length)
+        throw new Error(
+          'Requisição com materiais restritos, realize a saída pela OS e vincule à RM desejada'
         );
 
-        const materialReserveImport = exists.data[0].MaterialInItems.map(item=>
-        ({
+      setFieldValue('reqMaintenance', exists.data[0].reqMaintenance);
+
+      const materialReserveImport = exists.data[0].MaterialInItems.map(
+        (item) => ({
           materialId: item.MaterialId,
           name: item.Material.name,
           unit: item.Material.unit,
           quantity: item.quantity,
           value: item.value,
         })
-        )
+      );
 
-        setFieldValue('MaterialReserveItems', materialReserveImport);
+      setFieldValue('MaterialReserveItems', materialReserveImport);
 
       setIsLoading(false);
       setOpenCollapse(!openCollapse);
@@ -604,7 +604,9 @@ export default function Index() {
                     lg={2}
                     controlId="reqMaintenance"
                     className={`pb-3 ${
-                      (importSipac || importEntradas) && !openCollapse ? 'd-none' : ''
+                      (importSipac || importEntradas) && !openCollapse
+                        ? 'd-none'
+                        : ''
                     }`}
                   >
                     <Form.Label>MANUTENÇÃO</Form.Label>
@@ -626,7 +628,9 @@ export default function Index() {
                   {!openCollapse ? (
                     <Col
                       xs="auto"
-                      className={`ps-1 pt-4 ${importSipac || importEntradas ? 'd-none' : ''}`}
+                      className={`ps-1 pt-4 ${
+                        importSipac || importEntradas ? 'd-none' : ''
+                      }`}
                     >
                       <Button
                         type="submit"
@@ -751,7 +755,8 @@ export default function Index() {
                               formatReq(values.RMEntradas) // formatar o numero da requisicao
                             );
                             importRMEntrada(
-                              formatReq(values.RMEntradas),setFieldValue
+                              formatReq(values.RMEntradas),
+                              setFieldValue
                             );
                             // setOpenCollapse(!openCollapse);
                             // getReqMaterialsData(
