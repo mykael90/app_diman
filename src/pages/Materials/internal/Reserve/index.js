@@ -74,6 +74,7 @@ export default function Index() {
   const [showModalLoginSipac, setShowModalLoginSipac] = useState(false);
   const [RMModal, setRMModal] = useState('');
   const [importSipac, setImportSipac] = useState(false);
+  const [importEntradas, setImportEntradas] = useState(false);
   const [userSipac, setUserSipac] = useState({});
   // Rel = release
   const [showModalRel, setShowModalRel] = useState(false);
@@ -279,6 +280,53 @@ export default function Index() {
     }
   }
 
+  async function importRMEntrada(requisicoes, setFieldValue) {
+    try {
+      setIsLoading(true);
+
+      const exists = await axiosRest.post('/materials/in/reqMaterialArray', {
+        req: requisicoes,
+      });
+
+      console.log(exists);
+
+      if (!exists.data)
+        throw new Error(
+          'Requisição não recebida pelo depósito provisório, verifique novamente ou contate o setor do almoxarifado'
+        );
+
+          setFieldValue(
+          'reqMaintenance',
+          exists.data[0].reqMaintenance
+        );
+
+        const materialReserveImport = exists.data[0].MaterialInItems.map(item=>
+        ({
+          materialId: item.MaterialId,
+          name: item.Material.name,
+          unit: item.Material.unit,
+          quantity: item.quantity,
+          value: item.value,
+        })
+        )
+
+        setFieldValue('MaterialReserveItems', materialReserveImport);
+
+      setIsLoading(false);
+      setOpenCollapse(!openCollapse);
+    } catch (err) {
+      const status = get(err, 'response.status', 0);
+
+      if (status === 401) {
+        toast.error('Você precisa fazer login');
+      } else {
+        toast.error(err.message);
+      }
+
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
     // Focus on inputRef
     if (inputRef.current) {
@@ -437,6 +485,7 @@ export default function Index() {
     MaterialReserveItems: [],
     searchMaterial: '',
     RMSipac: '',
+    RMEntradas: '',
   };
   return (
     <>
@@ -499,7 +548,7 @@ export default function Index() {
 
                 {!openCollapse ? (
                   <Row className="mb-3">
-                    <Col xs={12} md={4}>
+                    <Col xs={12} md={6}>
                       <ToggleButtonGroup
                         type="radio"
                         name="options"
@@ -512,6 +561,7 @@ export default function Index() {
                           size="sm"
                           onClick={() => {
                             setImportSipac(false);
+                            setImportEntradas(false);
                           }}
                         >
                           Reserva OS
@@ -523,9 +573,22 @@ export default function Index() {
                           size="sm"
                           onClick={() => {
                             setImportSipac(true);
+                            setImportEntradas(false);
                           }}
                         >
-                          Importar RM Sipac
+                          Importar RM SIPAC
+                        </ToggleButton>
+                        <ToggleButton
+                          id="tbg-radio-3"
+                          value={3}
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => {
+                            setImportSipac(false);
+                            setImportEntradas(true);
+                          }}
+                        >
+                          Importar RM Entradas
                         </ToggleButton>
                       </ToggleButtonGroup>
                     </Col>
@@ -541,7 +604,7 @@ export default function Index() {
                     lg={2}
                     controlId="reqMaintenance"
                     className={`pb-3 ${
-                      importSipac && !openCollapse ? 'd-none' : ''
+                      (importSipac || importEntradas) && !openCollapse ? 'd-none' : ''
                     }`}
                   >
                     <Form.Label>MANUTENÇÃO</Form.Label>
@@ -563,7 +626,7 @@ export default function Index() {
                   {!openCollapse ? (
                     <Col
                       xs="auto"
-                      className={`ps-1 pt-4 ${importSipac ? 'd-none' : ''}`}
+                      className={`ps-1 pt-4 ${importSipac || importEntradas ? 'd-none' : ''}`}
                     >
                       <Button
                         type="submit"
@@ -616,6 +679,29 @@ export default function Index() {
                     ) : null}
                   </Form.Group>
 
+                  <Form.Group
+                    as={Col}
+                    xs={9}
+                    sm={5}
+                    md={3}
+                    lg={2}
+                    controlId="RMEntradas"
+                    className={`pb-3 ${!importEntradas ? 'd-none' : ''}`}
+                  >
+                    <Form.Label>IMPORTAR RM</Form.Label>
+                    <Form.Control
+                      type="tel"
+                      value={values.RMEntradas}
+                      onChange={handleChange}
+                      placeholder="Nº RM"
+                      onBlur={handleBlur}
+                      readOnly={!!openCollapse}
+                    />
+                    {touched.RMEntradas && !!errors.RMEntradas ? (
+                      <Badge bg="danger">{errors.RMEntradas}</Badge>
+                    ) : null}
+                  </Form.Group>
+
                   {!openCollapse ? (
                     <Col
                       xs="auto"
@@ -633,6 +719,39 @@ export default function Index() {
                             );
                             handleShowModalLoginSipac(
                               formatReq(values.RMSipac)
+                            );
+                            // setOpenCollapse(!openCollapse);
+                            // getReqMaterialsData(
+                            //   formatReq(values.reqMaintenance)
+                            // );
+                          }
+                        }}
+                        aria-controls="collapse-form"
+                        aria-expanded={openCollapse}
+                        className="mt-2"
+                      >
+                        <FaArrowAltCircleDown />
+                      </Button>
+                    </Col>
+                  ) : null}
+
+                  {!openCollapse ? (
+                    <Col
+                      xs="auto"
+                      className={`ps-1 pt-4 ${!importEntradas ? 'd-none' : ''}`}
+                    >
+                      <Button
+                        type="submit"
+                        variant="success"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!!values.RMEntradas && !errors.RMEntradas) {
+                            setFieldValue(
+                              'RMEntradas',
+                              formatReq(values.RMEntradas) // formatar o numero da requisicao
+                            );
+                            importRMEntrada(
+                              formatReq(values.RMEntradas),setFieldValue
                             );
                             // setOpenCollapse(!openCollapse);
                             // getReqMaterialsData(
@@ -678,7 +797,8 @@ export default function Index() {
                           placeholder="Selecione a RM"
                           isDisabled={
                             values.MaterialReserveItems.length > 0 ||
-                            importSipac
+                            importSipac ||
+                            importEntradas
                           }
                         />
                       </Form.Group>
