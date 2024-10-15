@@ -719,7 +719,7 @@ export default function Index({ data, handleCancelModal, handleSaveModal }) {
                                           onBlur={handleBlur}
                                           disabled={
                                             initialValues.WorkerContracts[index]
-                                              ?.acting
+                                              ?.end
                                           }
                                         >
                                           <option>Selecione a atuação</option>
