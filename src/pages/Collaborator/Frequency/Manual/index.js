@@ -195,18 +195,19 @@ export default function Index({ id = null }) {
 
         const differentsContracts = Array.from(
           new Set(
-            response.data.map((w) =>
-              JSON.stringify(w.WorkerContracts[0]?.Contract)
+            response.data.flatMap((w) =>
+              w.WorkerContracts.map((contract) =>
+                JSON.stringify(contract?.Contract)
+              )
             )
           )
         ).map((json) => JSON.parse(json));
+
         const differentsUnidades = Array.from(
           new Set(
-            response.data.map((w) =>
-              JSON.stringify(
-                w.WorkerContracts[0]?.Unidade
-                  ? w.WorkerContracts[0]?.Unidade
-                  : ''
+            response.data.flatMap((w) =>
+              w.WorkerContracts.map((contract) =>
+                JSON.stringify(contract?.Unidade ? contract?.Unidade : '')
               )
             )
           )
@@ -551,13 +552,16 @@ export default function Index({ id = null }) {
                                   .filter(
                                     // filtrando por contrato e unidade
                                     (v) =>
-                                      v.WorkerContracts[0]?.unidadeId ===
-                                        values.UnidadeId &&
-                                      v.WorkerContracts[0]?.ContractId ===
-                                        values.ContractId &&
-                                      (values.showInactives
-                                        ? true
-                                        : !v.WorkerContracts[0]?.end)
+                                      v.WorkerContracts.some(
+                                        (contract) =>
+                                          contract.unidadeId ===
+                                            values.UnidadeId &&
+                                          contract.ContractId ===
+                                            values.ContractId &&
+                                          (values.showInactives
+                                            ? true
+                                            : !contract.end)
+                                      )
                                   )
                                   .filter(
                                     // nao pode adicionar o mesmo item 2x
